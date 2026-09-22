@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#172033">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <title>Daniel 的桌游</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#101522; color:#f7f3e9; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at top,#273958,#101522 55%); }
+    main { width:min(100% - 32px, 620px); margin:auto; padding:clamp(32px,8vh,72px) 0 40px; }
+    h1 { margin:0; font-size:clamp(2.2rem,10vw,4rem); letter-spacing:-.06em; }
+    .subtitle { margin:8px 0 22px; color:#b8c3d6; letter-spacing:.08em; text-transform:uppercase; }
+    #offline-status { min-height:24px; margin-bottom:18px; color:#86efac; }
+    .games { display:grid; gap:14px; }
+    .game { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px; border:1px solid #405274; border-radius:22px; background:#1b2940e8; box-shadow:0 12px 30px #0003; }
+    .game h2 { margin:0 0 5px; font-size:1.18rem; }
+    .game p { margin:0; color:#aebbd0; font-size:.9rem; }
+    a { color:inherit; text-decoration:none; }
+    .launch { flex:none; padding:12px 15px; border-radius:14px; background:#f3c969; color:#172033; font-weight:800; white-space:nowrap; }
+    @media (max-width:420px) { .game { align-items:flex-start; flex-direction:column; } .launch { width:100%; text-align:center; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Daniel 的桌游</h1>
+    <p class="subtitle">Offline Party Games</p>
+    <div id="offline-status" role="status" aria-live="polite">正在准备离线资源…</div>
+    <section class="games" aria-label="桌游列表">
+      <a class="game" href="./games/fake-artist-new-york/"><div><h2>🎨 伪艺术家纽约行</h2><p>单手机传阅版身份推理</p></div><span class="launch">进入游戏</span></a>
+      <a class="game" href="./games/fake-painter/"><div><h2>🖼️ 赝品画师</h2><p>看画、传阅、找出赝品画师</p></div><span class="launch">进入游戏</span></a>
+      <a class="game" href="./games/pick-one-for-me/"><div><h2>🎲 今天纠结什么</h2><p>把选择交给随机命运</p></div><span class="launch">进入游戏</span></a>
+      <a class="game" href="./games/spyfall/"><div><h2>🕵️ 间谍危机</h2><p>Spyfall 多人问答派对</p></div><span class="launch">进入游戏</span></a>
+      <a class="game" href="./games/werewords-companion/"><div><h2>🌙 Werewords</h2><p>狼人真言桌面伴侣</p></div><span class="launch">进入游戏</span></a>
+    </section>
+  </main>
+  <script>
+    const status = document.querySelector('#offline-status');
+    const setStatus = (text, ok = false) => { status.textContent = text; status.style.color = ok ? '#86efac' : '#f3c969'; };
+    window.addEventListener('online', () => setStatus('✓ 在线，离线资源会自动更新', true));
+    window.addEventListener('offline', () => setStatus('离线模式'));
+    if (!navigator.onLine) setStatus('离线模式');
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').then(reg => {
+      if (navigator.serviceWorker.controller) setStatus(navigator.onLine ? '✓ 离线游戏已准备完成' : '离线模式', true);
+      reg.addEventListener('updatefound', () => setStatus('正在准备离线资源…'));
+    }).catch(() => setStatus('正在准备离线资源…'));
+  </script>
+</body>
+</html>

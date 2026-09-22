@@ -1,0 +1,5 @@
+.DS_Store
+Thumbs.db
+.openai/
+_site_stage/
+werewords-companion.tar.gz

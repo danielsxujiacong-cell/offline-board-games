@@ -1,0 +1,7 @@
+.DS_Store
+Thumbs.db
+*.log
+.github-downloads/
+node_modules/
+.openai/
+_site_stage/

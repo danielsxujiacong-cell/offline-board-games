@@ -1,0 +1,16 @@
+/* Shared Apple-style result feedback: soft focus, content-led lock, restrained particles. */
+.result-panel.show:before{display:none}
+.result-panel .result-glow{position:absolute;left:50%;top:42%;width:210px;height:170px;border:0;border-radius:50%;background:radial-gradient(ellipse at center,rgba(238,118,88,.14) 0%,rgba(238,118,88,.07) 32%,rgba(238,118,88,0) 74%);filter:blur(18px);opacity:0;transform:translate(-50%,-50%) scale(.94);z-index:0;pointer-events:none;animation:feedback-breathe 1.35s ease-in-out infinite}
+.food-state-spinning .result-panel .result-glow,.tool-state-spinning .result-panel .result-glow{opacity:.52}
+.result-panel.locked{animation:none}
+.result-panel.locked .result-glow{animation:feedback-pulse .62s cubic-bezier(.2,.8,.25,1) both}
+.result-panel .result-label,.result-panel .result-value,.result-panel .result-actions{z-index:2}
+.result-panel .result-value{transform:translateZ(0);backface-visibility:hidden}
+.result-panel.locked .result-value{animation:feedback-lock .58s cubic-bezier(.2,.92,.28,1.16) both}
+.result-particles{z-index:1;inset:50% 0 auto;height:1px}
+.result-particles i{width:var(--size);height:var(--size);background:rgba(238,118,88,.46);animation:feedback-particle .68s ease-out var(--delay) both}
+@keyframes feedback-breathe{0%,100%{transform:translate(-50%,-50%) scale(.94);opacity:.36}50%{transform:translate(-50%,-50%) scale(1.03);opacity:.58}}
+@keyframes feedback-pulse{0%{transform:translate(-50%,-50%) scale(.72);opacity:.62}100%{transform:translate(-50%,-50%) scale(1.32);opacity:0}}
+@keyframes feedback-lock{0%{opacity:.7;transform:scale(.92);filter:blur(3px)}58%{opacity:1;transform:scale(1.06);filter:blur(0)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+@keyframes feedback-particle{0%{opacity:0;transform:translate(0,0) scale(.7)}20%{opacity:.42}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.35)}}
+@media(prefers-reduced-motion:reduce){.result-panel .result-glow{animation:none;opacity:.18}.result-panel.locked .result-value{animation:none;opacity:1;filter:none}.result-particles{display:none}}

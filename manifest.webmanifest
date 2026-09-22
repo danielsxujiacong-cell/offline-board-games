@@ -1,0 +1,14 @@
+{
+  "name": "Daniel 的桌游",
+  "short_name": "Daniel桌游",
+  "description": "五款可以断网游玩的手机桌游合集",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#172033",
+  "background_color": "#101522",
+  "icons": [
+    { "src": "./assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
