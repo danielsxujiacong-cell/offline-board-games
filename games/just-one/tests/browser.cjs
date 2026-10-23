@@ -40,8 +40,8 @@ const assert = require('node:assert/strict');
  await page.screenshot({path:'outputs/just-one-landscape.png',fullPage:true});
  await page.click('#clear'); assert.equal(await page.inputValue('#clue'),'');
  await page.reload(); assert.equal(await page.inputValue('#clue'),'');
- await page.evaluate(async()=>{await navigator.serviceWorker.ready; if(!navigator.serviceWorker.controller) await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));});
- const cached=await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v5');return (await c.keys()).map(r=>r.url);});
+ await page.evaluate(async()=>{await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject)=>setTimeout(()=>reject(new Error('Service Worker installation exceeded 120s')),120000))]); if(!navigator.serviceWorker.controller) await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));});
+ const cached=await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v6');return (await c.keys()).map(r=>r.url);});
  assert.ok(cached.some(u=>u.endsWith('/data/insane.csv')));
  await context.setOffline(true);
  await page.reload(); await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('/ 13'));
@@ -54,6 +54,6 @@ const assert = require('node:assert/strict');
  }
  assert.deepEqual(errors,[]);
  await context.setOffline(false);
- console.log('PASS: 3 CSV loads; 13 unique cards; resume/restart/end; clue edit/resize/hide/clear; portrait/landscape; direct URL; SW v5; six offline entries and lobby return; no page errors.');
+ console.log('PASS: 3 CSV loads; 13 unique cards; resume/restart/end; clue edit/resize/hide/clear; portrait/landscape; direct URL; SW v6; six offline entries and lobby return; no page errors.');
  await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});
