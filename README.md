@@ -28,7 +28,7 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v12` 版本缓存大厅、十一个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v13` 版本缓存大厅、十一个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
 
 ## Just One 维护与发布
 
