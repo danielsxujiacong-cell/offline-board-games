@@ -5,3 +5,9 @@ Thumbs.db
 node_modules/
 .openai/
 _site_stage/
+
+cache/
+outputs/
+.env
+.env.*
+!.env.example

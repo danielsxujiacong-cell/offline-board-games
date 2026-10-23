@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f2e9"><title>独家暗语 Just One · Daniel 的桌游</title><link rel="stylesheet" href="styles.css"></head>
+<body><main>
+<header><span class="eyebrow">OFFLINE PARTY GAME</span><h1>独家暗语 <span>Just One</span></h1><p>一个词，一份默契。让你的提示独一无二。</p></header>
+<nav aria-label="游戏模式"><button id="bank-tab" aria-pressed="true">题库模式</button><button id="board-tab" aria-pressed="false">白板模式</button></nav>
+<section id="bank"><div class="settings"><label>难度 <select id="difficulty"><option value="normal">普通</option><option value="hard">困难</option><option value="insane">变态</option></select></label><button id="restart">重新开局</button></div>
+<p id="status" role="status" aria-live="polite">正在加载题库…</p><progress id="progress" max="13" value="1" aria-label="题卡进度"></progress>
+<article class="card"><p class="warning">猜题者请先闭眼或转身</p><div id="cover"><h2>准备好再看题卡</h2><p>猜题者盲选一个数字 1–5。<br>其他玩家查看题卡，用对应词语写提示。</p></div><ol id="words" hidden></ol><button id="reveal" disabled>展示题卡</button></article>
+<button id="next" class="primary" disabled>下一题</button><p class="rules">每人独立写一个提示词 → 玩家自行检查并取消重复或无效提示 → 猜题者根据剩余提示猜词。共 13 张题卡，自行计分。</p></section>
+<section id="board" hidden><p class="board-tip">横屏更适合展示 · 提示词仅留在当前页面</p><form id="editor"><label for="clue">你的提示词</label><div class="input-row"><input id="clue" maxlength="30" autocomplete="off" placeholder="输入一个提示词"><button class="primary" type="submit">大字展示</button></div></form><div id="display" aria-live="polite"><span id="clue-text">等待你的暗语</span></div><div class="toolbar"><button id="smaller" aria-label="缩小文字">A−</button><button id="larger" aria-label="放大文字">A＋</button><button id="edit">修改</button><button id="toggle">隐藏</button><button id="clear">清空</button></div><p class="rules">先隐藏提示，再与其他玩家检查重复；轮到猜题者时展示保留下来的提示。</p></section>
+<footer>同一个网址，自由选择题库或白板 · 无需房间，无需同步</footer>
+</main><script src="app.js"></script><script src="../../assets/home-link.js"></script></body></html>

@@ -1,6 +1,6 @@
 # Daniel 的桌游
 
-五款手机优先、可安装、可断网游玩的桌游合集 PWA。
+六款手机优先、可安装、可断网游玩的桌游合集 PWA。
 
 ## 本地运行
 
@@ -17,8 +17,9 @@ python -m http.server 8080
 - 今天纠结什么
 - 间谍危机 Spyfall
 - Werewords Companion
+- 独家暗语 Just One（题库 / 本地白板）：`/games/just-one/`
 
-五个游戏的运行文件都在 `games/` 内，首页没有 iframe 或外链启动逻辑。`sync-games.ps1` 可从五个独立原项目重新同步发行快照，并排除 `.git`、缓存和开发目录。
+六个游戏的运行文件都在 `games/` 内，首页没有 iframe 或外链启动逻辑。`sync-games.ps1` 可从五个独立原项目重新同步发行快照，并排除 `.git`、缓存和开发目录。
 
 ## 离线安装
 
@@ -26,4 +27,10 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v1` 版本缓存大厅、五个游戏的 HTML/CSS/JS/图片和本地字体候选资源。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v5` 版本缓存大厅、六个游戏的 HTML/CSS/JS/图片和本地字体候选资源。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+
+## Just One 维护与发布
+
+新增游戏直接在本仓库维护，不属于五个来源的同步脚本。词库为 `games/just-one/data/` 下三份 UTF-8 BOM CSV，每份 60 张卡，维护方法见同目录说明。运行 `node games/just-one/validate-data.cjs` 验证题库；本项目无构建步骤和 package.json。
+
+GitHub main 为最终来源，通过现有 EdgeOne 链路发布至 https://games.danielxu.cn/ 。同步前先检查工作区，干净时使用 `git pull --ff-only`；提交前检查差异和忽略规则，验证后 commit / push，不覆盖本地修改。

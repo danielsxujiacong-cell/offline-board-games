@@ -1,6 +1,13 @@
-const CACHE_NAME = 'daniel-board-games-v4';
+const CACHE_NAME = 'daniel-board-games-v5';
 const PRECACHE = [
   './',
+  './games/just-one/',
+  './games/just-one/index.html',
+  './games/just-one/styles.css',
+  './games/just-one/app.js',
+  './games/just-one/data/normal.csv',
+  './games/just-one/data/hard.csv',
+  './games/just-one/data/insane.csv',
   './assets/icon.svg',
   './assets/favicon.svg?v=1',
   './games/fake-artist-new-york/data/words.js',
