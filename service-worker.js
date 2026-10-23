@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v3';
+const CACHE_NAME = 'daniel-board-games-v4';
 const PRECACHE = [
   './',
   './assets/icon.svg',
