@@ -2,6 +2,8 @@
 
 2026-10-23 嘴炮炸弹：新增 `/pass-the-bomb/`，在本仓库直接维护，无需构建。三模式 × 三难度，共九份 UTF-8 BOM TSV / 270 题，包含维护用答案示例。自定义最短/最长秒数，允许 0 和小数，0～0 立即爆炸；同一轮固定截止时间，传递和应用设置不会重抽时间，设置用于下一轮。Date.now + performance.now 双时钟、后台恢复检查、一次性爆炸保护，Web Audio 合成音效和可选震动。未添加人数、计分、账号或联网功能。
 
+发布验收：实现提交 `0cb3da8` 已推送 origin/main，GitHub Pages 工作流 39972225310 成功；EdgeOne 自定义域名已独立验证。真实 HTTPS 首页入口及 `/pass-the-bomb/` 均返回新页面，线上浏览器通过九份 TSV / 270 题加载、九种模式/难度的 0 秒回合与无页面错误检查。Just One 原有浏览器回归也通过，仅将其缓存版本断言由 v8 更新至 v9，未改游戏逻辑。项目静态发布，无额外构建命令。后续可直接在手机访问 https://games.danielxu.cn/pass-the-bomb/ 试玩音量、震动和题目难度。
+
 本轮验证：`node --check pass-the-bomb/app.js`、`node --check service-worker.js`、`node pass-the-bomb/tests/browser.cjs` 通过。自动化覆盖九份题库、九种组合、0/小数/固定/随机时间、传递不重置、运行中设置、后台恢复、一次爆炸、音效开关，320/390/844 手机视口及七个真实离线入口（检查没有退回大厅）。输出截图在被忽略的 outputs/。使用已有 Playwright：`NODE_PATH=D:\_Codex project\02_Game\werewords-game-mvp\node_modules`；HTTP 服务端口 8096，测试通过 TEST_URL 指定。实际手机的扬声器/震动仍依赖用户设备，未声称真机验证。
 
 Service Worker v9 新增炸弹和题库预缓存，并补齐原五游戏目录 URL，避免离线点目录入口时退回大厅；原游戏业务源码未改。部署沿用 main → EdgeOne 自动发布，同时 GitHub Pages 仍配置为 main 根目录；自定义域名应独立进行 HTTP 内容验证。后续只需按 Excel 维护 TSV 并递增缓存版本，不要重跑初始种子脚本覆盖人工修改。
