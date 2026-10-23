@@ -1,5 +1,10 @@
-const CACHE_NAME = 'daniel-board-games-v8';
+const CACHE_NAME = 'daniel-board-games-v9';
 const PRECACHE = [
+  './games/friend-court/',
+  './games/friend-court/index.html',
+  './games/friend-court/styles.css',
+  './games/friend-court/questions.js',
+  './games/friend-court/app.js',
   './',
   './games/just-one/',
   './games/just-one/index.html',
