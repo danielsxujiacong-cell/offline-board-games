@@ -50,6 +50,8 @@ GitHub main 为最终来源，通过现有 EdgeOne 链路发布至 https://games
 
 统一源码在 `assets/party.js`、`assets/party.css`，硬编码词库在 `assets/party-data.js`。Tailwind CDN 为渐进增强，离线基础样式全部本地提供，游戏无后端、无构建步骤。音效偏好存浏览器本地，身份与简历只存当前页面内存；刷新/切换游戏会结束本局。
 
+题库现有 **120 条演技限制令、96 个聊天话题、64 个完整双簧剧本、120 个职位、288 个特长**；全部硬编码内置。联网参考来源与筛选口径见 [题库维护](docs/PARTY_LIBRARY.md)。
+
 验证：`node assets/tests/party-browser.cjs`，需现有 Playwright 安装和 HTTP 服务，`TEST_URL` 指定服务地址。
 
 ## 损友审判庭
