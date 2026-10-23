@@ -1,6 +1,6 @@
 # Daniel 的桌游
 
-七款手机优先、可安装、可断网游玩的桌游合集 PWA。
+十款手机优先、可安装、可断网游玩的桌游合集 PWA。
 
 ## 本地运行
 
@@ -28,7 +28,7 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v9` 版本缓存大厅、七个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v9` 版本缓存大厅、十个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
 
 ## Just One 维护与发布
 
@@ -41,3 +41,13 @@ GitHub main 为最终来源，通过现有 EdgeOne 链路发布至 https://games
 九份题库在 `pass-the-bomb/data/`，可用 Excel 编辑；列为 `id`、`prompt`、`example`，保存为 UTF-8 制表符分隔文本。示例用于确认有解，不会在游戏中显示。每份至少保留 30 行，字段不能含制表符或换行。`make-data.py` 仅记录初始种子，手工编辑 TSV 后不要重新运行，以免覆盖修改。
 
 普通接词无字数限制，困难至少三字，变态只接四字成语；均允许同音字。场景/脑洞由现场玩家判断合理答案。默认引信 15～45 秒，支持 0～0 秒立即爆炸。设置适用于所有模式，下次点燃使用；正在燃烧的引信保持原截止时间。后台不暂停，恢复时检查截止时间。音效与震动依赖设备支持。无构建步骤，测试命令见 AGENTS。
+
+## 派对演技三部曲
+
+- `/wasabi-roulette/` 芥末俄罗斯轮盘：4–10 人传阅、秘密指令与 180 秒聊天。
+- `/two-faced/` 双簧大忽悠：两位演员独立防窥卡、完整荒谬剧本与 180 秒审讯。
+- `/fun-employed/` 戏精求职部：2–10 位应聘者加 HR，三词简历、45 秒路演与录用撒花。
+
+统一源码在 `assets/party.js`、`assets/party.css`，硬编码词库在 `assets/party-data.js`。Tailwind CDN 为渐进增强，离线基础样式全部本地提供，游戏无后端、无构建步骤。音效偏好存浏览器本地，身份与简历只存当前页面内存；刷新/切换游戏会结束本局。
+
+验证：`node assets/tests/party-browser.cjs`，需现有 Playwright 安装和 HTTP 服务，`TEST_URL` 指定服务地址。

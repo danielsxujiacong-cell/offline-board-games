@@ -22,6 +22,10 @@
     a { color:inherit; text-decoration:none; }
     .launch { flex:none; padding:12px 15px; border-radius:14px; background:#f3c969; color:#172033; font-weight:800; white-space:nowrap; }
     @media (max-width:420px) { .game { align-items:flex-start; flex-direction:column; } .launch { width:100%; text-align:center; } }
+    .neon { border:3px solid var(--accent); box-shadow:5px 5px 0 var(--accent); background:#171723; margin-bottom:6px; }
+    .neon h2 { color:var(--accent); font-size:1.3rem; }
+    .neon .launch { background:var(--accent); font-weight:900; }
+    .neon-lime { --accent:#c5ff4a; } .neon-pink { --accent:#ff58b6; } .neon-cyan { --accent:#56e5ff; }
   </style>
 </head>
 <body>
@@ -30,6 +34,9 @@
     <p class="subtitle">Offline Party Games</p>
     <div id="offline-status" role="status" aria-live="polite">正在准备离线资源…</div>
     <section class="games" aria-label="桌游列表">
+      <a class="game neon neon-lime" href="./wasabi-roulette/"><div><h2>🥵 芥末俄罗斯轮盘</h2><p>3 分钟微表情演技局 · 找出藏在身边的影帝</p></div><span class="launch">开演</span></a>
+      <a class="game neon neon-pink" href="./two-faced/"><div><h2>🎭 双簧大忽悠</h2><p>一个真专家，一个全靠编 · 记者团请发难</p></div><span class="launch">开演</span></a>
+      <a class="game neon neon-cyan" href="./fun-employed/"><div><h2>💼 戏精求职部</h2><p>三个离谱特长 · 45 秒把老板忽悠瘸</p></div><span class="launch">开演</span></a>
       <a class="game" href="./pass-the-bomb/"><div><h2>💣 嘴炮炸弹 Pass the Bomb</h2><p>中文接词 · 场景联想 · 脑洞炸弹</p></div><span class="launch">点燃引信</span></a>
       <a class="game" href="./games/fake-artist-new-york/"><div><h2>🎨 伪艺术家纽约行</h2><p>单手机传阅版身份推理</p></div><span class="launch">进入游戏</span></a>
       <a class="game" href="./games/fake-painter/"><div><h2>🖼️ 赝品画师</h2><p>看画、传阅、找出赝品画师</p></div><span class="launch">进入游戏</span></a>

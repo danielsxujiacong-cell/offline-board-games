@@ -20,3 +20,11 @@ Service Worker v9 新增炸弹和题库预缓存，并补齐原五游戏目录 U
 
 
 2026-10-23 题库扩充：普通、困难、变态各追加 40 张 / 200 词，目前各 100 张 / 500 词，全库 1500 词无完全重复。原有 60 张均保持内容不变；保留原抽题、白板和加载逻辑。维护说明记录本轮中文搜索来源；Service Worker v8 更新 CSV 缓存。本轮验证：题库格式/BOM/全局去重、原有 60 张内容保护和 Chromium 浏览器题库/13 卡/白板/离线六入口回归。未跟踪的 games/friend-court/ 是其他工作，不纳入本次提交。
+
+## 2026-10-23 演技三部曲
+
+当前工作副本：offline-board-games-github-main；旧 offline-board-games 与远程历史无关，未对其做合并或覆盖。以 origin/main 为基线，新增 /wasabi-roulette/、/two-faced/、/fun-employed/，首页从 7 个入口增至 10 个；无构建步骤，继续使用 main → 现有 EdgeOne 发布链路与 games.danielxu.cn 域名。
+
+assets/party-data.js 含 30 限制令、24 话题、16 完整剧本、30 职位、72 特长。assets/party.js 实现全部状态、严格确认再看牌、退出隐藏、倒计时绝对截止时间、暂停/重置、问答灵感、独立重抽、录用下一轮和跨页面音效偏好。新游戏不持久化秘密。
+
+验证命令：node --check assets/party.js；node --check assets/party-data.js；node --check service-worker.js；node assets/tests/party-browser.cjs。浏览器测试需 NODE_PATH 指向现有 Playwright（本机 D:\_Codex project\02_Game\werewords-game-mvp\node_modules），TEST_URL 默认 http://127.0.0.1:8097。测试覆盖全部最低题库数/去重/故事长度、4/6/10 人恰好一名影帝、失焦隐藏、A/B 隔离、180 秒开始暂停重置到时、45 秒闪烁/结束、提问、重抽不重置计时、Offer 下一轮、音效偏好、320/390/844 宽无横向溢出，以及断网大厅和十个真实游戏入口。CDN 在测试中被阻断，确认本地基础样式和逻辑独立可用。截图 outputs/party-mobile.png 为忽略产物，不上传。下一步为真机试玩触屏操作、现场可读性和扬声器音量；未声称真机验证。
