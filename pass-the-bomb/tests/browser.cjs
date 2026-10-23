@@ -3,11 +3,12 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
+require('../validate-data.cjs');
 for (const mode of ['word','scene','brainstorm']) for (const level of ['normal','hard','extreme']) {
   const text=fs.readFileSync(path.join(root,'data',`${mode}-${level}.tsv`),'utf8');
   assert.equal(text.charCodeAt(0),0xfeff);
   const [header,...rows]=text.trim().replace(/^\uFEFF/,'').split(/\r?\n/);
-  assert.equal(header,'id\tprompt\texample'); assert.ok(rows.length>=30);
+  assert.equal(header,'id\tprompt\texample'); assert.ok(rows.length>=90);
   assert.equal(new Set(rows.map(r=>r.split('\t')[1])).size,rows.length);
   for(const row of rows) { const cells=row.split('\t'); assert.equal(cells.length,3); assert.ok(cells.every(Boolean)); }
 }
@@ -29,13 +30,17 @@ for (const mode of ['word','scene','brainstorm']) for (const level of ['normal',
     await apply(5,3); assert.match(await page.textContent('#time-status'),/最长时间/);
     assert.equal(await page.textContent('#range'),'15～45 秒');
     await apply(0,0);
+    await page.evaluate(()=>{window.originalRandom=Math.random;Math.random=()=>.999;});
     let previous='';
     for(const mode of ['word','scene','brainstorm']) for(const level of ['normal','hard','extreme']) {
       await page.selectOption('#mode',mode);await page.selectOption('#difficulty',level);
       await page.click('#action');assert.match(await page.textContent('#status'),/炸啦/);
       assert.equal(await page.textContent('#action'),'再来一轮');
       const prompt=await page.textContent('#prompt'); assert.ok(prompt && prompt!==previous); previous=prompt;
+      const last=fs.readFileSync(path.join(root,'data',`${mode}-${level}.tsv`),'utf8').trim().split(/\r?\n/).at(-1).split('\t')[1];
+      assert.equal(prompt,last,'Newly appended prompts are actually selectable in every bank');
     }
+    await page.evaluate(()=>{Math.random=window.originalRandom;});
     assert.equal(await page.evaluate(()=>blasts),9);
     await page.evaluate(()=>{window.dispatchEvent(new Event('focus'));document.dispatchEvent(new Event('visibilitychange'));});
     assert.equal(await page.evaluate(()=>blasts),9);
@@ -79,7 +84,7 @@ for (const mode of ['word','scene','brainstorm']) for (const level of ['normal',
     await offline.evaluate(()=>navigator.serviceWorker.ready);
     await offline.waitForFunction(()=>navigator.serviceWorker.controller);
     const links=await offline.locator('a.game').evaluateAll(links=>links.map(a=>a.getAttribute('href')));
-    assert.equal(links.length,7);
+    assert.equal(links.length,11);
     await context.setOffline(true);
     for(const link of links) {
       await offline.goto(new URL(link,base+'/').href);assert.ok(await offline.title());
@@ -90,8 +95,8 @@ for (const mode of ['word','scene','brainstorm']) for (const level of ['normal',
     await offline.waitForFunction(()=>document.querySelector('#action').textContent==='点燃引信');
     await offline.fill('#min-time','0');await offline.fill('#max-time','0');await offline.click('#time-form button');
     await offline.click('#action');assert.match(await offline.textContent('#status'),/炸啦/);
-    await offline.goto(base+'/');assert.equal(await offline.locator('a.game').count(),7);
+    await offline.goto(base+'/');assert.equal(await offline.locator('a.game').count(),11);
     assert.deepEqual(errors,[]);
-    console.log('PASS: 9 banks / 270 prompts; all modes; 0, decimal, random and fixed ranges; unchanged pass deadline; single explosion; resume; mobile layouts; seven offline entries.');
+    console.log('PASS: 9 banks / 810 prompts; appended prompts selectable; all modes; unchanged deadline; single explosion; resume; mobile layouts; eleven offline entries.');
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
