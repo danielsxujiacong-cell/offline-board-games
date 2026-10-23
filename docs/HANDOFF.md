@@ -2,7 +2,9 @@
 
 2026-10-23 嘴炮炸弹题库三倍扩充：九份 TSV 各追加 60 题，合计 270 → 810（每档 90）。原 001–030 文本完整保留；新增内容覆盖聚餐、KTV、社交翻车、宠物、虚构世界、拟人用途及带约束的脑洞设定。每题有维护用答案示例，参考来源与中文筛选标准在 `pass-the-bomb/data/题库维护与来源.md`。没有改 app.js、CSS、时间设置或其他游戏源码。
 
-验证通过：`node pass-the-bomb/validate-data.cjs`（810 题全库题面无重复、连续编号、BOM、接词长度）；对比 Git 证明原 270 题未变；`node pass-the-bomb/tests/browser.cjs`（九档新增题确实可抽到、0/小数/随机时间、传递不重计时、后台恢复、单次爆炸、320/390/844 视口、11 个真实离线入口）；`node --check service-worker.js`。合并远端同期演技题库扩容 3110df4 后缓存递增至 v13，保留对方变更，沿用现有 main → EdgeOne 发布链路。本轮最终线上题库数将在推送后独立核验。
+验证通过：`node pass-the-bomb/validate-data.cjs`（810 题全库题面无重复、连续编号、BOM、接词长度）；对比 Git 证明原 270 题未变；`node pass-the-bomb/tests/browser.cjs`（九档新增题确实可抽到、0/小数/随机时间、传递不重计时、后台恢复、单次爆炸、320/390/844 视口、11 个真实离线入口）；`node --check service-worker.js`。合并远端同期演技题库扩容 3110df4 后缓存递增至 v13，保留对方变更，沿用现有 main → EdgeOne 发布链路。
+
+上线核验：实现及缓存提交 c8c0159 已推送，GitHub Pages 工作流 39978266999 成功；独立访问 EdgeOne HTTPS 正式地址 https://games.danielxu.cn/pass-the-bomb/，九份 TSV 均返回 200、每份 90 题且与本地全文一致。线上浏览器逐一抽到九档 ID 090 新题，0 秒爆炸和 SW v13 均确认，无页面错误。截图 outputs/pass-the-bomb-expanded-live.png 为忽略产物，不上传。
 
 2026-10-23 嘴炮炸弹：新增 `/pass-the-bomb/`，在本仓库直接维护，无需构建。三模式 × 三难度，共九份 UTF-8 BOM TSV / 270 题，包含维护用答案示例。自定义最短/最长秒数，允许 0 和小数，0～0 立即爆炸；同一轮固定截止时间，传递和应用设置不会重抽时间，设置用于下一轮。Date.now + performance.now 双时钟、后台恢复检查、一次性爆炸保护，Web Audio 合成音效和可选震动。未添加人数、计分、账号或联网功能。
 
