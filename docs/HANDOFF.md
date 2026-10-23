@@ -9,3 +9,6 @@
 验证：`node games/just-one/validate-data.cjs`、app.js / service-worker.js 语法检查；`node games/just-one/tests/browser.cjs` 在 HTTP + Edge 通过题库加载、13 卡、刷新、直接编辑、中文组合输入/光标、隐藏/恢复、缩放、清空、320–844 宽手机视口及模拟键盘缩小/平移/恢复、六个离线入口和大厅返回。TEST_BROWSER=webkit 对应 WebKit 的题库和白板套件；Windows WebKit 在断网 reload 时报告引擎内部错误，离线部分使用 Chromium 验证。浏览器模拟不是 iOS/安卓真机键盘验收，真机触屏、输入法与安装体验仍待实测，题库难度也需要聚会试玩反馈。
 
 测试需要 Playwright（可用 NODE_PATH 指向现有安装）；WebKit 缓存使用项目内 cache/playwright，通过 PLAYWRIGHT_BROWSERS_PATH 指定。截图在 outputs/，两者均被 Git 忽略。本项目无构建步骤。Service Worker v7 预缓存同一路径及新题库，通过 main 现有链路发布到 https://games.danielxu.cn/games/just-one/，不改域名/DNS。
+
+
+2026-10-23 题库扩充：普通、困难、变态各追加 40 张 / 200 词，目前各 100 张 / 500 词，全库 1500 词无完全重复。原有 60 张均保持内容不变；保留原抽题、白板和加载逻辑。维护说明记录本轮中文搜索来源；Service Worker v8 更新 CSV 缓存。本轮验证：题库格式/BOM/全局去重、原有 60 张内容保护和 Chromium 浏览器题库/13 卡/白板/离线六入口回归。未跟踪的 games/friend-court/ 是其他工作，不纳入本次提交。

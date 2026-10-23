@@ -89,7 +89,7 @@ const assert = require('node:assert/strict');
    await browser.close(); return;
  }
  await page.evaluate(async()=>{await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject)=>setTimeout(()=>reject(new Error('Service Worker installation exceeded 120s')),120000))]); if(!navigator.serviceWorker.controller) await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));});
- const cached=await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v7');return (await c.keys()).map(r=>r.url);});
+ const cached=await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v8');return (await c.keys()).map(r=>r.url);});
  assert.ok(cached.some(u=>u.endsWith('/data/insane.csv')));
  await context.setOffline(true);
  await page.reload(); await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('/ 13'));
@@ -102,6 +102,6 @@ const assert = require('node:assert/strict');
  }
  assert.deepEqual(errors,[]);
  await context.setOffline(false);
- console.log('PASS: 3 CSV loads; 13 unique cards; resume/restart/end; direct textarea/IME/resize/hide/clear; mobile portrait/landscape and simulated keyboard open/close; direct URL; SW v7; six offline entries and lobby return; no page errors.');
+ console.log('PASS: 3 CSV loads; 13 unique cards; resume/restart/end; direct textarea/IME/resize/hide/clear; mobile portrait/landscape and simulated keyboard open/close; direct URL; SW v8; six offline entries and lobby return; no page errors.');
  await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});
