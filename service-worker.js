@@ -1,6 +1,16 @@
-const CACHE_NAME = 'daniel-board-games-v8';
+const CACHE_NAME = 'daniel-board-games-v9';
 const PRECACHE = [
+  './pass-the-bomb/',
+  './pass-the-bomb/index.html',
+  './pass-the-bomb/styles.css',
+  './pass-the-bomb/app.js',
+  ...['word', 'scene', 'brainstorm'].flatMap(mode => ['normal', 'hard', 'extreme'].map(level => `./pass-the-bomb/data/${mode}-${level}.tsv`)),
   './',
+  './games/fake-artist-new-york/',
+  './games/fake-painter/',
+  './games/pick-one-for-me/',
+  './games/spyfall/',
+  './games/werewords-companion/',
   './games/just-one/',
   './games/just-one/index.html',
   './games/just-one/styles.css',

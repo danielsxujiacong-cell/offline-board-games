@@ -1,5 +1,11 @@
 # Handoff
 
+2026-10-23 嘴炮炸弹：新增 `/pass-the-bomb/`，在本仓库直接维护，无需构建。三模式 × 三难度，共九份 UTF-8 BOM TSV / 270 题，包含维护用答案示例。自定义最短/最长秒数，允许 0 和小数，0～0 立即爆炸；同一轮固定截止时间，传递和应用设置不会重抽时间，设置用于下一轮。Date.now + performance.now 双时钟、后台恢复检查、一次性爆炸保护，Web Audio 合成音效和可选震动。未添加人数、计分、账号或联网功能。
+
+本轮验证：`node --check pass-the-bomb/app.js`、`node --check service-worker.js`、`node pass-the-bomb/tests/browser.cjs` 通过。自动化覆盖九份题库、九种组合、0/小数/固定/随机时间、传递不重置、运行中设置、后台恢复、一次爆炸、音效开关，320/390/844 手机视口及七个真实离线入口（检查没有退回大厅）。输出截图在被忽略的 outputs/。使用已有 Playwright：`NODE_PATH=D:\_Codex project\02_Game\werewords-game-mvp\node_modules`；HTTP 服务端口 8096，测试通过 TEST_URL 指定。实际手机的扬声器/震动仍依赖用户设备，未声称真机验证。
+
+Service Worker v9 新增炸弹和题库预缓存，并补齐原五游戏目录 URL，避免离线点目录入口时退回大厅；原游戏业务源码未改。部署沿用 main → EdgeOne 自动发布，同时 GitHub Pages 仍配置为 main 根目录；自定义域名应独立进行 HTTP 内容验证。后续只需按 Excel 维护 TSV 并递增缓存版本，不要重跑初始种子脚本覆盖人工修改。
+
 2026-10-23：Just One 位于 `games/just-one/`，本次只改白板编辑体验和变态题库，未改普通/困难 CSV、抽题加载逻辑或其他游戏业务；未运行 sync-games.ps1。
 
 白板：同一个 textarea 同时用于大字展示和直接编辑；input 维护内存状态，不回写中文输入过程中的 value/caret。通过 VisualViewport resize/scroll、动态高度和 safe-area 适配横竖屏与键盘；低高度隐藏辅助文案，保留所有操作。提示词不上传、不写持久存储。点击完成收起键盘，隐藏状态从 textarea 移除提示值，展示时恢复。

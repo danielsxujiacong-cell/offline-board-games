@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#151421">
+  <title>嘴炮炸弹 · Pass the Bomb</title>
+  <link rel="icon" href="../assets/favicon.svg?v=1" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<main>
+  <header><a href="../">‹ 桌游合集</a><button id="sound" type="button" aria-pressed="true">音效：开</button></header>
+  <div class="heading"><p class="eyebrow">PASS THE BOMB</p><h1>嘴炮炸弹<span>接得住话，躲得过炸。</span></h1></div>
+  <section id="setup" aria-label="游戏设置">
+    <div class="selects"><label>玩法<select id="mode"><option value="word">中文接词</option><option value="scene">场景联想</option><option value="brainstorm">脑洞炸弹</option></select></label><label>难度<select id="difficulty"><option value="normal">普通</option><option value="hard">困难</option><option value="extreme">变态</option></select></label></div>
+    <p id="rule">用上一词的尾字接下一个词，允许同音字；每次说一个，不要重复。</p>
+  </section>
+  <section class="arena" aria-label="炸弹游戏">
+    <div id="bomb" class="bomb" aria-hidden="true"><span class="spark">✦</span><span class="bomb-face">● ●<br>﹏</span></div>
+    <p id="status" role="status" aria-live="polite">准备好，把手机握稳。</p>
+    <h2 id="prompt">让话题在你手里接下去</h2>
+    <p id="hint">口头回答 → 点击传递 → 把手机递给下家</p>
+    <button id="action" class="primary" disabled>题库加载中…</button>
+  </section>
+  <details class="timing" open><summary>引信时间 <span id="range">15～45 秒</span></summary>
+    <form id="time-form"><div class="selects"><label>最短时间（秒）<input id="min-time" type="number" min="0" step="any" value="15" required inputmode="decimal"></label><label>最长时间（秒）<input id="max-time" type="number" min="0" step="any" value="45" required inputmode="decimal"></label></div><button type="submit" class="secondary">应用时间设置</button><p id="time-status" role="status" aria-live="polite">每轮随机抽取；传递不会重置。支持 0～0 秒立即爆炸。</p></form>
+  </details>
+  <footer>一部手机，一圈朋友。谁拿着爆炸，谁就被炸到。<br>倒计时不展示，悬念留给引信。</footer>
+</main>
+</body>
+</html>
