@@ -1,11 +1,30 @@
-const CACHE_NAME = 'daniel-board-games-v9';
+const CACHE_NAME = 'daniel-board-games-v11';
 const PRECACHE = [
   './games/friend-court/',
   './games/friend-court/index.html',
   './games/friend-court/styles.css',
   './games/friend-court/questions.js',
   './games/friend-court/app.js',
+  './wasabi-roulette/',
+  './wasabi-roulette/index.html',
+  './two-faced/',
+  './two-faced/index.html',
+  './fun-employed/',
+  './fun-employed/index.html',
+  './assets/party.css',
+  './assets/party-data.js',
+  './assets/party.js',
+  './pass-the-bomb/',
+  './pass-the-bomb/index.html',
+  './pass-the-bomb/styles.css',
+  './pass-the-bomb/app.js',
+  ...['word', 'scene', 'brainstorm'].flatMap(mode => ['normal', 'hard', 'extreme'].map(level => `./pass-the-bomb/data/${mode}-${level}.tsv`)),
   './',
+  './games/fake-artist-new-york/',
+  './games/fake-painter/',
+  './games/pick-one-for-me/',
+  './games/spyfall/',
+  './games/werewords-companion/',
   './games/just-one/',
   './games/just-one/index.html',
   './games/just-one/styles.css',
@@ -68,6 +87,6 @@ self.addEventListener('activate', event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)); return response; }).catch(() => caches.match('./index.html'))));
 });

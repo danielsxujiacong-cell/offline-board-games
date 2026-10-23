@@ -17,4 +17,4 @@
 未批量复制来源题目；题库使用新写的中文情景。不是商业桌游的官方电子版。
 
 ## 维护
-入口 /games/friend-court/，直接维护 index.html、styles.css、questions.js、app.js，无构建依赖。全站根 Service Worker v9 预缓存。测试：NODE_PATH 指向已有 Playwright 安装后运行 node games/friend-court/tests/browser.cjs，需要本地 HTTP 8080 和 Edge。GitHub main 经现有 EdgeOne 部署，不改变域名配置。
+入口 /games/friend-court/，直接维护 index.html、styles.css、questions.js、app.js，无构建依赖。全站根 Service Worker v11 预缓存。测试：NODE_PATH 指向已有 Playwright 安装后运行 node games/friend-court/tests/browser.cjs，需要本地 HTTP 8080 和 Edge。GitHub main 经现有 EdgeOne 部署，不改变域名配置。
