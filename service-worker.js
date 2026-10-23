@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v6';
+const CACHE_NAME = 'daniel-board-games-v7';
 const PRECACHE = [
   './',
   './games/just-one/',

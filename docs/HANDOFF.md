@@ -1,11 +1,11 @@
 # Handoff
 
-2026-10-23：在现有静态合集新增 `games/just-one/`，大厅现在包含六款游戏。Just One 直接在本仓库维护，未运行 sync-games.ps1，未修改其他游戏业务逻辑。
+2026-10-23：Just One 位于 `games/just-one/`，本次只改白板编辑体验和变态题库，未改普通/困难 CSV、抽题加载逻辑或其他游戏业务；未运行 sync-games.ps1。
 
-已完成：三档各 60 张 UTF-8 BOM CSV、每局 13 张无重复卡、本地进度恢复（刷新隐藏题卡）、手机横屏白板、编辑/清空/隐藏/缩放、根 Service Worker v6 预缓存。
+白板：同一个 textarea 同时用于大字展示和直接编辑；input 维护内存状态，不回写中文输入过程中的 value/caret。通过 VisualViewport resize/scroll、动态高度和 safe-area 适配横竖屏与键盘；低高度隐藏辅助文案，保留所有操作。提示词不上传、不写持久存储。点击完成收起键盘，隐藏状态从 textarea 移除提示值，展示时恢复。
 
-验证：`node games/just-one/validate-data.cjs` 通过，900 词全局不重复。`node --check games/just-one/app.js` 与 service-worker.js 通过。`node games/just-one/tests/browser.cjs` 在本地 HTTP + Edge 无头浏览器通过：三档加载、抽题/终局/重开/刷新、白板操作、390×844 与 844×390 布局、直接入口、返回大厅、六款游戏断网入口和 CSV 缓存。测试依赖外部 Playwright，可通过 NODE_PATH 指向可用安装；测试截图写入被忽略的 outputs/。项目无 package.json 或构建命令。
+题库：变态 CSV 已自主重制，60 张 / 300 词，UTF-8 BOM；全站三档共 900 词无重复。选词侧重大众听过但难用单一词提示的梗、典故、人物和社会/科技/心理概念，维护说明含选词规则与中文研究来源。普通、困难文件保持原样。
 
-发布：推送 GitHub main，沿用现有 EdgeOne 链路和 games.danielxu.cn。下一步为真实手机软键盘及主屏幕安装体验复核；浏览器模拟不等同于真机验证。不要改 DNS 或新建站点。
+验证：`node games/just-one/validate-data.cjs`、app.js / service-worker.js 语法检查；`node games/just-one/tests/browser.cjs` 在 HTTP + Edge 通过题库加载、13 卡、刷新、直接编辑、中文组合输入/光标、隐藏/恢复、缩放、清空、320–844 宽手机视口及模拟键盘缩小/平移/恢复、六个离线入口和大厅返回。TEST_BROWSER=webkit 对应 WebKit 的题库和白板套件；Windows WebKit 在断网 reload 时报告引擎内部错误，离线部分使用 Chromium 验证。浏览器模拟不是 iOS/安卓真机键盘验收，真机触屏、输入法与安装体验仍待实测，题库难度也需要聚会试玩反馈。
 
-线上复测发现首次直接访问期间返回大厅脚本可能尚未进入运行时缓存，已将 assets/home-link.js 加入 v6 预缓存。
+测试需要 Playwright（可用 NODE_PATH 指向现有安装）；WebKit 缓存使用项目内 cache/playwright，通过 PLAYWRIGHT_BROWSERS_PATH 指定。截图在 outputs/，两者均被 Git 忽略。本项目无构建步骤。Service Worker v7 预缓存同一路径及新题库，通过 main 现有链路发布到 https://games.danielxu.cn/games/just-one/，不改域名/DNS。

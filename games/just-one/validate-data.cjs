@@ -13,7 +13,7 @@ for (const name of ['normal','hard','insane']) {
     assert.equal(words.length, 5, `${name}:${i+2}`);
     assert.equal(new Set(words).size, 5);
     for (const word of words) {
-      assert.match(word, /^[\u3400-\u9fff]+$/u);
+      assert.match(word, /^[\u3400-\u9fff]+(?:：[\u3400-\u9fff]+)?$/u);
       assert.ok(!seen.has(word), `重复用词：${word}`);
       seen.add(word);
     }
