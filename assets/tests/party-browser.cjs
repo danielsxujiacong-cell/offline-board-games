@@ -3,10 +3,41 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const data=vm.runInNewContext(fs.readFileSync('assets/party-data.js','utf8')+';PARTY_DATA');
-for(const [key,min] of Object.entries({restrictions:25,topics:20,scripts:15,jobs:25,traits:60})){
+for(const [key,min] of Object.entries({restrictions:120,topics:96,scripts:64,jobs:120,traits:288})){
  assert.ok(data[key].length>=min,key);assert.equal(new Set(data[key].map(x=>typeof x==='string'?x:x.title)).size,data[key].length);
 }
 assert.ok(data.scripts.every(x=>x.secretDetail.length>=75&&x.secretDetail.length<=150));
+const originalPrefixes={
+  "restrictions": {
+    "count": 30,
+    "hash": "2d08df8199c5db7e51a68308a58f060d7a8d7101147dff2b233e36c54da538f7"
+  },
+  "topics": {
+    "count": 24,
+    "hash": "1f2566755593e659c47b44c3cb9abf572e1e8177571d9e16cb14e7b772bc28b4"
+  },
+  "scripts": {
+    "count": 16,
+    "hash": "5193c0f7c85981d5dccf691e9b23bd50750ffeee93ffb4159739953497dd5ff1"
+  },
+  "jobs": {
+    "count": 30,
+    "hash": "db616d68d734e0c8f547a91d2f985e3f27b906c1539e87307209f08b29a7e3db"
+  },
+  "traits": {
+    "count": 72,
+    "hash": "a58ff8fde744145b0e20982bf982663273667b91b7e4018a3c271642b1c692cd"
+  }
+};
+for(const [key,{count,hash}] of Object.entries(originalPrefixes)) {
+ assert.equal(require('node:crypto').createHash('sha256').update(JSON.stringify(data[key].slice(0,count))).digest('hex'),hash,'original prefix changed: '+key);
+}
+for(const key of Object.keys(originalPrefixes)) for(const entry of data[key]) {
+ const text=typeof entry==='string'?entry:entry.title+entry.secretDetail;
+ assert.ok(!/TODO|示例[0-9]|占位符/.test(text),'placeholder: '+key);
+}
+assert.equal(new Set(data.scripts.map(x=>x.secretDetail)).size,data.scripts.length);
+
 (async()=>{
 const browser=await chromium.launch({channel:'msedge',headless:true});
 try{
@@ -45,14 +76,13 @@ try{
  for(const width of [320,390,844]){await page.setViewportSize({width,height:width===844?390:844});for(const route of ['wasabi-roulette','two-faced','fun-employed']){await page.goto(base+'/'+route+'/');assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route+' overflow '+width);}}
  // Online install followed by genuine offline navigations for all existing and new games.
  await page.goto(base+'/');await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
- const routes=await page.locator('.game').evaluateAll(es=>es.map(e=>e.getAttribute('href')));assert.equal(routes.length,10);
- assert.ok(await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v10');return !!(await c.match('/assets/party.js'));}));
+ const routes=await page.locator('.game').evaluateAll(es=>es.map(e=>e.getAttribute('href')));assert.equal(routes.length,11);
+ assert.ok(await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v12');return !!(await c.match('/assets/party.js'));}));
  await context.setOffline(true);
  for(const route of routes){await page.goto(new URL(route,base+'/').href);assert.ok(!await page.locator('.games').count(),'offline silently returned lobby: '+route);assert.ok((await page.locator('body').innerText()).length>20);}
  for(const route of ['wasabi-roulette','two-faced','fun-employed']){await page.goto(base+'/'+route+'/');await click('deal');assert.ok(await page.locator('main').innerText());}
- await page.goto(base+'/');assert.equal(await page.locator('.game').count(),10);
+ await page.goto(base+'/');assert.equal(await page.locator('.game').count(),11);
  assert.deepEqual(errors,[]);
- console.log('PASS: data quality, privacy, 4/6/10 players, timers, questions, offers, sound preference, 320/390/844 layouts and ten offline games');
+ console.log('PASS: data quality, privacy, 4/6/10 players, timers, questions, offers, sound preference, 320/390/844 layouts and eleven offline games');
 }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
-

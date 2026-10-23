@@ -8,6 +8,6 @@
 - Just One 位于 `games/just-one/`，无构建依赖；题库检查命令：`node games/just-one/validate-data.cjs`。不运行整站同步脚本来更新它。
 - Pass the Bomb 位于 `pass-the-bomb/`，无构建依赖；题库验证：`node pass-the-bomb/validate-data.cjs`；浏览器测试：`node pass-the-bomb/tests/browser.cjs`（需 Playwright 和 HTTP 服务）。九份 UTF-8 BOM TSV 在 `data/`，每份至少 90 题，可用 Excel 编辑；不可通过传递或应用设置重置当前轮截止时间。
 
-- 演技三部曲独立入口在 `wasabi-roulette/`、`two-faced/`、`fun-employed/`；共享 assets/party*。修改词库后保持 25/20/15/25/60 最低条目数；传阅秘密必须先确认本人、再显示、主动隐藏后才能传给下一人。
+- 演技三部曲独立入口在 `wasabi-roulette/`、`two-faced/`、`fun-employed/`；共享 assets/party*。修改词库后保持 120/96/64/120/288 条目数及原题前缀；传阅秘密必须先确认本人、再显示、主动隐藏后才能传给下一人。
 
 - 损友审判庭在 games/friend-court/，纯前端无玩家配置；测试 node games/friend-court/tests/browser.cjs。
