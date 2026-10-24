@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v13';
+const CACHE_NAME = 'daniel-board-games-v14';
 const PRECACHE = [
   './games/friend-court/',
   './games/friend-court/index.html',
