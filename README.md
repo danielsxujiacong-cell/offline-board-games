@@ -79,3 +79,7 @@ GitHub main 为最终来源，通过现有 EdgeOne 链路发布至 https://games
 本地在仓库根目录运行 `python -m http.server 8080`，打开 `http://localhost:8080/lost-cities/`。规则/存档测试：`node --test tests/lost-cities.test.mjs`；浏览器验收：`node tests/lost-cities-browser.cjs`，复用现有 Playwright 与 Edge（可设置 `PLAYWRIGHT_PATH` 和 `TEST_URL`）。包括完整 44 回合、手动公式核对、刷新/交接隐私、清零确认、损坏存档、320–1280px 和大厅所有入口 Network Offline。自动化双人操作已验证，真实两人主观体验仍需人工验收。
 
 沿用 GitHub main → EdgeOne 的静态部署，无服务器和新部署配置。
+
+## 诺丁汉警长 · 双袋博弈
+
+入口 /sheriff/，双人同设备传阅的非官方变体：156 张货物、双袋申报、谈判买路财、六回合及终局王冠。支持本地阶段存档、刷新/后台隐藏、离线新局；装袋草稿刷新后重选。规则与原版差异见 sheriff/RULES.md，工程交接见 sheriff/DEVELOPMENT.md。规则验证 node --test tests/sheriff.test.mjs；整场与全站离线验证 node tests/sheriff-browser.cjs（复用现有 Playwright/Edge）。

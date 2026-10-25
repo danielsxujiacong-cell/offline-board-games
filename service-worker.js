@@ -1,5 +1,12 @@
-const CACHE_NAME = 'daniel-board-games-v26-tragedy-audit';
+const CACHE_NAME = 'daniel-board-games-v27-sheriff';
 const PRECACHE = [
+  './sheriff/',
+  './sheriff/index.html',
+  './sheriff/style.css',
+  './sheriff/app.js',
+  './sheriff/engine.js',
+  './sheriff/RULES.md',
+  './sheriff/DEVELOPMENT.md',
   './tragedy-looper/',
   './tragedy-looper/index.html',
   './tragedy-looper/src/app.js',
