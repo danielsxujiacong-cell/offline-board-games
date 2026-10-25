@@ -1,0 +1,268 @@
+[
+  {
+    "id": "move-h",
+    "name": "横向移动",
+    "effect": {
+      "type": "move",
+      "direction": "h"
+    },
+    "priority": 2,
+    "copies": {
+      "GM": 1,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。"
+  },
+  {
+    "id": "move-v",
+    "name": "纵向移动",
+    "effect": {
+      "type": "move",
+      "direction": "v"
+    },
+    "priority": 2,
+    "copies": {
+      "GM": 1,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。"
+  },
+  {
+    "id": "move-d",
+    "name": "斜向移动",
+    "effect": {
+      "type": "move",
+      "direction": "d"
+    },
+    "priority": 2,
+    "copies": {
+      "GM": 1,
+      "protagonist": 0
+    },
+    "oncePerLoop": {
+      "GM": true,
+      "protagonist": true
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。"
+  },
+  {
+    "id": "forbid-move",
+    "name": "禁止移动",
+    "effect": {
+      "type": "forbid",
+      "counter": "move"
+    },
+    "priority": 1,
+    "copies": {
+      "GM": 0,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": true,
+      "protagonist": true
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。"
+  },
+  {
+    "id": "paranoia-plus",
+    "name": "不安 +1",
+    "effect": {
+      "type": "counter",
+      "counter": "paranoia",
+      "amount": 1
+    },
+    "priority": 4,
+    "copies": {
+      "GM": 2,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。增加先于减少；禁止效果优先。"
+  },
+  {
+    "id": "paranoia-minus",
+    "name": "不安 −1",
+    "effect": {
+      "type": "counter",
+      "counter": "paranoia",
+      "amount": -1
+    },
+    "priority": 4,
+    "copies": {
+      "GM": 1,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": true
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。增加先于减少；禁止效果优先。"
+  },
+  {
+    "id": "forbid-paranoia",
+    "name": "禁止不安",
+    "effect": {
+      "type": "forbid",
+      "counter": "paranoia"
+    },
+    "priority": 3,
+    "copies": {
+      "GM": 1,
+      "protagonist": 0
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。"
+  },
+  {
+    "id": "forbid-goodwill",
+    "name": "禁止友好",
+    "effect": {
+      "type": "forbid",
+      "counter": "goodwill"
+    },
+    "priority": 3,
+    "copies": {
+      "GM": 1,
+      "protagonist": 0
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。"
+  },
+  {
+    "id": "intrigue-plus",
+    "name": "密谋 +1",
+    "effect": {
+      "type": "counter",
+      "counter": "intrigue",
+      "amount": 1
+    },
+    "priority": 4,
+    "copies": {
+      "GM": 1,
+      "protagonist": 0
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": true,
+    "description": "可以打在角色或地点。地点上有效。增加先于减少；禁止效果优先。"
+  },
+  {
+    "id": "intrigue-double",
+    "name": "密谋 +2",
+    "effect": {
+      "type": "counter",
+      "counter": "intrigue",
+      "amount": 2
+    },
+    "priority": 4,
+    "copies": {
+      "GM": 1,
+      "protagonist": 0
+    },
+    "oncePerLoop": {
+      "GM": true,
+      "protagonist": true
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": true,
+    "description": "可以打在角色或地点。地点上有效。增加先于减少；禁止效果优先。"
+  },
+  {
+    "id": "goodwill-plus",
+    "name": "友好 +1",
+    "effect": {
+      "type": "counter",
+      "counter": "goodwill",
+      "amount": 1
+    },
+    "priority": 4,
+    "copies": {
+      "GM": 0,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。增加先于减少；禁止效果优先。"
+  },
+  {
+    "id": "goodwill-double",
+    "name": "友好 +2",
+    "effect": {
+      "type": "counter",
+      "counter": "goodwill",
+      "amount": 2
+    },
+    "priority": 4,
+    "copies": {
+      "GM": 0,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": true,
+      "protagonist": true
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": false,
+    "description": "可以打在角色或地点。打在地点上合法，但不产生效果。增加先于减少；禁止效果优先。"
+  },
+  {
+    "id": "forbid-intrigue",
+    "name": "禁止密谋",
+    "effect": {
+      "type": "forbid",
+      "counter": "intrigue"
+    },
+    "priority": 3,
+    "copies": {
+      "GM": 0,
+      "protagonist": 1
+    },
+    "oncePerLoop": {
+      "GM": false,
+      "protagonist": false
+    },
+    "targetTypes": ["character", "location"],
+    "locationEffective": true,
+    "description": "可以打在角色或地点。地点上有效。所有主人公当天合计打出两张以上此卡时，全部相互抵消，与目标无关。"
+  }
+]

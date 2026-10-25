@@ -1,0 +1,210 @@
+[
+  {
+    "id": "boy-student",
+    "name": "男学生",
+    "nameEn": "Boy Student",
+    "paranoiaLimit": 2,
+    "tags": ["student", "boy"],
+    "startLocation": "school",
+    "forbiddenLocations": [],
+    "goodwillAbilities": [
+      {
+        "id": "boy-calm",
+        "timing": "goodwillAbility",
+        "description": "同地点的一名学生不安 −1。",
+        "goodwillRequired": 2,
+        "oncePerLoop": false,
+        "condition": "存活；目标为同地点存活学生。",
+        "effect": {
+          "type": "counter",
+          "counter": "paranoia",
+          "amount": -1,
+          "target": "studentHere"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "girl-student",
+    "name": "女学生",
+    "nameEn": "Girl Student",
+    "paranoiaLimit": 3,
+    "tags": ["student", "girl"],
+    "startLocation": "school",
+    "forbiddenLocations": [],
+    "goodwillAbilities": [
+      {
+        "id": "girl-calm",
+        "timing": "goodwillAbility",
+        "description": "同地点的一名学生不安 −1。",
+        "goodwillRequired": 2,
+        "oncePerLoop": false,
+        "condition": "存活；目标为同地点存活学生。",
+        "effect": {
+          "type": "counter",
+          "counter": "paranoia",
+          "amount": -1,
+          "target": "studentHere"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "shrine-maiden",
+    "name": "巫女",
+    "nameEn": "Shrine Maiden",
+    "paranoiaLimit": 2,
+    "tags": ["student", "girl"],
+    "startLocation": "shrine",
+    "forbiddenLocations": ["city"],
+    "goodwillAbilities": [
+      {
+        "id": "shrine-clean",
+        "timing": "goodwillAbility",
+        "description": "在神社时，神社密谋 −1。",
+        "goodwillRequired": 3,
+        "oncePerLoop": false,
+        "condition": "本人在神社。",
+        "effect": {
+          "type": "counter",
+          "counter": "intrigue",
+          "amount": -1,
+          "target": "shrine"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      },
+      {
+        "id": "shrine-reveal",
+        "timing": "goodwillAbility",
+        "description": "公开同地点一名角色的真实身份。",
+        "goodwillRequired": 5,
+        "oncePerLoop": true,
+        "condition": "",
+        "effect": {
+          "type": "reveal",
+          "target": "characterHere"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "office-worker",
+    "name": "上班族",
+    "nameEn": "Office Worker",
+    "paranoiaLimit": 2,
+    "tags": ["adult", "man"],
+    "startLocation": "city",
+    "forbiddenLocations": ["school"],
+    "goodwillAbilities": [
+      {
+        "id": "office-reveal",
+        "timing": "goodwillAbility",
+        "description": "公开自己的真实身份（GM 可按身份规则拒绝友好技能）。",
+        "goodwillRequired": 3,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "reveal",
+          "target": "self"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "police-officer",
+    "name": "警察",
+    "nameEn": "Police Officer",
+    "paranoiaLimit": 3,
+    "tags": ["adult", "man"],
+    "startLocation": "city",
+    "forbiddenLocations": [],
+    "goodwillAbilities": [
+      {
+        "id": "police-culprit",
+        "timing": "goodwillAbility",
+        "description": "公开本局之前已经发生的一起事件的真凶。",
+        "goodwillRequired": 4,
+        "oncePerLoop": true,
+        "condition": "",
+        "effect": {
+          "type": "revealCulprit"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      },
+      {
+        "id": "police-protect",
+        "timing": "goodwillAbility",
+        "description": "本轮回一次：防止同地点一名角色的一次死亡。可在死亡时使用。",
+        "goodwillRequired": 5,
+        "oncePerLoop": true,
+        "condition": "死亡发生时；本人存活，与被保护角色同地点。",
+        "effect": {
+          "type": "preventDeath"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "doctor",
+    "name": "医生",
+    "nameEn": "Doctor",
+    "paranoiaLimit": 2,
+    "tags": ["adult", "man"],
+    "startLocation": "hospital",
+    "forbiddenLocations": [],
+    "goodwillAbilities": [
+      {
+        "id": "doctor-paranoia",
+        "timing": "goodwillAbility",
+        "description": "同地点一名角色不安 +1 或 −1。",
+        "goodwillRequired": 2,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "counter",
+          "counter": "paranoia",
+          "amount": 1,
+          "choice": true,
+          "target": "characterHere"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      },
+      {
+        "id": "doctor-discharge",
+        "timing": "goodwillAbility",
+        "description": "解除病人在本轮回的地点限制（仍需移动卡才能移动）。",
+        "goodwillRequired": 3,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "releasePatient"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "patient",
+    "name": "病人",
+    "nameEn": "Patient",
+    "paranoiaLimit": 2,
+    "tags": ["boy"],
+    "startLocation": "hospital",
+    "forbiddenLocations": ["city", "school", "shrine"],
+    "goodwillAbilities": []
+  }
+]

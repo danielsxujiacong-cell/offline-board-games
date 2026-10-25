@@ -1,0 +1,34 @@
+[
+  {
+    "id": "hospital",
+    "name": "医院",
+    "nameEn": "Hospital",
+    "intrigueOnly": true,
+    "row": 0,
+    "column": 0
+  },
+  {
+    "id": "shrine",
+    "name": "神社",
+    "nameEn": "Shrine",
+    "intrigueOnly": true,
+    "row": 0,
+    "column": 1
+  },
+  {
+    "id": "city",
+    "name": "都市",
+    "nameEn": "City",
+    "intrigueOnly": true,
+    "row": 1,
+    "column": 0
+  },
+  {
+    "id": "school",
+    "name": "学校",
+    "nameEn": "School",
+    "intrigueOnly": true,
+    "row": 1,
+    "column": 1
+  }
+]

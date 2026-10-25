@@ -1,0 +1,105 @@
+[
+  {
+    "id": "murder-plan",
+    "name": "谋杀计划",
+    "nameEn": "Murder Plan",
+    "kind": "main",
+    "addedRoles": ["key-person", "brain", "killer"],
+    "rules": [],
+    "creationNote": ""
+  },
+  {
+    "id": "light-of-the-avenger",
+    "name": "复仇者之光",
+    "nameEn": "Light of the Avenger",
+    "kind": "main",
+    "addedRoles": ["brain"],
+    "rules": [
+      {
+        "id": "avenger-end",
+        "timing": "loopEnd",
+        "description": "幕后黑手初始地点有至少 2 密谋，主人公失败。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "locationLoss",
+          "target": "brainStart",
+          "minimum": 2
+        },
+        "mandatory": true,
+        "resolutionMode": "manual-with-hint"
+      }
+    ],
+    "creationNote": ""
+  },
+  {
+    "id": "a-place-to-protect",
+    "name": "守护之地",
+    "nameEn": "A Place to Protect",
+    "kind": "main",
+    "addedRoles": ["key-person", "cultist"],
+    "rules": [
+      {
+        "id": "school-end",
+        "timing": "loopEnd",
+        "description": "学校有至少 2 密谋时，主人公失败。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "locationLoss",
+          "target": "school",
+          "minimum": 2
+        },
+        "mandatory": true,
+        "resolutionMode": "manual-with-hint"
+      }
+    ],
+    "creationNote": ""
+  },
+  {
+    "id": "shadow-of-the-ripper",
+    "name": "开膛手之影",
+    "nameEn": "Shadow of the Ripper",
+    "kind": "subplot",
+    "addedRoles": ["conspiracy-theorist", "serial-killer"],
+    "rules": [],
+    "creationNote": ""
+  },
+  {
+    "id": "an-unsettling-rumor",
+    "name": "不安的传闻",
+    "nameEn": "An Unsettling Rumor",
+    "kind": "subplot",
+    "addedRoles": ["conspiracy-theorist"],
+    "rules": [
+      {
+        "id": "rumor-intrigue",
+        "timing": "mastermindAbility",
+        "description": "每轮回一次，可以在任意地点放置 1 密谋。",
+        "goodwillRequired": 0,
+        "oncePerLoop": true,
+        "condition": "",
+        "effect": {
+          "type": "counter",
+          "counter": "intrigue",
+          "amount": 1,
+          "target": "location"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ],
+    "creationNote": ""
+  },
+  {
+    "id": "a-hideous-script",
+    "name": "恐怖剧本",
+    "nameEn": "A Hideous Script",
+    "kind": "subplot",
+    "addedRoles": ["conspiracy-theorist", "friend"],
+    "rules": [],
+    "creationNote": "可加入 0–2 名乖僻者。"
+  }
+]

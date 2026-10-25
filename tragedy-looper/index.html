@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#121c29" />
+    <title>惨剧轮回 · Tragedy Looper</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="masthead">
+      <a href="/" class="home">← 桌游合集</a
+      ><span class="edition">FIRST STEPS / 原版教学集</span
+      ><button id="gm-open" class="quiet">◈ GM 暗箱</button>
+    </header>
+    <main id="app"><p class="loading">正在整理轮回档案……</p></main>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <dialog id="gm-dialog" aria-labelledby="gm-title"></dialog>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

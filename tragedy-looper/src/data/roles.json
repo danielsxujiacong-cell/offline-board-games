@@ -1,0 +1,198 @@
+[
+  {
+    "id": "key-person",
+    "name": "关键人物",
+    "nameEn": "Key Person",
+    "goodwillRefusal": "none",
+    "abilities": [
+      {
+        "id": "key-death",
+        "timing": "always",
+        "description": "此角色死亡：主人公立即失败，轮回立即结束。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "keyDeath"
+        },
+        "mandatory": true,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "killer",
+    "name": "杀手",
+    "nameEn": "Killer",
+    "goodwillRefusal": "optional",
+    "abilities": [
+      {
+        "id": "killer-key",
+        "timing": "dayEnd",
+        "description": "同地点的关键人物有至少 2 密谋时，可以杀死该关键人物。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "kill",
+          "target": "keyHereIntrigue2"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      },
+      {
+        "id": "killer-heroes",
+        "timing": "dayEnd",
+        "description": "自身有至少 4 密谋时，可以杀死主人公。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "killProtagonists",
+          "condition": "selfIntrigue4"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "brain",
+    "name": "幕后黑手",
+    "nameEn": "Brain",
+    "goodwillRefusal": "optional",
+    "abilities": [
+      {
+        "id": "brain-intrigue",
+        "timing": "mastermindAbility",
+        "description": "在自身所在地点或同地点一名角色上放置 1 密谋。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "counter",
+          "counter": "intrigue",
+          "amount": 1,
+          "target": "anyHere"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "cultist",
+    "name": "邪教徒",
+    "nameEn": "Cultist",
+    "goodwillRefusal": "mandatory",
+    "abilities": [
+      {
+        "id": "cult-ignore",
+        "timing": "cardResolve",
+        "description": "可以无视自身所在地点及同地点所有角色的禁止密谋效果。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "ignoreForbidIntrigue"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "conspiracy-theorist",
+    "name": "阴谋论者",
+    "nameEn": "Conspiracy Theorist",
+    "goodwillRefusal": "none",
+    "abilities": [
+      {
+        "id": "conspiracy-paranoia",
+        "timing": "mastermindAbility",
+        "description": "同地点一名角色不安 +1（可以选择自己）。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "counter",
+          "counter": "paranoia",
+          "amount": 1,
+          "target": "characterHere"
+        },
+        "mandatory": false,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "serial-killer",
+    "name": "连环杀手",
+    "nameEn": "Serial Killer",
+    "goodwillRefusal": "none",
+    "abilities": [
+      {
+        "id": "serial-kill",
+        "timing": "dayEnd",
+        "description": "同地点恰好只有一名其他存活角色时，该角色死亡。尸体不计人数。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "kill",
+          "target": "onlyOtherHere"
+        },
+        "mandatory": true,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "curmudgeon",
+    "name": "乖僻者",
+    "nameEn": "Curmudgeon",
+    "goodwillRefusal": "optional",
+    "abilities": []
+  },
+  {
+    "id": "friend",
+    "name": "朋友",
+    "nameEn": "Friend",
+    "goodwillRefusal": "none",
+    "abilities": [
+      {
+        "id": "friend-end",
+        "timing": "loopEnd",
+        "description": "轮回结束时若此角色死亡，公开身份，主人公失败。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "friendDeath"
+        },
+        "mandatory": true,
+        "resolutionMode": "manual-with-hint"
+      },
+      {
+        "id": "friend-start",
+        "timing": "loopStart",
+        "description": "若此身份已经公开，轮回开始时获得 1 友好。",
+        "goodwillRequired": 0,
+        "oncePerLoop": false,
+        "condition": "",
+        "effect": {
+          "type": "revealedGoodwill"
+        },
+        "mandatory": true,
+        "resolutionMode": "manual-with-hint"
+      }
+    ]
+  },
+  {
+    "id": "person",
+    "name": "普通人",
+    "nameEn": "Person",
+    "goodwillRefusal": "none",
+    "abilities": []
+  }
+]

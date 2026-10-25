@@ -1,0 +1,653 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://games.danielxu.cn/tragedy-looper/src/data/schema.json",
+  "title": "Tragedy Looper First Steps Data Bundle",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/location"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "characters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/character"
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/role"
+      }
+    },
+    "plots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/plot"
+      }
+    },
+    "incidents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/incident"
+      }
+    },
+    "actionCards": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actionCard"
+      }
+    },
+    "scripts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/script"
+      },
+      "minItems": 2
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "locations",
+    "characters",
+    "roles",
+    "plots",
+    "incidents",
+    "actionCards",
+    "scripts"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "locationId": {
+      "enum": ["hospital", "shrine", "city", "school"]
+    },
+    "roleId": {
+      "enum": [
+        "key-person",
+        "killer",
+        "brain",
+        "cultist",
+        "conspiracy-theorist",
+        "serial-killer",
+        "curmudgeon",
+        "friend",
+        "person"
+      ]
+    },
+    "counter": {
+      "type": "object",
+      "properties": {
+        "paranoia": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "goodwill": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "intrigue": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["paranoia", "goodwill", "intrigue"],
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "counter": {
+          "enum": ["paranoia", "goodwill", "intrigue", "move"]
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "direction": {
+          "enum": ["h", "v", "d"]
+        },
+        "choice": {
+          "type": "boolean"
+        },
+        "condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "killAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "protagonistsAt": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "ability": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timing": {
+          "enum": [
+            "always",
+            "loopStart",
+            "cardResolve",
+            "mastermindAbility",
+            "goodwillAbility",
+            "incidentStep",
+            "dayEnd",
+            "loopEnd"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goodwillRequired": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "oncePerLoop": {
+          "type": "boolean"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "effect": {
+          "$ref": "#/$defs/effect"
+        },
+        "mandatory": {
+          "type": "boolean"
+        },
+        "resolutionMode": {
+          "enum": ["manual", "manual-with-hint"]
+        }
+      },
+      "required": [
+        "id",
+        "timing",
+        "description",
+        "goodwillRequired",
+        "oncePerLoop",
+        "condition",
+        "effect",
+        "mandatory",
+        "resolutionMode"
+      ],
+      "additionalProperties": false
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "enum": ["hospital", "shrine", "city", "school"]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intrigueOnly": {
+          "const": true
+        },
+        "row": {
+          "enum": [0, 1]
+        },
+        "column": {
+          "enum": [0, 1]
+        }
+      },
+      "required": ["id", "name", "nameEn", "intrigueOnly", "row", "column"],
+      "additionalProperties": false
+    },
+    "character": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "paranoiaLimit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "startLocation": {
+          "enum": ["hospital", "shrine", "city", "school"]
+        },
+        "forbiddenLocations": {
+          "type": "array",
+          "items": {
+            "enum": ["hospital", "shrine", "city", "school"]
+          }
+        },
+        "goodwillAbilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ability"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "nameEn",
+        "paranoiaLimit",
+        "tags",
+        "startLocation",
+        "forbiddenLocations",
+        "goodwillAbilities"
+      ],
+      "additionalProperties": false
+    },
+    "role": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "enum": [
+            "key-person",
+            "killer",
+            "brain",
+            "cultist",
+            "conspiracy-theorist",
+            "serial-killer",
+            "curmudgeon",
+            "friend",
+            "person"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goodwillRefusal": {
+          "enum": ["none", "optional", "mandatory"]
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ability"
+          }
+        }
+      },
+      "required": ["id", "name", "nameEn", "goodwillRefusal", "abilities"],
+      "additionalProperties": false
+    },
+    "plot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": ["main", "subplot"]
+        },
+        "addedRoles": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "key-person",
+              "killer",
+              "brain",
+              "cultist",
+              "conspiracy-theorist",
+              "serial-killer",
+              "curmudgeon",
+              "friend",
+              "person"
+            ]
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ability"
+          }
+        },
+        "creationNote": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "nameEn",
+        "kind",
+        "addedRoles",
+        "rules",
+        "creationNote"
+      ],
+      "additionalProperties": false
+    },
+    "incident": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectDescription": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiresCulpritAlive": {
+          "type": "boolean"
+        },
+        "requiresParanoiaAtLimit": {
+          "type": "boolean"
+        },
+        "resolutionMode": {
+          "enum": ["manual", "manual-with-hint"]
+        },
+        "effect": {
+          "$ref": "#/$defs/effect"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "nameEn",
+        "effectDescription",
+        "requiresCulpritAlive",
+        "requiresParanoiaAtLimit",
+        "resolutionMode",
+        "effect"
+      ],
+      "additionalProperties": false
+    },
+    "actionCard": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect": {
+          "$ref": "#/$defs/effect"
+        },
+        "priority": {
+          "enum": [1, 2, 3, 4]
+        },
+        "copies": {
+          "type": "object",
+          "properties": {
+            "GM": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "protagonist": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": ["GM", "protagonist"],
+          "additionalProperties": false
+        },
+        "oncePerLoop": {
+          "type": "object",
+          "properties": {
+            "GM": {
+              "type": "boolean"
+            },
+            "protagonist": {
+              "type": "boolean"
+            }
+          },
+          "required": ["GM", "protagonist"],
+          "additionalProperties": false
+        },
+        "targetTypes": {
+          "type": "array",
+          "items": {
+            "enum": ["character", "location"]
+          }
+        },
+        "locationEffective": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "effect",
+        "priority",
+        "copies",
+        "oncePerLoop",
+        "targetTypes",
+        "locationEffective",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "scheduledIncident": {
+      "type": "object",
+      "properties": {
+        "day": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "incident": {
+          "type": "string",
+          "minLength": 1
+        },
+        "culprit": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["day", "incident", "culprit"],
+      "additionalProperties": false
+    },
+    "victoryCondition": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": [
+            "surviveCompleteLoop",
+            "allLoopsFailed",
+            "roleAndPlotConditions"
+          ]
+        },
+        "winner": {
+          "enum": ["protagonists", "GM"]
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "script": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edition": {
+          "const": "Z-Man original"
+        },
+        "creator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tragedySet": {
+          "const": "First Steps"
+        },
+        "defaultLoops": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "loopOptions": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "daysPerLoop": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "finalGuess": {
+          "const": false
+        },
+        "characters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mainPlot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subplot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roles": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "key-person",
+              "killer",
+              "brain",
+              "cultist",
+              "conspiracy-theorist",
+              "serial-killer",
+              "curmudgeon",
+              "friend",
+              "person"
+            ]
+          }
+        },
+        "incidents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/scheduledIncident"
+          }
+        },
+        "initialLayout": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": ["hospital", "shrine", "city", "school"]
+          }
+        },
+        "setupMode": {
+          "enum": ["printed-character-start", "gm-layout"]
+        },
+        "victoryConditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/victoryCondition"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "nameEn",
+        "edition",
+        "creator",
+        "tragedySet",
+        "defaultLoops",
+        "loopOptions",
+        "daysPerLoop",
+        "finalGuess",
+        "characters",
+        "mainPlot",
+        "subplot",
+        "roles",
+        "incidents",
+        "initialLayout",
+        "setupMode",
+        "victoryConditions"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

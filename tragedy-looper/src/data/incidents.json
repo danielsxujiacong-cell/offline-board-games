@@ -1,0 +1,91 @@
+[
+  {
+    "id": "murder",
+    "name": "谋杀",
+    "nameEn": "Murder",
+    "effectDescription": "杀死真凶同地点的一名其他存活角色。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "kill",
+      "target": "otherHere"
+    }
+  },
+  {
+    "id": "increasing-unease",
+    "name": "不安蔓延",
+    "nameEn": "Increasing Unease",
+    "effectDescription": "任意一名角色不安 +2，再给另一名角色密谋 +1。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "unease"
+    }
+  },
+  {
+    "id": "suicide",
+    "name": "自杀",
+    "nameEn": "Suicide",
+    "effectDescription": "真凶死亡。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "kill",
+      "target": "self"
+    }
+  },
+  {
+    "id": "hospital-incident",
+    "name": "医院事件",
+    "nameEn": "Hospital Incident",
+    "effectDescription": "医院至少 1 密谋：医院所有存活角色死亡；医院至少 2 密谋：主人公也死亡。0 密谋时事件发生但无效果。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "hospital",
+      "killAt": 1,
+      "protagonistsAt": 2
+    }
+  },
+  {
+    "id": "faraway-murder",
+    "name": "远隔谋杀",
+    "nameEn": "Faraway Murder",
+    "effectDescription": "杀死任意一名至少有 2 密谋的存活角色；没有合格目标时无效果。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "kill",
+      "target": "intrigue2"
+    }
+  },
+  {
+    "id": "missing-person",
+    "name": "失踪",
+    "nameEn": "Missing Person",
+    "effectDescription": "将真凶移动到任意合法地点，再在该地点放置 1 密谋。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "missing"
+    }
+  },
+  {
+    "id": "spreading",
+    "name": "传播",
+    "nameEn": "Spreading",
+    "effectDescription": "从一名角色移除 2 友好，再给另一名角色放置 2 友好。",
+    "requiresCulpritAlive": true,
+    "requiresParanoiaAtLimit": true,
+    "resolutionMode": "manual-with-hint",
+    "effect": {
+      "type": "spreading"
+    }
+  }
+]

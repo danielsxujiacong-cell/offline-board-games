@@ -1,0 +1,70 @@
+{
+  "id": "the-first-script",
+  "name": "第一剧本",
+  "nameEn": "The First Script",
+  "edition": "Z-Man original",
+  "creator": "BakaFire",
+  "tragedySet": "First Steps",
+  "defaultLoops": 3,
+  "loopOptions": [3, 2],
+  "daysPerLoop": 4,
+  "finalGuess": false,
+  "characters": [
+    "girl-student",
+    "office-worker",
+    "doctor",
+    "police-officer",
+    "shrine-maiden",
+    "boy-student"
+  ],
+  "mainPlot": "murder-plan",
+  "subplot": "shadow-of-the-ripper",
+  "roles": {
+    "girl-student": "key-person",
+    "office-worker": "killer",
+    "doctor": "brain",
+    "police-officer": "conspiracy-theorist",
+    "shrine-maiden": "serial-killer",
+    "boy-student": "person"
+  },
+  "incidents": [
+    {
+      "day": 2,
+      "incident": "murder",
+      "culprit": "office-worker"
+    },
+    {
+      "day": 3,
+      "incident": "suicide",
+      "culprit": "girl-student"
+    }
+  ],
+  "initialLayout": {
+    "girl-student": "school",
+    "office-worker": "city",
+    "doctor": "hospital",
+    "police-officer": "city",
+    "shrine-maiden": "shrine",
+    "boy-student": "school"
+  },
+  "setupMode": "printed-character-start",
+  "victoryConditions": [
+    {
+      "type": "surviveCompleteLoop",
+      "winner": "protagonists"
+    },
+    {
+      "type": "allLoopsFailed",
+      "winner": "GM"
+    },
+    {
+      "type": "roleAndPlotConditions",
+      "references": [
+        "murder-plan",
+        "shadow-of-the-ripper",
+        "key-person",
+        "killer"
+      ]
+    }
+  ]
+}
