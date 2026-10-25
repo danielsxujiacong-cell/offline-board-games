@@ -1530,3 +1530,37 @@ dialog::backdrop {
     display: block;
   }
 }
+/* Keep escape controls reachable in long, short-height GM dialogs. */
+.dialog-top {
+  position: sticky;
+  top: -28px;
+  background: var(--paper);
+  z-index: 3;
+}
+@media (max-width: 680px) {
+  .dialog-top {
+    top: -20px;
+  }
+}
+/* Touch devices include tablets and landscape phones, not only narrow screens.
+   16px inputs also avoid Safari's automatic focus zoom on small form text. */
+@media (pointer: coarse) {
+  select,
+  input {
+    font-size: 16px !important;
+  }
+  .counter button {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .counters {
+    flex-wrap: wrap;
+  }
+  .counters .counter {
+    flex: 1 1 116px;
+  }
+  .location-heading > .counter {
+    min-width: 116px;
+  }
+}

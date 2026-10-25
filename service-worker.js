@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v25-tragedy-looper';
+const CACHE_NAME = 'daniel-board-games-v26-tragedy-audit';
 const PRECACHE = [
   './tragedy-looper/',
   './tragedy-looper/index.html',

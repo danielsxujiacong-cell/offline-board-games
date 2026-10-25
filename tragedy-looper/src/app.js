@@ -123,7 +123,7 @@ function stagePanel() {
     dayEnd: "GM 检查夜间身份能力，先处理强制技能，再处理可选技能。",
     nextDay: "确认后进入下一天；最后一天后进入轮回结束检查。",
     loopEnd: s.failed
-      ? "本轮回已失败。请 GM 检查轮回结束效果并确认结果，再回溯或结束整局。"
+      ? `${s.protagonistsDead ? "主人公死亡，本轮回已失败。" : "本轮回已失败。"}请 GM 检查轮回结束效果并确认结果，再回溯或结束整局。`
       : "最后一天已完成。请 GM 检查主线、支线和身份的轮回结束条件。",
   };
   return `<section class="panel stage"><div><div class="section-label">CURRENT PHASE / 当前阶段</div><h2>${phase}</h2><p class="muted">${hints[s.phase] || ""}</p>${

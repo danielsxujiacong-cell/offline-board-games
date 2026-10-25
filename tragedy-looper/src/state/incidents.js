@@ -50,6 +50,14 @@ export function confirmIncident(
   let effective = false;
   if (check.triggers) {
     const e = check.definition.effect;
+    // Validate choices before consuming one-shot protection or changing state.
+    if (e.type === "kill") {
+      const targets = incidentTargets(s, d, check);
+      if (targets.length && !targets.includes(target))
+        throw Error("请选择合法死亡目标");
+      if (!targets.length && preventTarget)
+        throw Error("没有面临死亡的合法目标");
+    }
     if (preventTarget) {
       if (
         (e.type === "kill" && preventTarget !== target) ||
@@ -88,10 +96,13 @@ export function confirmIncident(
     if (e.type === "hospital") {
       const count = s.locations.hospital.intrigue;
       if (count >= e.killAt) {
+        const victims = Object.entries(s.characters).filter(
+          ([, c]) => c.alive && c.location === "hospital",
+        );
         for (const [id, c] of Object.entries(s.characters))
           if (c.alive && c.location === "hospital")
             killCharacter(s, d, id, { prevent: id === preventTarget });
-        effective = true;
+        effective = victims.some(([id]) => id !== preventTarget);
       }
       if (count >= e.protagonistsAt) {
         s.protagonistsDead = true;

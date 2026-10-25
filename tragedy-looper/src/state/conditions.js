@@ -34,7 +34,12 @@ export function confirmImmediateLoss(s, d) {
   if (reasons.length) {
     s.failed = true;
     s.phase = "loopEnd";
-    record(s, "GM 确认轮回提前失败");
+    record(
+      s,
+      s.protagonistsDead
+        ? "主人公死亡，轮回立即失败"
+        : "主人公失败，轮回立即结束",
+    );
   }
   return reasons;
 }
