@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v30-wavelength-ruler';
+const CACHE_NAME = 'daniel-board-games-v31-sheriff-comic';
 const PRECACHE = [
   './wavelength/',
   './wavelength/index.html',
@@ -9,6 +9,8 @@ const PRECACHE = [
   './sheriff/index.html',
   './sheriff/style.css',
   './sheriff/app.js',
+  './sheriff/art.js',
+  './sheriff/assets/gate.webp',
   './sheriff/engine.js',
   './sheriff/RULES.md',
   './sheriff/DEVELOPMENT.md',
