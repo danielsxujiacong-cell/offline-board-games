@@ -166,7 +166,9 @@ export function freshSession() {
 export function nextGame(session, reset = false) {
   return {
     version: 1,
-    game: newGame(1 - session.game.player),
+    // Original continuation rule: the player leading on cumulative points starts.
+    // Player 1 starts a new score series and resolves a tied cumulative score.
+    game: newGame(reset || session.totals[0] >= session.totals[1] ? 0 : 1),
     totals: reset ? [0, 0] : [...session.totals],
     history: reset ? [] : structuredClone(session.history),
   };

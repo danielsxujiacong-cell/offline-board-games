@@ -5,6 +5,14 @@ const check = (condition) => {
     throw Error("存档损坏或版本不兼容；原始数据已保留。请导出备份后再重置。");
 };
 export function validate(s) {
+  // All malformed nested shapes use the same actionable recovery message.
+  try {
+    return validateSession(s);
+  } catch {
+    check(false);
+  }
+}
+function validateSession(s) {
   check(
     s?.version === 1 &&
       Array.isArray(s.totals) &&
@@ -16,6 +24,7 @@ export function validate(s) {
   check(
     g &&
       typeof g.id === "string" &&
+      g.id.length > 0 &&
       [0, 1].includes(g.player) &&
       ["PLAY", "DRAW", "END"].includes(g.phase) &&
       typeof g.ended === "boolean" &&
@@ -25,13 +34,18 @@ export function validate(s) {
   check(
     Array.isArray(g.hands) &&
       g.hands.length === 2 &&
+      g.hands.every(Array.isArray) &&
       Array.isArray(g.deck) &&
       Array.isArray(g.expeditions) &&
       g.expeditions.length === 2,
   );
   const all = [...g.deck, ...g.hands.flat()];
   for (const row of [...g.expeditions, g.discards]) {
-    check(row && COLORS.every((c) => Array.isArray(row[c])));
+    check(
+      row &&
+        Object.keys(row).length === COLORS.length &&
+        COLORS.every((c) => Array.isArray(row[c])),
+    );
     for (const color of COLORS) {
       check(row[color].every((c) => c.color === color));
       all.push(...row[color]);
@@ -83,8 +97,10 @@ export function validate(s) {
   for (const h of s.history) {
     check(
       typeof h.id === "string" &&
+        h.id.length > 0 &&
         !ids.has(h.id) &&
         typeof h.time === "string" &&
+        Number.isFinite(Date.parse(h.time)) &&
         Array.isArray(h.players) &&
         h.players.length === 2,
     );
@@ -99,6 +115,7 @@ export function validate(s) {
               ["sum", "wagers", "count", "bonus", "score"].every((k) =>
                 Number.isFinite(d[k]),
               ) &&
+              validColumnDetail(d) &&
               d.score ===
                 (d.count ? (d.sum - 20) * (d.wagers + 1) + d.bonus : 0) &&
               d.bonus === (d.count >= 8 ? 20 : 0)
@@ -119,6 +136,30 @@ export function validate(s) {
     );
   }
   return s;
+}
+// Feasible sums of n distinct values from 2–10, computed once for history validation.
+const possibleSums = Array.from({ length: 10 }, () => new Set());
+for (let mask = 0; mask < 512; mask++) {
+  let count = 0,
+    sum = 0;
+  for (let i = 0; i < 9; i++)
+    if (mask & (1 << i)) {
+      count++;
+      sum += i + 2;
+    }
+  possibleSums[count].add(sum);
+}
+function validColumnDetail(d) {
+  return (
+    ["sum", "wagers", "count", "bonus", "score"].every((k) =>
+      Number.isInteger(d[k]),
+    ) &&
+    d.wagers >= 0 &&
+    d.wagers <= 3 &&
+    d.count >= d.wagers &&
+    d.count <= d.wagers + 9 &&
+    possibleSums[d.count - d.wagers].has(d.sum)
+  );
 }
 export function load(storage = localStorage) {
   const raw = storage.getItem(KEY);

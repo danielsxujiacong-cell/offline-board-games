@@ -17,6 +17,25 @@ const assert = require("node:assert/strict"),
     const page = await context.newPage(),
       errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
+    await page.goto(base + "/");
+    const currentCache = require("node:fs")
+      .readFileSync(path.join(root, "service-worker.js"), "utf8")
+      .match(/CACHE_NAME = '([^']+)'/)[1];
+    await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.update();
+    });
+    await page.waitForFunction(async (name) => {
+      const reg = await navigator.serviceWorker.getRegistration();
+      const cached = await caches.open(name);
+      return (
+        reg?.active?.state === "activated" &&
+        !reg.installing &&
+        !reg.waiting &&
+        !!(await cached.match(new URL("/lost-cities/engine.js", location.href)))
+      );
+    }, currentCache);
+    await page.reload();
     await page.goto(base + "/lost-cities/");
     await page.evaluate(() => localStorage.removeItem("lost-cities-save-v1"));
     await page.reload();
@@ -28,7 +47,7 @@ const assert = require("node:assert/strict"),
     assert.equal(await page.locator("[data-card]").count(), 0);
     await page.click("#accept");
     assert.equal(await page.locator(".selected").count(), 1);
-    for (const w of [320, 390, 768, 1280]) {
+    for (const w of [320, 375, 390, 768, 1280]) {
       await page.setViewportSize({ width: w, height: 844 });
       assert.ok(
         await page.evaluate(
@@ -191,6 +210,11 @@ const assert = require("node:assert/strict"),
       const r = await page.goto(base + "/" + entry);
       assert.equal(r.status(), 200);
       assert.ok(r.fromServiceWorker());
+      if (entry)
+        assert.notEqual(
+          await page.title(),
+          "Daniel 的桌游｜中文离线聚会桌游合集",
+        );
       console.log("OFFLINE OK", entry || "lobby");
     }
     await page.goto(base + "/lost-cities/");

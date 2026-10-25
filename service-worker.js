@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v21-jaipur';
+const CACHE_NAME = 'daniel-board-games-v23-lost-cities-audit';
 const PRECACHE = [
   './lost-cities/',
   './lost-cities/index.html',

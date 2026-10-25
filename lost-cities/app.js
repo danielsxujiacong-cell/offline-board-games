@@ -103,12 +103,15 @@ function render() {
 function action(a) {
   if (locked || blocked) return;
   try {
+    const handScroll = root.querySelector(".hand")?.scrollLeft ?? 0;
     const oldPlayer = session.game.player;
     session.game = transition(session.game, a);
     if (session.game.ended) settle(session);
     if (oldPlayer !== session.game.player) locked = true;
     persist();
     render();
+    const hand = root.querySelector(".hand");
+    if (hand && oldPlayer === session.game.player) hand.scrollLeft = handScroll;
   } catch (e) {
     notice.textContent = e.message;
   }
