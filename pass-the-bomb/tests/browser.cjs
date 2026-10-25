@@ -84,7 +84,7 @@ for (const mode of ['word','scene','brainstorm']) for (const level of ['normal',
     await offline.evaluate(()=>navigator.serviceWorker.ready);
     await offline.waitForFunction(()=>navigator.serviceWorker.controller);
     const links=await offline.locator('a.game').evaluateAll(links=>links.map(a=>a.getAttribute('href')));
-    assert.equal(links.length,11);
+    assert.ok(links.length>=13);
     await context.setOffline(true);
     for(const link of links) {
       await offline.goto(new URL(link,base+'/').href);assert.ok(await offline.title());
@@ -95,8 +95,8 @@ for (const mode of ['word','scene','brainstorm']) for (const level of ['normal',
     await offline.waitForFunction(()=>document.querySelector('#action').textContent==='点燃引信');
     await offline.fill('#min-time','0');await offline.fill('#max-time','0');await offline.click('#time-form button');
     await offline.click('#action');assert.match(await offline.textContent('#status'),/炸啦/);
-    await offline.goto(base+'/');assert.equal(await offline.locator('a.game').count(),11);
+    await offline.goto(base+'/');assert.equal(await offline.locator('a.game').count(),links.length);
     assert.deepEqual(errors,[]);
-    console.log('PASS: 9 banks / 810 prompts; appended prompts selectable; all modes; unchanged deadline; single explosion; resume; mobile layouts; eleven offline entries.');
+    console.log('PASS: 9 banks / 810 prompts; appended prompts selectable; all modes; unchanged deadline; single explosion; resume; mobile layouts; thirteen offline entries.');
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

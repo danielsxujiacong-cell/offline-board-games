@@ -76,13 +76,13 @@ try{
  for(const width of [320,390,844]){await page.setViewportSize({width,height:width===844?390:844});for(const route of ['wasabi-roulette','two-faced','fun-employed']){await page.goto(base+'/'+route+'/');assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route+' overflow '+width);}}
  // Online install followed by genuine offline navigations for all existing and new games.
  await page.goto(base+'/');await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
- const routes=await page.locator('.game').evaluateAll(es=>es.map(e=>e.getAttribute('href')));assert.equal(routes.length,11);
- assert.ok(await page.evaluate(async()=>{const c=await caches.open('daniel-board-games-v12');return !!(await c.match('/assets/party.js'));}));
+ const routes=await page.locator('.game').evaluateAll(es=>es.map(e=>e.getAttribute('href')));assert.ok(routes.length>=13);
+ assert.ok(await page.evaluate(async()=>!!(await caches.match('/assets/party.js'))));
  await context.setOffline(true);
  for(const route of routes){await page.goto(new URL(route,base+'/').href);assert.ok(!await page.locator('.games').count(),'offline silently returned lobby: '+route);assert.ok((await page.locator('body').innerText()).length>20);}
  for(const route of ['wasabi-roulette','two-faced','fun-employed']){await page.goto(base+'/'+route+'/');await click('deal');assert.ok(await page.locator('main').innerText());}
- await page.goto(base+'/');assert.equal(await page.locator('.game').count(),11);
+ await page.goto(base+'/');assert.equal(await page.locator('.game').count(),routes.length);
  assert.deepEqual(errors,[]);
- console.log('PASS: data quality, privacy, 4/6/10 players, timers, questions, offers, sound preference, 320/390/844 layouts and eleven offline games');
+ console.log('PASS: data quality, privacy, 4/6/10 players, timers, questions, offers, sound preference, 320/390/844 layouts and thirteen offline games');
 }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

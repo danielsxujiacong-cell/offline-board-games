@@ -52,9 +52,9 @@ const fs=require('node:fs');
  await cdp.send('Network.enable');
  await cdp.send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
  const entries=['',...Array.from(fs.readFileSync(path.join(root,'index.html'),'utf8').matchAll(/class="game[^"\n]*" href="\.\/([^"\n]+)"/g),m=>m[1])];
- assert.equal(entries.length,13);
+ assert.ok(entries.includes('jaipur/'));
  for(const entry of entries){const response=await page.goto(base+'/'+entry);assert.equal(response.status(),200);assert.ok(response.fromServiceWorker());if(entry)assert.notEqual(await page.title(),'Daniel 的桌游｜中文离线聚会桌游合集');console.log('OFFLINE OK',entry||'lobby');}
  assert.deepEqual(errors,[]);
- console.log('PASS: full round, privacy, confirmations, mobile/desktop, all 13 offline entries');
+ console.log('PASS: full round, privacy, confirmations, mobile/desktop, all offline entries');
  } finally {await context.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

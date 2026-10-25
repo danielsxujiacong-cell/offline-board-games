@@ -1,6 +1,6 @@
 # Daniel 的桌游
 
-十二款手机优先、可安装、可断网游玩的桌游合集 PWA。
+十四款手机优先、可安装、可断网游玩的桌游合集 PWA。
 
 ## 本地运行
 
@@ -30,7 +30,7 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v16` 版本缓存大厅、十二个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v21-jaipur` 版本缓存大厅、十四个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
 
 ## 花见小路维护
 
@@ -63,6 +63,12 @@ GitHub main 为最终来源，通过现有 EdgeOne 链路发布至 https://games
 ## 损友审判庭
 
 入口：/games/friend-court/。100 道原创题、倒数指人、可选受害榜与 PNG 战报。无玩家设置和后端；投票计分在线下。规则与测试见 docs/FRIEND_COURT.md。
+
+## 斋浦尔 Jaipur
+
+入口 `/jaipur/`，原生 HTML/CSS/JavaScript，无构建、依赖安装、后端或外部素材。集中规则引擎 `jaipur/engine.js`；当前对局仅存内存，刷新重新开局。每次交接先移除秘密手牌，再由本人确认显示。完整原版数值与动作见页面交易规则；完全同分采用明确标注的网页自定义规则：本轮先手获胜。
+
+验证：`node --test tests/*.test.mjs`；`node tests/jaipur-browser.cjs`（复用现有 Playwright，可用 `PLAYWRIGHT_PATH` 指定，`TEST_URL` 默认为 http://127.0.0.1:8080）。浏览器测试包含整场比赛、隐私、320–1280px 布局、子路径刷新和大厅及十四款游戏 Network Offline。
 
 ## 失落的城市 Lost Cities
 
