@@ -1,5 +1,11 @@
-const CACHE_NAME = 'daniel-board-games-v19-hanamikoji';
+const CACHE_NAME = 'daniel-board-games-v20-lost-cities';
 const PRECACHE = [
+  './lost-cities/',
+  './lost-cities/index.html',
+  './lost-cities/style.css',
+  './lost-cities/app.js',
+  './lost-cities/engine.js',
+  './lost-cities/storage.js',
   './games/hanamikoji/',
   './games/hanamikoji/index.html',
   './games/hanamikoji/style.css',

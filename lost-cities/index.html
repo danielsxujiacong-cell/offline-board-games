@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#eee8da" />
+    <title>失落的城市 Lost Cities · 双人远征</title>
+    <meta
+      name="description"
+      content="双人同设备传递，五条远征路线，自动计分与本地存档。"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="icon" href="../assets/favicon.svg" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="../">← 桌游合集</a><button id="rules">探险手帖</button>
+      </header>
+      <div class="title">
+        <small>二人远征 · PASS & PLAY</small>
+        <h1>失落的城市</h1>
+        <p>LOST CITIES <span>一张地图，两位探险家。</span></p>
+      </div>
+      <p id="notice" role="status" aria-live="polite"></p>
+      <div id="game"></div>
+      <footer>存档仅保存在当前浏览器 · 非官方同人实现 · 无需联网</footer>
+    </main>
+    <dialog id="rulebook">
+      <h2>探险手帖</h2>
+      <p>
+        五色各含三张投资卡、2–10 各一张，共 60 张。双方各八张手牌，余下 44
+        张组成公共牌库。
+      </p>
+      <p>
+        每回合先出一张牌，再明确点击摸一张牌。可以将手牌打入自己的同色路线，或弃入同色公共弃牌堆。投资必须在数字之前；数字严格递增。开路线可能亏分，请谨慎出发。
+      </p>
+      <p>
+        摸牌可选公共牌库或任意弃牌堆顶牌，但不能拿回本回合刚弃掉的那张。抽走公共牌库最后一张即结束，双方手牌不计分。
+      </p>
+      <p>
+        空路线 0 分；其他路线：（数字总和 − 20）×（投资数 +
+        1），总牌数含投资达到八张后另外加 20
+        分，奖励不乘倍率。五列相加；同分为平局。
+      </p>
+      <p>
+        交接后由本人确认才显示手牌；刷新也会锁屏，可恢复出牌或摸牌阶段。再来一局保留累计成绩，清零需要确认。浏览器存储不是加密保险箱。
+      </p>
+      <button id="close-rules">开始探险</button>
+    </dialog>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

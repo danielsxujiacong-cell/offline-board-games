@@ -63,3 +63,13 @@ GitHub main 为最终来源，通过现有 EdgeOne 链路发布至 https://games
 ## 损友审判庭
 
 入口：/games/friend-court/。100 道原创题、倒数指人、可选受害榜与 PNG 战报。无玩家设置和后端；投票计分在线下。规则与测试见 docs/FRIEND_COURT.md。
+
+## 失落的城市 Lost Cities
+
+入口 `/lost-cities/`，纯前端，无依赖安装和构建。古地图、黄铜罗盘与五色地形卡牌全部使用本地 CSS 绘制。60 张原版卡牌、严格出牌/摸牌阶段、公开远征与弃牌堆、隐私交接、同一函数实时/最终计分、自由续局和累计成绩。
+
+存档键 `lost-cities-save-v1`，每次有效操作保存完整状态与唯一对局 ID，刷新与切后台重新隐藏手牌；支持 PLAY/DRAW 恢复、逐列结算与历史，已结束牌局不会重复累计。损坏或版本不兼容时保留原始存档，可导出备份并二次确认重置。仅在当前浏览器保存，无跨设备同步。
+
+本地在仓库根目录运行 `python -m http.server 8080`，打开 `http://localhost:8080/lost-cities/`。规则/存档测试：`node --test tests/lost-cities.test.mjs`；浏览器验收：`node tests/lost-cities-browser.cjs`，复用现有 Playwright 与 Edge（可设置 `PLAYWRIGHT_PATH` 和 `TEST_URL`）。包括完整 44 回合、手动公式核对、刷新/交接隐私、清零确认、损坏存档、320–1280px 和大厅所有入口 Network Offline。自动化双人操作已验证，真实两人主观体验仍需人工验收。
+
+沿用 GitHub main → EdgeOne 的静态部署，无服务器和新部署配置。
