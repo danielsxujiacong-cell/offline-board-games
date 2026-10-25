@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {newGame,shuffle,accept,act,choose,settle,nextRound,view,counts,winner,VALUES} from '../games/hanamikoji/engine.mjs';
+import {newGame,shuffle,accept,act,choose,settle,nextRound,view,counts,winner,VALUES} from '../games/hanamikoji/engine.js';
 const all=s=>[s.removed,...s.deck,...s.players.flatMap(p=>[...p.hand,...p.table,...p.secret,...p.discard]),...(s.pending?.cards||[])];
 function playRound(s){for(let i=0;i<8;i++){accept(s);const a=['secret','discard','gift','compete'][Math.floor(i/2)];act(s,a,s.players[s.turn].hand.slice(0,{secret:1,discard:2,gift:3,compete:4}[a]).map(c=>c.id));if(s.pending){accept(s);choose(s,i%2);}assert.equal(all(s).length,21);}return s;}
 test('21 unique cards, correct multiplicities, 6/6/8/1 deal and unbiased-shuffle boundaries',()=>{const s=newGame();assert.equal(all(s).length,21);assert.equal(new Set(all(s).map(c=>c.id)).size,21);assert.deepEqual(VALUES.map((_,i)=>all(s).filter(c=>c.type===i).length),VALUES);assert.deepEqual(s.players.map(p=>p.hand.length),[6,6]);assert.equal(s.deck.length,8);const a=[1,2,3];assert.deepEqual(shuffle(a,()=>.999),a);assert.deepEqual(shuffle(a,()=>0),[2,3,1]);assert.deepEqual(a,[1,2,3]);});

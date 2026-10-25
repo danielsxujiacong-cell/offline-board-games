@@ -1,4 +1,4 @@
-import {newGame,accept,act,choose,settle,nextRound,view,VALUES,ACTIONS} from './engine.mjs';
+import {newGame,accept,act,choose,settle,nextRound,view,VALUES,ACTIONS} from './engine.js';
 let state=newGame(), selected=[], action='';
 const names=['樱','梅','菊','藤','莲','枫','月'],icons=['✿','❀','✺','❧','❁','✦','☾'];
 const labels={secret:'密约',discard:'取舍',gift:'赠予',compete:'竞争'};
