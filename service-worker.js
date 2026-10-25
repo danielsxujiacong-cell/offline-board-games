@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v28-wavelength';
+const CACHE_NAME = 'daniel-board-games-v29-wavelength-ruler';
 const PRECACHE = [
   './wavelength/',
   './wavelength/index.html',
