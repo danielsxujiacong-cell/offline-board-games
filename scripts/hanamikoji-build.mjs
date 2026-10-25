@@ -1,0 +1,17 @@
+import {readFile,writeFile,mkdir,copyFile} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const require=createRequire(import.meta.url);
+const tools=path.join(root,'.openai/hanamikoji-tools/node_modules');
+const {build}=require(path.join(tools,'esbuild'));
+await copyFile(path.join(root,'games/hanamikoji/engine.js'),path.join(root,'supabase/functions/_shared/hanamikoji/engine.js'));
+await writeFile(path.join(root,'supabase/functions/_shared/hanamikoji/package.json'),'{"type":"module","private":true}\n');
+await mkdir(path.join(root,'games/hanamikoji/online/vendor'),{recursive:true});
+await build({stdin:{contents:'export {createClient} from "@supabase/supabase-js";',resolveDir:tools},bundle:true,format:'esm',platform:'browser',minify:true,legalComments:'eof',outfile:path.join(root,'games/hanamikoji/online/vendor/supabase.js')});
+const pkg=JSON.parse(await readFile(path.join(tools,'@supabase/supabase-js/package.json'),'utf8'));
+await writeFile(path.join(root,'games/hanamikoji/online/vendor/README.md'),`Supabase JS ${pkg.version}, bundled locally with esbuild. MIT; see supabase.LICENSE. Regenerate with node scripts/hanamikoji-build.mjs. Only online mode imports this file.\n`);
+await copyFile(path.join(tools,'@supabase/supabase-js/LICENSE'),path.join(root,'games/hanamikoji/online/vendor/supabase.LICENSE'));
+await build({entryPoints:[path.join(root,'supabase/functions/hanamikoji-api/index.ts')],bundle:true,format:'esm',platform:'neutral',outfile:path.join(root,'.openai/hanamikoji-edge-check.js')});
+console.log('Shared rules copied byte-for-byte; browser SDK bundled locally.');

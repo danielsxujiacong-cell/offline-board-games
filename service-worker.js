@@ -1,5 +1,12 @@
-const CACHE_NAME = 'daniel-board-games-v32-sheriff-compact';
+const CACHE_NAME = 'daniel-board-games-v33-hanamikoji-online';
 const PRECACHE = [
+  './games/hanamikoji/art.js',
+  './games/hanamikoji/online/',
+  './games/hanamikoji/online/index.html',
+  './games/hanamikoji/online/client.js',
+  './games/hanamikoji/online/config.js',
+  './games/hanamikoji/online/online.css',
+  './games/hanamikoji/online/vendor/supabase.js',
   './wavelength/',
   './wavelength/index.html',
   './wavelength/style.css',

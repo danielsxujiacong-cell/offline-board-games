@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "@supabase/supabase-js": "2.118.0",
+    "esbuild": "0.28.2",
+    "supabase": "2.122.0"
+  },
+  "private": true
+}

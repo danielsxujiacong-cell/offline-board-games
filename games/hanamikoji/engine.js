@@ -13,6 +13,8 @@ function deal(old,rng) {
     phase:'handoff',recipient:old.starter,pending:null,winner:null};
 }
 export function accept(s) {
+  if(s.phase==='reviewHandoff') {s.phase='review';return;}
+  if(s.phase==='resumeHandoff') {s.phase='action';return;}
   if(s.phase!=='handoff') throw Error('当前无需交接');
   if(s.pending) { s.phase='choice'; return; }
   const card=s.deck.pop(); if(!card) throw Error('牌库已空');
@@ -51,11 +53,28 @@ export function nextRound(s,rng=Math.random) {
   if(s.phase!=='roundResult') throw Error('不可开始下一轮');
   return deal({...s,starter:1-s.starter},rng);
 }
+export function beginReview(s,player) {
+  if(![0,1].includes(player)||!['handoff','action','choice','roundEnd'].includes(s.phase)) throw Error('当前不可查看暗置牌');
+  s.review={player,returnPhase:s.phase,recipient:s.recipient};
+  s.phase='reviewHandoff';s.recipient=player;
+}
+export function closeReview(s) {
+  if(s.phase!=='review') throw Error('当前未查看暗置牌');
+  const {returnPhase,recipient}=s.review;
+  s.phase=returnPhase==='action'?'resumeHandoff':returnPhase==='choice'?'handoff':returnPhase;
+  s.recipient=returnPhase==='action'?s.turn:recipient;
+  delete s.review;
+}
+export function hidePrivate(s) {
+  if(s.phase==='action') {s.phase='resumeHandoff';s.recipient=s.turn;}
+  else if(s.phase==='review') s.phase='reviewHandoff';
+}
 // Only public information crosses the privacy boundary. Hidden cards never enter the DOM.
 export function view(s) {
   const reveal=['roundResult','gameOver'].includes(s.phase);
   return {round:s.round,turn:s.turn,phase:s.phase,recipient:s.recipient,markers:s.markers,scores:scores(s.markers),winner:s.winner,deck:s.deck.length,
     players:s.players.map(p=>({used:p.used,counts:counts(p,reveal),handSize:p.hand.length})),
     hand:s.phase==='action'?s.players[s.turn].hand:[],
+    privateCards:s.phase==='review'?{player:s.review.player,secret:[...s.players[s.review.player].secret],discard:[...s.players[s.review.player].discard]}:null,
     pending:s.phase==='choice'?s.pending:null};
 }

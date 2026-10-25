@@ -4,6 +4,7 @@ Thumbs.db
 .github-downloads/
 node_modules/
 .openai/
+supabase/.temp/
 _site_stage/
 
 cache/

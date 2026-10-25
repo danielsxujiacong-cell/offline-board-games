@@ -12,7 +12,7 @@ python -m http.server 8080
 
 ## 包含游戏
 
-- 花见小路 Hanamikoji：`/games/hanamikoji/`，两人单设备传递，完整四行动、轮末结算与多轮支持继承。
+- 花见小路 Hanamikoji：`/games/hanamikoji/` 单机传递；`/games/hanamikoji/online/` 在线双人，支持私有手牌、实时同步和重连。配置与维护见 `supabase/README-hanamikoji.md`。
 
 - 嘴炮炸弹 Pass the Bomb：`/pass-the-bomb/`，三模式 × 三难度，810 道中文题（每档 90 题），自定义 0 秒起的引信范围。
 - 伪艺术家纽约行
