@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-25 花见小路
+
+新增 `/games/hanamikoji/`，完整四行动、对手亲选赠予/竞争、确认交接后才显示手牌、行动后立即移除手牌 DOM，轮末翻开密约、支持平局保留、11 分优先与多轮交换先手。源码直接在本仓库维护，不运行 sync-games.ps1。规则与界面为本地 JS，无运行依赖、安装或打包步骤；package.json 仅声明模块类型供 Node 测试使用。刷新会结束当前内存对局。
+
+规则测试 `node --test tests/hanamikoji.test.mjs`（10 项）及 `node tests/hanamikoji-browser.cjs` 通过；后者沿用现有 Playwright/Edge，用 PLAYWRIGHT_PATH 指定已有包、TEST_URL 指定地址。覆盖整轮、交接无手牌 DOM、取消重开/结算、隐藏恢复不重复摸牌、390/1280 视口无横向溢出、CDP Network Offline 下大厅及全部 12 个真实游戏入口。现有 Just One / Pass the Bomb 题库验证亦通过。
+
+实现 2d8854e、静态服务器 MIME 兼容修正 f435bba 已推送 main，GitHub 部署检查成功。正式域名 app.js/engine.js 返回 application/javascript，浏览器在 https://games.danielxu.cn 完整通过相同整轮及全部 13 个离线入口测试；SW v16。截图在忽略目录 .openai/。不使用 .mjs 作为线上脚本，当前部署将其返回 application/octet-stream。仅做浏览器设备模拟，未声称实体手机验证。
+
 2026-10-23 嘴炮炸弹题库三倍扩充：九份 TSV 各追加 60 题，合计 270 → 810（每档 90）。原 001–030 文本完整保留；新增内容覆盖聚餐、KTV、社交翻车、宠物、虚构世界、拟人用途及带约束的脑洞设定。每题有维护用答案示例，参考来源与中文筛选标准在 `pass-the-bomb/data/题库维护与来源.md`。没有改 app.js、CSS、时间设置或其他游戏源码。
 
 验证通过：`node pass-the-bomb/validate-data.cjs`（810 题全库题面无重复、连续编号、BOM、接词长度）；对比 Git 证明原 270 题未变；`node pass-the-bomb/tests/browser.cjs`（九档新增题确实可抽到、0/小数/随机时间、传递不重计时、后台恢复、单次爆炸、320/390/844 视口、11 个真实离线入口）；`node --check service-worker.js`。合并远端同期演技题库扩容 3110df4 后缓存递增至 v13，保留对方变更，沿用现有 main → EdgeOne 发布链路。
