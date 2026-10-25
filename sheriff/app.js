@@ -1,4 +1,4 @@
-import {icon,portrait,scene} from './art.js';
+import {icon,portrait,scene} from './art.js?v=compact-1';
 import {GOODS,LEGAL,merchant,create,exchange,seal,negotiate,resolve,next,scores} from './engine.js';
 const $=s=>document.querySelector(s), key='sheriff-dual-bags-v1', esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let game=null,locked=true,selected=[],assign={},active=0,declarations=['apple','apple'],bribes=[0,0],saveError='',corrupt=false;

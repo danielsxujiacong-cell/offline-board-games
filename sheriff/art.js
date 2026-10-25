@@ -1,5 +1,5 @@
 // Original inline ink drawings. No fonts, emoji or remote icon dependencies.
-const wrap=(body,cls='')=>`<svg class="ink-art ${cls}" viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="#35251e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+const wrap=(body,cls='')=>`<svg class="ink-art ${cls}" width="100" height="100" viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="#35251e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 const drawings={
 apple:'<path fill="#aa3d30" d="M50 34C21 12 10 47 23 71c12 23 22 11 27 12 18 9 35-10 36-30 2-21-19-30-36-19Z"/><path d="m49 34 4-19"/><path fill="#748449" d="M54 24C58 9 74 13 78 14c-3 13-12 16-24 10Z"/><path stroke="#e8a074" d="M31 44q-8 13-2 23"/>',
 cheese:'<path fill="#ecc451" d="m15 49 47-26 23 18v37H15Z"/><path fill="#f6da7a" d="m15 49 47-26 23 18-45 20Z"/><path d="m40 61 45-20M40 61v17"/><circle cx="58" cy="65" r="6" fill="#ba8435"/><circle cx="75" cy="55" r="4" fill="#ba8435"/><path d="M21 66q9-9 12 0"/>',

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v31-sheriff-comic';
+const CACHE_NAME = 'daniel-board-games-v32-sheriff-compact';
 const PRECACHE = [
   './wavelength/',
   './wavelength/index.html',
@@ -8,8 +8,11 @@ const PRECACHE = [
   './sheriff/',
   './sheriff/index.html',
   './sheriff/style.css',
+  './sheriff/style.css?v=compact-1',
   './sheriff/app.js',
+  './sheriff/app.js?v=compact-1',
   './sheriff/art.js',
+  './sheriff/art.js?v=compact-1',
   './sheriff/assets/gate.webp',
   './sheriff/engine.js',
   './sheriff/RULES.md',
