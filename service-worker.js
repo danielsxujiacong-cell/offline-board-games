@@ -1,5 +1,10 @@
-const CACHE_NAME = 'daniel-board-games-v14';
+const CACHE_NAME = 'daniel-board-games-v15';
 const PRECACHE = [
+  './games/hanamikoji/',
+  './games/hanamikoji/index.html',
+  './games/hanamikoji/style.css',
+  './games/hanamikoji/app.mjs',
+  './games/hanamikoji/engine.mjs',
   './games/friend-court/',
   './games/friend-court/index.html',
   './games/friend-court/styles.css',

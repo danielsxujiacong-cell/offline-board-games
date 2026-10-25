@@ -1,6 +1,6 @@
 # Daniel 的桌游
 
-十一款手机优先、可安装、可断网游玩的桌游合集 PWA。
+十二款手机优先、可安装、可断网游玩的桌游合集 PWA。
 
 ## 本地运行
 
@@ -11,6 +11,8 @@ python -m http.server 8080
 打开 `http://127.0.0.1:8080/`。Service Worker 需要 HTTP(S) 环境，不能用 `file://` 直接打开。
 
 ## 包含游戏
+
+- 花见小路 Hanamikoji：`/games/hanamikoji/`，两人单设备传递，完整四行动、轮末结算与多轮支持继承。
 
 - 嘴炮炸弹 Pass the Bomb：`/pass-the-bomb/`，三模式 × 三难度，810 道中文题（每档 90 题），自定义 0 秒起的引信范围。
 - 伪艺术家纽约行
@@ -28,7 +30,11 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v13` 版本缓存大厅、十一个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v15` 版本缓存大厅、十二个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+
+## 花见小路维护
+
+源码在 `games/hanamikoji/`，仅本地 HTML/CSS/JavaScript，无构建或安装步骤，直接使用现有静态部署。原创花纹图形，无外部资源。对局仅保存当前页面内存，刷新会重新开局。规则测试：`node --test tests/hanamikoji.test.mjs`；浏览器测试：`node tests/hanamikoji-browser.cjs`（使用现有 Playwright，`PLAYWRIGHT_PATH` 可指定包路径，`TEST_URL` 可指定 HTTP 地址）。覆盖完整一轮、传递隐私、手机/桌面布局及所有入口 Network Offline 导航。
 
 ## Just One 维护与发布
 
