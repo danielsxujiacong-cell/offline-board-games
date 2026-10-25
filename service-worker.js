@@ -1,5 +1,10 @@
-const CACHE_NAME = 'daniel-board-games-v27-sheriff';
+const CACHE_NAME = 'daniel-board-games-v28-wavelength';
 const PRECACHE = [
+  './wavelength/',
+  './wavelength/index.html',
+  './wavelength/style.css',
+  './wavelength/prompts.js',
+  './wavelength/app.js',
   './sheriff/',
   './sheriff/index.html',
   './sheriff/style.css',
