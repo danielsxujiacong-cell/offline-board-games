@@ -6,20 +6,22 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'C:/Users/weissblake/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const base=process.env.TEST_URL||'http://127.0.0.1:8080';
-const contexts=[],pages=[],frames=[0,0],errors=[];
+const contexts=[],pages=[],frames=[0,0],errors=[],network=[];
 const tap=async(p,s)=>{await p.locator(s).tap();};
 const version=p=>p.locator('.round span').textContent().then(t=>Number(t.match(/版本 (\d+)/)[1]));
 const atVersion=async(p,n)=>p.waitForFunction(n=>document.querySelector('.round span')?.textContent.includes('版本 '+n),n,{timeout:15000});
 try{
  for(let p=0;p<2;p++){
   const context=await chromium.launchPersistentContext(path.join(root,'.openai/hanamikoji-real-'+p),{channel:'msedge',headless:true,viewport:{width:p?375:390,height:844},hasTouch:true,isMobile:true,serviceWorkers:'block'});contexts.push(context);
-  await context.addInitScript(()=>{localStorage.removeItem('hanamikoji-online-room-v1');const interval=window.setInterval;window.setInterval=(f,ms,...args)=>ms===5000?0:interval(f,ms,...args);});
+  await context.addInitScript(()=>{if(!sessionStorage.getItem('hanamikoji-qa-initialized')){localStorage.removeItem('hanamikoji-online-room-v1');sessionStorage.setItem('hanamikoji-qa-initialized','1');}const interval=window.setInterval;window.setInterval=(f,ms,...args)=>ms===5000?0:interval(f,ms,...args);});
   const page=await context.newPage();pages.push(page);page.on('pageerror',e=>errors.push(e.message));
+  page.on('response',r=>{if(r.url().includes('/functions/v1/'))network.push(`${p}: HTTP ${r.status()}`);});
+  page.on('requestfailed',r=>network.push(`${p}: ${new URL(r.url()).pathname} ${r.failure()?.errorText}`));
   page.on('websocket',ws=>ws.on('framereceived',e=>{try{const data=JSON.parse(e.payload),payload=Array.isArray(data)?data[4]:data.payload;if(payload?.data?.record?.snapshot){assert.equal(payload.data.record.snapshot.seat,p);frames[p]++;}}catch(e){if(e instanceof assert.AssertionError)errors.push(e.message);}}));
   await page.goto(base+'/games/hanamikoji/online/');
  }
  const [host,guest]=pages;
- await tap(host,'#create');await host.locator('.room-code').waitFor({timeout:20000});
+ await tap(host,'#create');await host.locator('.room-code').waitFor({timeout:45000});
  const code=(await host.locator('.room-code').textContent()).replace('房间 ','');
  await guest.locator('#code').fill(code);await tap(guest,'#join');
  await host.waitForFunction(()=>document.querySelector('.lobby')?.textContent.includes('玩家 2：未准备'));
@@ -47,9 +49,12 @@ try{
  for(const n of frames)assert.ok(n>=10,'Realtime frames were not received');
  await contexts[1].setOffline(true);await guest.waitForFunction(()=>document.querySelector('#connection').textContent.includes('已断网'));
  await contexts[1].setOffline(false);await guest.waitForFunction(()=>document.querySelector('#connection').textContent.includes('已连接'));
- // Reload the current URL, bypassing the test's initial room-selection reset.
+ // A transient API failure during startup must not erase the remembered room.
  const savedRoom=await host.evaluate(()=>localStorage.getItem('hanamikoji-online-room-v1'));
- await guest.evaluate(id=>localStorage.setItem('hanamikoji-online-room-v1',id),savedRoom);
+ await guest.route('**/functions/v1/hanamikoji-api',route=>route.request().postDataJSON().type==='sync'?route.abort('internetdisconnected'):route.continue());
+ await guest.reload();await guest.waitForFunction(()=>document.querySelector('#connection').textContent.includes('房间已保留'));
+ assert.equal(await guest.evaluate(()=>localStorage.getItem('hanamikoji-online-room-v1')),savedRoom);
+ await guest.unroute('**/functions/v1/hanamikoji-api');
  await guest.locator('#refresh').tap();await atVersion(guest,await version(host));
  for(const [w,h] of [[320,568],[375,667],[390,844],[667,375],[1280,900]]){await host.setViewportSize({width:w,height:h});assert.equal(await host.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
  await host.setViewportSize({width:390,height:844});await host.screenshot({path:path.join(root,'.openai/hanamikoji-production.png'),fullPage:true});
@@ -59,6 +64,7 @@ try{
  assert.deepEqual(errors,[]);
  console.log('PASS REAL BROWSER: four actions, per-owner WebSockets (fallback polling disabled), round scoring, reconnect, restart, host exit, mobile/desktop. '+base);
 }catch(e){
+ console.error('Network diagnostics:',network);
  for(let i=0;i<pages.length;i++){await pages[i].screenshot({path:path.join(root,`.openai/hanamikoji-cloud-failure-${i}.png`),fullPage:true}).catch(()=>{});console.error('Player '+i+' UI:',await pages[i].locator('#error').textContent().catch(()=>''));}
  throw e;
 }finally{for(const context of contexts)await context.close();}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v33-hanamikoji-online';
+const CACHE_NAME = 'daniel-board-games-v34-hanamikoji-reconnect';
 const PRECACHE = [
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',

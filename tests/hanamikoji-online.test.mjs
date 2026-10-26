@@ -36,6 +36,11 @@ test('readiness and start require both players, only host can start',async()=>{
  assert.ok(!JSON.stringify(guest).includes('removed'));assert.ok(!JSON.stringify(guest).includes('users'));
  assert.ok(room.board.hand.every(c=>!guest.board.hand.some(x=>x.id===c.id)));
 });
+test('an existing member can rejoin a running room by code without changing cards or drawing',async()=>{
+ const before=(await store.getRoom(room.id)).state;
+ room=(await call(users[0],command('join',null,{code:room.code}))).body;
+ assert.equal(room.seat,0);assert.deepEqual((await store.getRoom(room.id)).state,before);
+});
 test('RLS: owner reads only own projection; strangers read no rows; all client writes and full state/RPC access denied',async()=>{
  await db.exec('set role authenticated');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[users[0]]);
  try{

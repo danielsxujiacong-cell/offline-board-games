@@ -62,7 +62,7 @@ node tests/hanamikoji-online-dev.mjs
 
 打开 `http://127.0.0.1:8098/games/hanamikoji/online/`，在普通窗口和独立无痕窗口各开一份；每个浏览器身份不同。**这是明确的本地测试模拟器**：实际执行 PostgreSQL、迁移/RLS/RPC、服务端规则和浏览器 SDK，但 Auth 与 Realtime 传输为替身；只绑定 loopback，没有生产凭据，数据只存在此进程内存。不要部署此测试服务器。
 
-实际结果：32 项单机+联机逻辑/SQL 测试通过；本地双浏览器 E2E 通过完整获胜对局、全部四行动、自己的 Realtime 投影、第三人拒绝、重开同意/拒绝、掉线重连、刷新恢复、丢失响应后的同请求重试一次、房主退出及 320/375/390 手机、横屏、桌面布局。原单机触屏套件及大厅/所有游戏 Network Offline 入口通过，无页面异常。真实 Supabase Auth/API/Realtime E2E 已通过：真实匿名身份、四行动、计分获胜、幂等、双方私有 Realtime、重连同步、重新开局和退出。生产 REST 适配器补充了 void RPC 空响应兼容与回归测试；同版本重复通知不再重绘牌面。可用 `node tests/hanamikoji-production-browser.mjs` 运行真实双浏览器联调，`TEST_URL` 可指定正式站点；其自动同步轮询被关闭以证明 WebSocket 更新生效。
+实际结果：33 项单机+联机逻辑/SQL 测试通过；本地双浏览器 E2E 通过完整获胜对局、全部四行动、自己的 Realtime 投影、第三人拒绝、重开同意/拒绝、掉线重连、刷新恢复、丢失响应后的同请求重试一次、房主退出及 320/375/390 手机、横屏、桌面布局。原单机触屏套件及大厅/所有游戏 Network Offline 入口通过，无页面异常。真实 Supabase Auth/API/Realtime E2E 已通过：真实匿名身份、四行动、计分获胜、幂等、双方私有 Realtime、重连同步、重新开局和退出。生产 REST 适配器补充了 void RPC 空响应兼容与回归测试；同版本重复通知不再重绘牌面。启动同步临时失败保留房间记录，原成员可凭房间码重返进行中的对局且不重复摸牌。可用 `node tests/hanamikoji-production-browser.mjs` 运行真实双浏览器联调，`TEST_URL` 可指定正式站点；其自动同步轮询被关闭以证明 WebSocket 更新生效。
 
 安全顾问对三张权威内部表提示 [RLS 无客户端策略](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) 为 INFO，与拒绝客户端访问设计一致。其他原有项目警告不在本任务范围内，未改动。
 

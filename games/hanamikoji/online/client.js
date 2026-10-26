@@ -85,7 +85,7 @@ function render(){
 }
 async function boot(){
   showError('');render();
-  try{const auth=await session();user=auth.user;setConnection('匿名身份已连接');const id=localStorage.getItem(storageKey);if(id){try{apply(await call({type:'sync',roomId:id}));await subscribe();}catch(e){localStorage.removeItem(storageKey);showError(e.message);}}render();}
+  try{const auth=await session();user=auth.user;connected=navigator.onLine;setConnection('匿名身份已连接');const id=localStorage.getItem(storageKey);if(id){try{apply(await call({type:'sync',roomId:id}));await subscribe();}catch(e){if(['not_member','room_unavailable','room_expired'].includes(e.code))localStorage.removeItem(storageKey);else{connected=false;setConnection('连接中断 · 房间已保留，请重新同步');}showError(e.message);}}render();}
   catch(e){setConnection('在线模式配置未就绪 · 单机版不受影响');showError(e.message);render();}
 }
 document.querySelector('#refresh').onclick=()=>room?sync():boot();

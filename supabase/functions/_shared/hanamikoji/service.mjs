@@ -20,8 +20,8 @@ export function transition(original,actor,command,rng=secureRandom){
   requireRule(Date.parse(room.expiresAt)>Date.now(),'room_expired',410);
   requireRule(room.status!=='closed','room_closed',410);
   if(type==='join'){
-    requireRule(room.status==='waiting','room_unavailable',409);
     if(room.users.includes(actor))return room;
+    requireRule(room.status==='waiting','room_unavailable',409);
     requireRule(room.users[1]===null,'room_unavailable',409);
     room.users[1]=actor;room.ready=[false,false];return room;
   }
