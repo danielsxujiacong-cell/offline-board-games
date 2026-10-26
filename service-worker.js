@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v37-wavelength-drag-intimacy';
+const CACHE_NAME = 'daniel-board-games-v38-wavelength-report-export';
 const PRECACHE = [
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',
@@ -13,6 +13,7 @@ const PRECACHE = [
   './wavelength/prompts.js',
   './wavelength/questions.json',
   './wavelength/app.js',
+  './wavelength/report.js',
   './sheriff/',
   './sheriff/index.html',
   './sheriff/style.css',

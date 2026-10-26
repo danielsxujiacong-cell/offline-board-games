@@ -7,3 +7,12 @@
 .back-button{font-size:13px;padding:10px 14px;background:#294a43}.pack-count{margin-left:auto;font-size:10px;opacity:.65}.packs label{min-height:32px;font-size:12px}.packs{column-gap:18px}
 
 .interactive-spectrum{cursor:ew-resize;touch-action:none;user-select:none;-webkit-user-select:none}.interactive-spectrum .needle{pointer-events:none;box-shadow:0 0 0 2px #f6f1df55}.interactive-spectrum:focus-visible{outline:3px solid var(--lime);outline-offset:5px}
+
+.report-panel>.tools{flex-wrap:wrap}.report-panel>.tools button{flex:1 1 140px}.report-export{max-width:680px;padding:22px}.report-export h2{font-size:24px;margin:0}.report-export .topline{align-items:flex-start}.export-actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.export-actions[hidden]{display:none}.export-download{display:flex;align-items:center;justify-content:center;border-radius:12px;padding:14px 18px;min-height:48px}.export-image{display:block;width:100%;height:auto;border-radius:10px;user-select:auto;-webkit-user-select:auto}.export-image[hidden]{display:none}
+@page{size:A4 portrait;margin:12mm}
+@media print{
+ :root{color-scheme:light;background:white;color:black}body{background:white!important;color:black!important}
+ header,footer,dialog,.confetti,.game>.topline,.report-panel>.tools,.report-panel>#share-status,.report-panel>#again{display:none!important}
+ main,.game{width:auto!important;max-width:none!important;margin:0!important;padding:0!important}.game .panel{margin:0!important;padding:0!important;border:0!important;border-radius:0;background:white!important;box-shadow:none}
+ .report-panel{font-size:12px}.report-panel h2{font-size:20px;margin:5px 0;overflow-wrap:anywhere}.report-panel .score{font-size:42px;line-height:1.1;margin:8px 0;color:black}.report-panel p{font-size:12px;line-height:1.4;margin:4px 0;color:black}.report-panel .eyebrow,.report-panel .history strong{color:black}.report-panel>.eyebrow{font-size:11px}.report-panel .history{display:block}.report-panel .history article{padding:7px 0;border-color:#999;break-inside:avoid;page-break-inside:avoid}.report-panel .history .eyebrow{font-size:10px;letter-spacing:.04em}.report-panel .small{font-size:10px}
+}
