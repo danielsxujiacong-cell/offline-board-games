@@ -4,3 +4,7 @@ project_id = "vjqsorzsilxblufpdxxc"
 [functions.hanamikoji-api]
 verify_jwt = true
 entrypoint = "./functions/hanamikoji-api/index.ts"
+
+[functions.wavelength-api]
+verify_jwt = true
+entrypoint = "./functions/wavelength-api/index.ts"

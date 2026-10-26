@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v38-wavelength-report-export';
+const CACHE_NAME = 'daniel-board-games-v39-wavelength-online';
 const PRECACHE = [
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',
@@ -14,6 +14,12 @@ const PRECACHE = [
   './wavelength/questions.json',
   './wavelength/app.js',
   './wavelength/report.js',
+  './wavelength/spectrum.js',
+  './wavelength/online/',
+  './wavelength/online/index.html',
+  './wavelength/online/client.js',
+  './wavelength/online/config.js',
+  './wavelength/online/online.css',
   './sheriff/',
   './sheriff/index.html',
   './sheriff/style.css',

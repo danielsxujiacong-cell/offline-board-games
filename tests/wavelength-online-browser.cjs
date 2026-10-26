@@ -1,0 +1,28 @@
+const {chromium}=require(process.env.PLAYWRIGHT_PATH || 'playwright');const assert=require('node:assert/strict');const fs=require('node:fs');
+(async()=>{const browser=await chromium.launch({channel:'msedge',headless:true});const contexts=await Promise.all([0,1].map(()=>browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true})));const pages=await Promise.all(contexts.map(c=>c.newPage()));const [a,b]=pages,errors=[];const base=process.env.TEST_URL||'http://127.0.0.1:8091';let roomCode;
+for(const p of pages){p.setDefaultTimeout(45000);p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.__WAVELENGTH_DISABLE_POLLING__=true);p.on('dialog',d=>d.accept());}
+const tap=async(p,s)=>{const el=p.locator(s);await el.scrollIntoViewIfNeeded();await el.click()};
+try{
+ await Promise.all(pages.map(p=>p.goto(base+'/wavelength/online/')));await Promise.all(pages.map(p=>p.getByText('在线身份已连接',{exact:true}).waitFor()));
+ await a.locator('#name').fill('云端猫猫');await tap(a,'#create');await a.locator('.room-code').waitFor();roomCode=await a.locator('.room-code').innerText();assert.equal(roomCode.length,10);
+ await b.locator('#name').fill('远方搭档');await b.locator('#code').fill(roomCode);await tap(b,'#join');await b.locator('.room-code').waitFor();await a.locator('.player').filter({hasText:'远方搭档'}).waitFor();
+ await tap(a,'[data-send=ready]');await b.locator('.player').filter({hasText:'云端猫猫'}).filter({hasText:'已准备'}).waitFor();await tap(b,'[data-send=ready]');await a.locator('[data-send=start]:enabled').waitFor();await tap(a,'[data-send=start]');
+ for(let round=0;round<6;round++){
+  const sender=pages[round%2],receiver=pages[1-round%2];await sender.locator('#peek').waitFor();await receiver.getByText(/正在想线索/).waitFor();assert.equal(await receiver.locator('.target-value').count(),0);
+  await sender.locator('#peek').dispatchEvent('pointerdown',{pointerType:'touch'});assert.equal(await sender.locator('.target-value').isVisible(),true);const target=Number((await sender.locator('.target-value').innerText()).replace(/\D/g,''));await sender.locator('#peek').dispatchEvent('pointerup');assert.equal(await sender.locator('.target-value').isVisible(),false);
+  if(round===0){await sender.locator('#clue').fill('未发送的线索');await sender.reload();await sender.locator('#peek').waitFor();assert.equal(await sender.locator('#clue').inputValue(),'未发送的线索');}
+  await sender.locator('#clue').fill(round===0?'《三体》':'远方的火锅');await tap(sender,'#clue-form .primary');await receiver.locator('#lock').waitFor();assert.equal(await receiver.locator('.target-value').count(),0);assert.equal(await sender.locator('.target-value').count(),0);
+  await receiver.locator('#guess').fill(String(target));if(round===0){await receiver.reload();await receiver.locator('#lock').waitFor();assert.equal(await receiver.locator('#guess').inputValue(),String(target));await contexts[1].setOffline(true);await receiver.waitForTimeout(100);assert.equal(await receiver.locator('#lock').isDisabled(),true);await contexts[1].setOffline(false);await receiver.locator('#lock:enabled').waitFor();}
+  await tap(receiver,'#lock');await Promise.all(pages.map(p=>p.locator('[data-send=next]').waitFor()));for(const p of pages){assert.ok((await p.locator('.score').innerText()).includes('+4'));assert.equal(await p.locator('.interactive-spectrum').count(),0)}
+  await tap(a,'[data-send=next]');await b.locator('.next-status').filter({hasText:'搭档：已就绪'}).waitFor();await tap(b,'[data-send=next]');
+ }
+ await Promise.all(pages.map(p=>p.locator('.history article').nth(5).waitFor()));assert.equal(await a.locator('.history article').count(),6);assert.ok((await a.locator('.score').innerText()).includes('24'));
+ await tap(b,'#save-image');await b.locator('.export-download').waitFor({state:'visible'});await b.locator('.export-close').click();
+ // Verify production Data API grants with a real authenticated member.
+ const access=await a.evaluate(async()=>{const session=JSON.parse(localStorage.getItem('wavelength-auth-v1'));const {config}=await import('./config.js');const opts={headers:{apikey:config.publishableKey,Authorization:'Bearer '+session.access_token}};const raw=await fetch(config.url+'/rest/v1/wavelength_rooms?select=*',opts);const views=await fetch(config.url+'/rest/v1/wavelength_player_views?select=*',opts);return {raw:raw.status,views:await views.json(),uid:session.user.id}});assert.ok(access.raw>=400);assert.equal(access.views.length,1);assert.ok(access.views.every(v=>v.user_id===access.uid));
+ fs.mkdirSync('.openai',{recursive:true});await a.screenshot({path:'.openai/wavelength-online-report.png',fullPage:true});
+ await tap(a,'[data-send=restart]');await b.locator('[data-send=restartAccept]').waitFor();await tap(b,'[data-send=restartAccept]');await a.locator('[data-send=ready]').waitFor();assert.equal(await a.locator('#peek').count(),0);await tap(a,'#leave');await b.getByText('房间已关闭',{exact:true}).waitFor();
+ assert.deepEqual(errors,[]);console.log('PASS CLOUD: two real Auth identities, private targets, six rounds / 24 points, WebSocket sync without polling, draft/guess reload, offline recovery, PNG report, RLS REST checks, consent restart, exit closes both');
+}catch(e){console.error('Cloud browser failed:',e.message);for(let i=0;i<pages.length;i++){try{console.error('page '+i+': '+(await pages[i].locator('#connection,#error').allTextContents()).join(' | '));await pages[i].screenshot({path:'.openai/wavelength-online-failure-'+i+'.png',fullPage:true})}catch{}}throw e}
+finally{try{if(await a.locator('#leave').count())await tap(a,'#leave')}catch{}await browser.close()}
+})().catch(e=>{console.error(e);process.exit(1)});
