@@ -5,6 +5,7 @@ const packs=Object.fromEntries([...new Set(questions.map(row=>row[0]))].map(c=>[
 
 import assert from 'node:assert/strict';
 assert.ok(questions.length>=1120,'保留原有120题并新增至少1000题');
+assert.deepEqual(Object.keys(packs),['日常生活','美食消费','社交关系','亲密关系','娱乐脑洞','旅行自然']);
 const seen=new Set();
 for(const [i,row] of questions.entries()){
  assert.equal(row.length,3,`第${i+1}题应为[分类,左端,右端]`);
