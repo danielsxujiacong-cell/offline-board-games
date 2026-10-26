@@ -5,3 +5,5 @@
 @media(max-width:360px){.scale{font-size:9px}.scale span:nth-last-child(2){transform:translateX(-65%)}}
 
 .back-button{font-size:13px;padding:10px 14px;background:#294a43}.pack-count{margin-left:auto;font-size:10px;opacity:.65}.packs label{min-height:32px;font-size:12px}.packs{column-gap:18px}
+
+.interactive-spectrum{cursor:ew-resize;touch-action:none;user-select:none;-webkit-user-select:none}.interactive-spectrum .needle{pointer-events:none;box-shadow:0 0 0 2px #f6f1df55}.interactive-spectrum:focus-visible{outline:3px solid var(--lime);outline-offset:5px}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v36-wavelength-six-packs';
+const CACHE_NAME = 'daniel-board-games-v37-wavelength-drag-intimacy';
 const PRECACHE = [
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',
