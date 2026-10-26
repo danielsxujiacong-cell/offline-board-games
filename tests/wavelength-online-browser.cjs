@@ -1,6 +1,6 @@
 const {chromium}=require(process.env.PLAYWRIGHT_PATH || 'playwright');const assert=require('node:assert/strict');const fs=require('node:fs');
 (async()=>{const browser=await chromium.launch({channel:'msedge',headless:true});const contexts=await Promise.all([0,1].map(()=>browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true})));const pages=await Promise.all(contexts.map(c=>c.newPage()));const [a,b]=pages,errors=[];const base=process.env.TEST_URL||'http://127.0.0.1:8091';let roomCode;
-for(const p of pages){p.setDefaultTimeout(45000);p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.__WAVELENGTH_DISABLE_POLLING__=true);p.on('dialog',d=>d.accept());}
+for(const p of pages){p.setDefaultTimeout(45000);p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.__WAVELENGTH_DISABLE_POLLING__=true);p.on('dialog',d=>d.accept());p.on('response',async r=>{if(r.url().includes('/auth/v1/signup')&&!r.ok()){const e=await r.json().catch(()=>({}));console.error('Auth registration status',r.status(),e.code||e.error_code||'unknown')}});}
 const tap=async(p,s)=>{const el=p.locator(s);await el.scrollIntoViewIfNeeded();await el.click()};
 try{
  await Promise.all(pages.map(p=>p.goto(base+'/wavelength/online/')));await Promise.all(pages.map(p=>p.getByText('在线身份已连接',{exact:true}).waitFor()));
