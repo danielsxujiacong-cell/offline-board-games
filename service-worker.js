@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v34-hanamikoji-reconnect';
+const CACHE_NAME = 'daniel-board-games-v35-wavelength-library';
 const PRECACHE = [
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',
@@ -11,6 +11,7 @@ const PRECACHE = [
   './wavelength/index.html',
   './wavelength/style.css',
   './wavelength/prompts.js',
+  './wavelength/questions.json',
   './wavelength/app.js',
   './sheriff/',
   './sheriff/index.html',
@@ -156,5 +157,21 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
+  if (new URL(event.request.url).pathname === new URL('./wavelength/questions.json', self.registration.scope).pathname) {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(event.request, {cache: 'no-store'});
+        if (!response.ok) throw new Error('Question library unavailable');
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(event.request, response.clone());
+        return response;
+      } catch (error) {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        return new Response('Question library unavailable', {status: 503});
+      }
+    })());
+    return;
+  }
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)); return response; }).catch(() => caches.match('./index.html'))));
 });
