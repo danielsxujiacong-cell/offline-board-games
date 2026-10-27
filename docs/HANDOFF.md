@@ -57,3 +57,7 @@ assets/party-data.js 含 30 限制令、24 话题、16 完整剧本、30 职位�
 
 大厅及十一个固定游戏入口补充标题、描述与 canonical，新增 robots.txt 与 sitemap.xml。Service Worker 缓存版本 v14，游戏脚本和题库未改动。
 推送后需核对自定义域名已更新；搜索平台归属验证与 sitemap 提交由用户完成。
+
+## 2026-10-27 · SEO 增量
+
+六个较新入口补齐 canonical/robots 与缺失描述；惨剧轮回加入地图（共 19 个公开 URL）。SW v42。hanamikoji-browser.cjs 通过多视口、整局隐私与大厅和 17 个游戏离线导航；零页面异常。只提交 SEO 文件，其他在途题库工作保留。
