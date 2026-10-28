@@ -28,6 +28,6 @@ await backAndResume();assert.equal(await page.locator('.history article').count(
 await page.screenshot({path:'wavelength-report.png',fullPage:true});
 await page.goto(base+'/');await page.evaluate(async()=>{await navigator.serviceWorker.ready});await page.waitForFunction(async()=>{const c=await caches.open('daniel-board-games-v40-wavelength-auth-reconnect');return !!await c.match(new URL('/wavelength/questions.json',location.href))});await page.reload();
 const links=await page.locator('a.game').evaluateAll(els=>els.map(e=>e.getAttribute('href')));await context.setOffline(true);for(const href of ['./',...links]){const r=await page.goto(new URL(href,base+'/').href);assert.ok(r?.ok(),href+' offline');}await page.goto(base+'/wavelength/');await page.locator('#setup .primary').click();await peek();
-console.log('PASS: 345 prompts; six rounds; score boundaries; touch privacy; custom; reload; mobile; all '+links.length+' game entries + lobby offline; zero JS errors');
+console.log('PASS: 348 prompts; six rounds; score boundaries; touch privacy; custom; reload; mobile; all '+links.length+' game entries + lobby offline; zero JS errors');
 await context.setOffline(false);await page.goto(base+'/wavelength/');await page.screenshot({path:'wavelength-home.png',fullPage:true});
 }finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
