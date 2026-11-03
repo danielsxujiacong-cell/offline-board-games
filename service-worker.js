@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v45-wavelength-concise-348';
+const CACHE_NAME = 'daniel-board-games-v47-wavelength-concise-385';
 const PRECACHE = [
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',
