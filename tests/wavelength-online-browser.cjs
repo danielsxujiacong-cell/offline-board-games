@@ -4,7 +4,12 @@ for(const p of pages){p.setDefaultTimeout(45000);p.on('pageerror',e=>errors.push
 const tap=async(p,s)=>{const el=p.locator(s);await el.scrollIntoViewIfNeeded();await el.click()};
 try{
  await Promise.all(pages.map(p=>p.goto(base+'/wavelength/online/')));await Promise.all(pages.map(p=>p.getByText('在线身份已连接',{exact:true}).waitFor()));
- await a.locator('#name').fill('云端猫猫');await tap(a,'#create');await a.locator('.room-code').waitFor();roomCode=await a.locator('.room-code').innerText();assert.equal(roomCode.length,10);
+ for(const p of pages){assert.match(await p.locator('#name').inputValue(),/^[\u4e00-\u9fff]{1,12}$/);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)}
+ await a.locator('#name').fill('');await tap(a,'#create');await a.locator('.room-code').waitFor();const defaultCode=await a.locator('.room-code').innerText();
+ await b.locator('#name').fill('  ');await b.locator('#code').fill(defaultCode);await tap(b,'#join');await b.locator('.room-code').waitFor();
+ for(const p of pages){const saved=await p.evaluate(()=>localStorage.getItem('wavelength-online-name'));assert.match(saved,/^[\u4e00-\u9fff]{1,12}$/);assert.ok((await p.locator('.room-toolbar').innerText()).includes(saved));await p.reload();await p.locator('.room-code').waitFor()}
+ await tap(a,'#leave');await b.getByText('房间已关闭',{exact:true}).waitFor();await tap(b,'#leave');
+ await a.locator('#name').fill('云端猫猫');await a.reload();await a.getByText('在线身份已连接',{exact:true}).waitFor();assert.equal(await a.locator('#name').inputValue(),'云端猫猫');await tap(a,'#create');await a.locator('.room-code').waitFor();roomCode=await a.locator('.room-code').innerText();assert.equal(roomCode.length,10);
  await b.locator('#name').fill('远方搭档');await b.locator('#code').fill(roomCode);await tap(b,'#join');await b.locator('.room-code').waitFor();await a.locator('.player').filter({hasText:'远方搭档'}).waitFor();
  await tap(a,'[data-send=ready]');await b.locator('.player').filter({hasText:'云端猫猫'}).filter({hasText:'已准备'}).waitFor();await tap(b,'[data-send=ready]');await a.locator('[data-send=start]:enabled').waitFor();await tap(a,'[data-send=start]');
  for(let round=0;round<6;round++){
@@ -16,10 +21,10 @@ try{
   await tap(receiver,'#lock');await Promise.all(pages.map(p=>p.locator('[data-send=next]').waitFor()));for(const p of pages){assert.ok((await p.locator('.score').innerText()).includes('+4'));assert.equal(await p.locator('.interactive-spectrum').count(),0)}
   await tap(a,'[data-send=next]');await b.locator('.next-status').filter({hasText:'搭档：已就绪'}).waitFor();await tap(b,'[data-send=next]');
  }
- await Promise.all(pages.map(p=>p.locator('.history article').nth(5).waitFor()));assert.equal(await a.locator('.history article').count(),6);assert.ok((await a.locator('.score').innerText()).includes('24'));
+ await Promise.all(pages.map(p=>p.locator('.history article').nth(5).waitFor()));assert.equal(await a.locator('.history article').count(),6);for(const p of pages){assert.equal(await p.locator('.report-panel h2').first().innerText(),'云端猫猫 × 远方搭档');assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)}assert.ok((await a.locator('.score').innerText()).includes('24'));
  await tap(b,'#save-image');await b.locator('.export-download').waitFor({state:'visible'});await b.locator('.export-close').click();
  // Verify production Data API grants with a real authenticated member.
- const access=await a.evaluate(async()=>{const session=JSON.parse(localStorage.getItem('wavelength-auth-v1'));const {config}=await import('./config.js');const opts={headers:{apikey:config.publishableKey,Authorization:'Bearer '+session.access_token}};const raw=await fetch(config.url+'/rest/v1/wavelength_rooms?select=*',opts);const views=await fetch(config.url+'/rest/v1/wavelength_player_views?select=*',opts);return {raw:raw.status,views:await views.json(),uid:session.user.id}});assert.ok(access.raw>=400);assert.equal(access.views.length,1);assert.ok(access.views.every(v=>v.user_id===access.uid));
+ const access=await a.evaluate(async()=>{const session=JSON.parse(localStorage.getItem('wavelength-auth-v1'));const {config}=await import('./config.js');const opts={headers:{apikey:config.publishableKey,Authorization:'Bearer '+session.access_token}};const raw=await fetch(config.url+'/rest/v1/wavelength_rooms?select=*',opts);const views=await fetch(config.url+'/rest/v1/wavelength_player_views?select=*',opts);return {raw:raw.status,views:await views.json(),uid:session.user.id}});assert.ok(access.raw>=400);assert.equal(access.views.length,2);assert.ok(access.views.every(v=>v.user_id===access.uid));
  fs.mkdirSync('.openai',{recursive:true});await a.screenshot({path:'.openai/wavelength-online-report.png',fullPage:true});
  await tap(a,'[data-send=restart]');await b.locator('[data-send=restartAccept]').waitFor();await tap(b,'[data-send=restartAccept]');await a.locator('[data-send=ready]').waitFor();assert.equal(await a.locator('#peek').count(),0);await tap(a,'#leave');await b.getByText('房间已关闭',{exact:true}).waitFor();
  assert.deepEqual(errors,[]);console.log('PASS CLOUD: two real Auth identities, private targets, six rounds / 24 points, WebSocket sync without polling, draft/guess reload, offline recovery, PNG report, RLS REST checks, consent restart, exit closes both');
