@@ -8,7 +8,7 @@ export function roomCode(){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';ret
 export function createRoom(actor,command){
  const name=text(command.name,12,'invalid_name');
  requireRule(Array.isArray(command.packs)&&command.packs.length>0&&command.packs.length<=6&&command.packs.every(c=>categories.includes(c))&&new Set(command.packs).size===command.packs.length,'invalid_packs');
- return {id:crypto.randomUUID(),code:roomCode(),version:0,users:[actor,null],names:[name,null],packs:[...command.packs],ready:[false,false],status:'waiting',restartRequested:false,game:1,state:null,expiresAt:new Date(Date.now()+24*60*60*1000).toISOString()};
+ return {id:crypto.randomUUID(),code:roomCode(),version:0,users:[actor,null],names:[name,null],packs:[...command.packs],returned:[false,false],status:'waiting',game:1,state:null,expiresAt:new Date(Date.now()+24*60*60*1000).toISOString()};
 }
 export function seat(room,actor){const p=room.users.indexOf(actor);requireRule(p>=0,'not_member',403);return p}
 function draw(s,rng){requireRule(s.deck.length>0,'deck_empty');const [category,left,right]=questions[s.deck.pop()];s.prompt={category,left,right};s.clue=''}
@@ -16,13 +16,15 @@ function beginRound(s,rng){s.phase='sender';s.target=14+Math.floor(rng()*73);s.g
 function newGame(packs,rng){const deck=questions.flatMap(([c],i)=>packs.includes(c)?[i]:[]);for(let i=deck.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}const s={round:0,deck,history:[]};beginRound(s,rng);return s}
 export function transition(original,actor,c,rng=secureRandom){
  const room=structuredClone(original);requireRule(Date.parse(room.expiresAt)>Date.now(),'room_expired',410);requireRule(room.status!=='closed','room_closed',410);
- if(c.type==='join'){if(room.users.includes(actor))return room;requireRule(room.status==='waiting'&&room.users[1]===null,'room_unavailable',409);room.users[1]=actor;room.names[1]=text(c.name,12,'invalid_name');room.ready=[false,false];return room}
+ if(c.type==='join'){if(room.users.includes(actor))return room;requireRule(room.status==='waiting'&&room.users[1]===null,'room_unavailable',409);room.users[1]=actor;room.names[1]=text(c.name,12,'invalid_name');room.returned=[false,false];room.state=newGame(room.packs,rng);room.status='playing';return room}
  const p=seat(room,actor);
- if(c.type==='leave'){room.status='closed';room.state=null;room.ready=[false,false];room.restartRequested=false;return room}
- if(c.type==='ready'){requireRule(room.status==='waiting'&&typeof c.ready==='boolean','invalid_ready');room.ready[p]=c.ready;return room}
- if(c.type==='start'){requireRule(p===0,'host_only',403);requireRule(room.status==='waiting'&&room.users[1]&&room.ready.every(Boolean),'players_not_ready',409);room.state=newGame(room.packs,rng);room.status='playing';return room}
- if(c.type==='restart'){requireRule(p===0&&room.status==='playing','host_only',403);room.restartRequested=true;return room}
- if(c.type==='restartAccept'||c.type==='restartDecline'){requireRule(p===1&&room.restartRequested,'no_restart_request',409);if(c.type==='restartAccept'){room.state=null;room.status='waiting';room.ready=[false,false];room.game++}room.restartRequested=false;return room}
+ if(c.type==='leave'){room.status='closed';room.state=null;room.returned=[false,false];return room}
+ if(c.type==='return'){
+  requireRule(c.game===room.game&&room.state?.phase==='report','game_not_finished',409);
+  room.returned??=[false,false];room.returned[p]=true;
+  if(room.returned.every(Boolean)){room.game++;room.state=newGame(room.packs,rng);room.returned=[false,false]}
+  return room;
+ }
  requireRule(room.status==='playing'&&room.state,'no_game',409);const s=room.state;
  if(['swap','custom','clue'].includes(c.type)){requireRule(s.phase==='sender'&&p===s.round%2,'not_sender',403);
   if(c.type==='swap')draw(s,rng);
@@ -40,14 +42,14 @@ export function transition(original,actor,c,rng=secureRandom){
 // Explicit per-player projection: never send deck order, UUIDs or the other player's hidden target.
 export function snapshot(room,actor){
  const p=seat(room,actor),s=room.status==='closed'?null:room.state;
- const result={id:room.id,code:room.code,version:room.version,seat:p,isHost:p===0,status:room.status,ready:[...room.ready],members:room.users.map(Boolean),names:[...room.names],packs:[...room.packs],restartRequested:room.restartRequested,game:room.game,expiresAt:room.expiresAt};
+ const result={id:room.id,code:room.code,version:room.version,seat:p,isHost:p===0,status:room.status,returned:[...(room.returned||[false,false])],members:room.users.map(Boolean),names:[...room.names],packs:[...room.packs],game:room.game,expiresAt:room.expiresAt};
  if(!s)return {...result,board:null};
  const board={round:s.round,phase:s.phase,sender:s.round%2,prompt:{...s.prompt},clue:s.clue,history:structuredClone(s.history),nextReady:[...s.nextReady]};
  if((s.phase==='sender'&&p===s.round%2)||['reveal','report'].includes(s.phase))board.target=s.target;
  if(['reveal','report'].includes(s.phase))board.guess=s.guess;
  return {...result,board};
 }
-const fields={create:['name','packs'],join:['code','name'],sync:[],ready:['ready'],start:[],leave:[],restart:[],restartAccept:[],restartDecline:[],swap:[],custom:['left','right'],clue:['clue'],guess:['guess'],next:[]};
+const fields={create:['name','packs'],join:['code','name'],sync:[],leave:[],return:['game'],swap:[],custom:['left','right'],clue:['clue'],guess:['guess'],next:[]};
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function validate(c){
   requireRule(c&&typeof c==='object'&&!Array.isArray(c)&&Object.hasOwn(fields,c.type),'invalid_command');
@@ -56,6 +58,7 @@ export function validate(c){
   if(c.type!=='sync')requireRule(uuid.test(c.requestId||''),'invalid_request_id');
   if(!['create','join'].includes(c.type))requireRule(uuid.test(c.roomId||''),'invalid_room_id');
   if(!['create','join','sync'].includes(c.type))requireRule(Number.isSafeInteger(c.version)&&c.version>=0,'invalid_version');
+  if(c.type==='return')requireRule(Number.isSafeInteger(c.game)&&c.game>=1,'invalid_game');
   if(c.type==='join')requireRule(/^[A-HJ-NP-Z2-9]{10}$/.test(c.code||''),'invalid_room_code');
 }
 export async function fingerprint(command){const text=JSON.stringify(Object.fromEntries(Object.keys(command).sort().map(key=>[key,command[key]])));return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),v=>v.toString(16).padStart(2,'0')).join('');}
