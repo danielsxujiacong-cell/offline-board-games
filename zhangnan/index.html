@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#f8f5ef">
+  <meta name="description" content="你认真问，张楠认真答。一个可爱、会眨眼的废话文学问答小舞台，支持自由提问和离线游玩。">
+  <link rel="canonical" href="https://games.danielxu.cn/zhangnan/">
+  <link rel="icon" href="./assets/spark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preload" as="image" href="./assets/character.webp">
+  <title>张楠问答 · 你问，我就答</title>
+  <script src="./data.js" defer></script>
+  <script src="./engine.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <clipPath id="head-clip" clipPathUnits="objectBoundingBox">
+        <path d="M0 0H1V.505H.69L.66 .445H.43L.405 .433L.35 .443L.30 .49H0Z"/>
+      </clipPath>
+      <clipPath id="body-clip" clipPathUnits="objectBoundingBox">
+        <path d="M0 .49H.30L.35 .443L.405 .433L.43 .445H.66L.69 .505H1V1H0Z"/>
+      </clipPath>
+    </defs>
+  </svg>
+  <div class="app">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="张楠问答首页">
+        <span class="brand-avatar"><img src="./assets/character.webp" alt="" width="1047" height="1502"></span>
+        <span><strong>张楠问答<span class="brand-dot">.</span></strong><small>ZHANG NAN'S LITTLE ANSWERS</small></span>
+      </a>
+      <a class="home-link" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h18"/></svg><span>桌游大厅</span></a>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <span class="eyebrow"><i></i> 正在认真营业中</span>
+        <h1 id="page-title">你问，<span>张楠答。</span><svg class="title-spark" viewBox="0 0 30 36" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" aria-hidden="true"><path d="m7 18 4-8m5 12 9-3M14 7l2-5"/></svg></h1>
+        <p>每句话都很正确，每句话都好像没说。</p>
+      </section>
+
+      <section class="scene" aria-label="张楠的问答小舞台" data-state="idle">
+        <div class="scene-orbit" aria-hidden="true"></div>
+        <span class="doodle doodle-star" aria-hidden="true">✧</span>
+        <span class="doodle doodle-flower" aria-hidden="true">✳</span>
+        <div class="stage-label" aria-hidden="true"><span>一本正经</span><svg viewBox="0 0 60 32" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3c13 24 30 25 51 16m-8-3 9 2-3 9"/></svg></div>
+
+        <div id="question-bubble" class="bubble question-bubble" hidden>
+          <span class="bubble-label">你认真地问</span><p id="question-text"></p>
+        </div>
+        <div class="bubble answer-bubble" id="answer-bubble">
+          <span class="bubble-label"><span class="tiny-spark">✦</span> 张楠的回答</span>
+          <p id="answer-text">你问吧，<br>问了就算问过了。</p>
+          <span class="thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+
+        <div class="platform" aria-hidden="true"></div>
+        <button class="character" id="character" type="button" aria-label="戳一戳张楠">
+          <span class="character-breathe">
+            <img class="body-art" src="./assets/character.webp" width="1047" height="1502" alt="紫灰色齐肩发、穿深色日系学院装的可爱 Q 版张楠" draggable="false">
+            <span class="head-layer">
+              <img class="head-art" src="./assets/character.webp" width="1047" height="1502" alt="" draggable="false">
+              <img class="blink-art" src="./assets/blink.webp" width="1036" height="1519" alt="" draggable="false">
+              <img class="talk-art" src="./assets/talk.webp" width="1047" height="1502" alt="" draggable="false">
+            </span>
+          </span>
+          <span class="poke-heart" aria-hidden="true">♡</span>
+        </button>
+        <div class="character-status"><span id="state-dot"></span><span id="state-text">在呢，想问什么？</span></div>
+        <span class="tap-hint">轻轻戳她一下 <svg viewBox="0 0 35 28" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M31 23C22 28 7 20 6 5m-4 7L6 4l6 6"/></svg></span>
+      </section>
+
+      <section class="suggestions" aria-labelledby="suggestion-heading">
+        <div class="section-line"><h2 id="suggestion-heading">不知道问什么？<span>试试这几个</span></h2><button class="shuffle-button" id="shuffle" type="button"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M16 7a6.5 6.5 0 0 0-11-2L2.5 7m0-4v4h4M4 13a6.5 6.5 0 0 0 11 2l2.5-2m0 4v-4h-4"/></svg>换一批</button></div>
+        <div class="quick-questions" id="quick-questions"></div>
+      </section>
+      <div class="conversation-tools">
+        <button type="button" id="history-open"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 9a7 7 0 1 1 1 5M3 3v6h6M10 5v5l3 2"/></svg>废话小本本 <span id="history-count">0</span></button>
+        <span class="tools-divider" aria-hidden="true"></span>
+        <button type="button" id="reset-open"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="m4 14 9-10 3 3-9 10H4v-3ZM11 6l3 3M11 17h6"/></svg>重新聊聊</button>
+      </div>
+    </main>
+
+    <footer class="composer-wrap">
+      <form class="composer" id="question-form" novalidate>
+        <label class="sr-only" for="question-input">想问张楠什么？</label>
+        <textarea id="question-input" rows="1" maxlength="180" enterkeyhint="send" placeholder="有什么想问的？尽管问吧…" autocomplete="off"></textarea>
+        <button type="submit" id="send-button"><span>问问张楠</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m4 11 15-7-7 15-2-7-6-1Zm6 1 9-8" stroke-linejoin="round"/></svg></button>
+      </form>
+      <p class="composer-note"><span id="composer-hint">认真提问 · 随缘长知识</span><span class="note-dot">·</span><span id="connection-label">离线也能聊</span></p>
+    </footer>
+  </div>
+
+  <dialog id="history-dialog" class="history-dialog" aria-labelledby="history-title">
+    <div class="dialog-header"><div><span class="eyebrow">LITTLE BOOK OF ANSWERS</span><h2 id="history-title">废话小本本<span>。</span></h2></div><button class="icon-button" type="button" data-close="history-dialog" aria-label="关闭历史记录">×</button></div>
+    <p class="history-note">聊过的都在这里。记录只保存在这台设备。</p>
+    <div class="history-list" id="history-list" tabindex="0" aria-label="问答历史"></div>
+    <button class="dialog-done" type="button" data-close="history-dialog">合上本本，接着聊</button>
+  </dialog>
+  <dialog id="reset-dialog" class="reset-dialog" aria-labelledby="reset-title">
+    <span class="reset-symbol" aria-hidden="true">↺</span><h2 id="reset-title">把这些废话翻篇吗？</h2><p>清空这台设备上的问答记录，<br>从一个新的问题开始。</p>
+    <div class="dialog-actions"><button type="button" data-close="reset-dialog">先留着</button><button type="button" id="reset-confirm">重新开始</button></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="answer-announcement" role="status" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

@@ -1,5 +1,15 @@
-const CACHE_NAME = 'daniel-board-games-v53-wavelength-couples-435';
+const CACHE_NAME = 'daniel-board-games-v54-zhangnan';
 const PRECACHE = [
+  './zhangnan/',
+  './zhangnan/index.html',
+  './zhangnan/style.css',
+  './zhangnan/data.js',
+  './zhangnan/engine.js',
+  './zhangnan/app.js',
+  './zhangnan/assets/character.webp',
+  './zhangnan/assets/blink.webp',
+  './zhangnan/assets/talk.webp',
+  './zhangnan/assets/spark.svg',
   './games/hanamikoji/art.js',
   './games/hanamikoji/online/',
   './games/hanamikoji/online/index.html',

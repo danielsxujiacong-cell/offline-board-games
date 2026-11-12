@@ -1,6 +1,6 @@
 # Daniel 的桌游
 
-十四款手机优先、可安装、可断网游玩的桌游合集 PWA。
+手机优先、可安装、可断网游玩的桌游与互动小游戏合集 PWA。
 
 ## 本地运行
 
@@ -30,7 +30,11 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v24-jaipur-audit` 版本缓存大厅、十四个游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v54-zhangnan` 版本缓存大厅、全部游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+
+## 张楠问答
+
+新增互动页 **张楠问答** 位于 `/zhangnan/`：紫发 Q 版人物、分层眨眼／歪头／嘴型、经典和自由问答、浏览器本地历史与重开。使用纯前端废话句式规则引擎，没有接入大模型，离线可玩。维护和验证见 [zhangnan/README.md](zhangnan/README.md)；继续沿用现有 `main` → EdgeOne 静态发布。
 
 ## 花见小路维护
 

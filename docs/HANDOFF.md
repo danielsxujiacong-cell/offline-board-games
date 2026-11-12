@@ -1,5 +1,27 @@
 # Handoff
 
+## 2026-11-12 · 张楠问答第一版
+
+在实际云端 `/workspace/offline-board-games` 开发。开始前阅读根 AGENTS、README 和本文件，确认工作区干净；先快进同步 origin/main 的 `8d4d283`，保留电波同步 435 题及情侣分类的全部更新。未运行同步脚本、未改其他游戏业务、域名、DNS 或托管配置。继续沿用同一 GitHub `main` → 既有 EdgeOne 静态链路。
+
+新增 `/zhangnan/`（无构建、运行依赖或后端），奶油白／淡紫舞台，采用用户最后确认的紫灰齐肩发、日系 JK 穿搭 Q 版角色。`character.webp` 加生成的闭眼／开口表情，通过独立头／身体裁剪、眼睛／嘴部羽化蒙版和 CSS 动画实现真实眨眼、呼吸、思考歪头、回答嘴型与点击反馈；提问不会增加动画定时器。三个 WebP 合计约 520 KB，私人参考照片未入库。
+
+`data.js` / `engine.js` 与 UI 分离：经典问答（首次香蕉固定为“就是香蕉味。”）、按问题类型提取对象／动作／时间的前端废话句式、近期回答去重。明确没有大模型或真正多轮理解。输入和快捷按钮均触发真实问答；支持串行连续提问、逐字回答、历史小本本、刷新恢复、确认重开和取消旧队列。最多 100 组已完成问答仅保存在本机 `localStorage['zhangnan-chat-v1']`，未完成问题刷新取消。无账号或数据上传。
+
+根大厅首位新增入口，回大厅使用 `../`；更新 sitemap，Service Worker 由 v53 递增为 `daniel-board-games-v54-zhangnan`，新增本页全部运行资源预缓存并保留原游戏列表与网络逻辑。维护细节见 `zhangnan/README.md`。
+
+已验证：
+
+- `node --test tests/zhangnan.test.mjs`：7 项通过，经典原句、类型／对象对应、有限随机下去重、长输入、恢复与重置。
+- `node tests/zhangnan-browser.cjs`：真实输入／快捷按钮／三条快速发送的顺序、空输入、中文 IME 确认和发送分离、刷新历史、取消重开／思考中重开、长问题和纯文本显示、闭眼及嘴型实际渲染／歪头／点击、动画持续时间和数量稳定、320/390/768/1440px 及横屏无溢出、模拟键盘缩小后仍可发送、减少动态效果模式、子路径刷新与双向大厅导航。零 pageerror。
+- HTTP 服务注册 SW 后使用 CDP Network Offline 验证**大厅 + 全部 18 个实际入口**，均由 SW 返回对应页面；新页可离线提问、刷新历史和回大厅。
+- `node --test tests/*.test.mjs`：85/85 通过。初次执行缺少既有在线游戏测试的 PGlite；仅在被忽略的 `.openai/zhangnan-test-tools` 安装测试依赖，并让已有测试引用该安装后重跑通过，没有新增页面运行依赖或修改数据库／在线服务。
+- 既有 `tests/hanamikoji-browser.cjs`、`games/just-one/tests/browser.cjs`、`pass-the-bomb/tests/browser.cjs` 全部通过；Just One 1500 词与炸弹 810 题验证通过。测试复用现有 Playwright 和 Linux Chromium，旧测试使用临时 preload 适配其 Windows Edge 配置。
+
+真实 HTTP 预览截图位于忽略目录 `.openai/zhangnan/mobile-final.png`、`desktop-final.png`，另有闭眼、开口、历史和多视口证据；测试日志与依赖均不提交。仅完成浏览器设备模拟，实体 iPhone／Android 的输入法、键盘和触屏手感仍需用户手机验收。
+
+发布核验限制：本次云环境的出站域名规则没有放行 `games.danielxu.cn`，HTTPS 探测在代理 CONNECT 阶段返回 403；网页读取工具也无法访问该域名。GitHub 可访问，推送后可检查源码及既有自动发布任务，但任务成功不能单独证明 EdgeOne 自定义域名已刷新。手机验收地址：<https://games.danielxu.cn/zhangnan/>，大厅：<https://games.danielxu.cn/>。不将本地预览或 push 成功写成正式域名验收成功。
+
 ## 2026-10-25 花见小路
 
 新增 `/games/hanamikoji/`，完整四行动、对手亲选赠予/竞争、确认交接后才显示手牌、行动后立即移除手牌 DOM，轮末翻开密约、支持平局保留、11 分优先与多轮交换先手。源码直接在本仓库维护，不运行 sync-games.ps1。规则与界面为本地 JS，无运行依赖、安装或打包步骤；package.json 仅声明模块类型供 Node 测试使用。刷新会结束当前内存对局。
