@@ -15,7 +15,9 @@
 - CDP Network Offline：大厅 + 全部 18 个实际入口由 Service Worker 返回对应页面，张楠可断网提问、刷新后继承价格话题、触发身份梗并回到大厅。
 - 缓存递增为 `daniel-board-games-v55-zhangnan-short-replies`，资源清单及其他游戏业务保持原样；JS 语法与差异空白检查通过。
 
-浏览器证据位于忽略目录 `.openai/zhangnan-short-local/`，包括 short-replies-mobile、表情层、历史及多视口截图。发布后使用正式根地址重跑同一浏览器套件，并核对线上 engine/data/app 与本地文件及 v55 缓存一致；结果以实际自定义域名检查为准。实体手机输入法与触屏手感仍由用户真机体验。
+发布核验：实现提交 `4708365` 已推送 main，GitHub Pages 工作流 `43229334117` 成功。独立访问正式域名，`zhangnan/engine.js`、`data.js`、`app.js` 和根 Service Worker 均为 HTTP 200、全文与本地一致，缓存为 v55。在 `https://games.danielxu.cn` 重跑完整浏览器套件通过：固定梗与明确单位、价格追问、刷新继承、话题切换、复述、重开、IME、排队、真实表情层、多视口和模拟键盘、全站离线及断网追问，零 pageerror。线上网络下增加图片解码完成等待后再验证人物资源，避免把尚未加载完成误判为图片损坏；三个 WebP 的 HTTPS 状态与类型也已核对。
+
+浏览器证据位于忽略目录 `.openai/zhangnan-short-local/` 与 `.openai/zhangnan-short-live/`，包括 short-replies-mobile、表情层、历史及多视口截图。没有安装依赖或产生大型 C 盘写入；开发开始 C 盘剩余约 26.9 GB，本地验收后约 28.5 GB。实体手机输入法与触屏手感仍由用户真机体验。
 
 ## 2026-11-12 · 张楠问答第一版
 

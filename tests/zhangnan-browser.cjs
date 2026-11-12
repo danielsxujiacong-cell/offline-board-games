@@ -37,6 +37,7 @@ const launchOptions = process.env.TEST_BROWSER_PATH ? { executablePath: process.
     await page.waitForFunction(() => document.querySelectorAll('.quick-question').length === 4);
     assert.match(await page.title(), /张楠问答/);
     assert.equal(await page.locator('.home-link').getAttribute('href'), '../');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('#character img')).every(img => img.complete && img.naturalWidth > 0), null, { timeout: 30000 });
     assert.equal(await page.locator('#character img').evaluateAll(imgs => imgs.every(img => img.complete && img.naturalWidth > 0)), true);
     await noOverflow();
 
