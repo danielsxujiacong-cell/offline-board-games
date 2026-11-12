@@ -5,7 +5,7 @@ const packs=Object.fromEntries([...new Set(questions.map(row=>row[0]))].map(c=>[
 
 import assert from 'node:assert/strict';
 assert.ok(questions.length>=300 && questions.length<=500,'精选300-500题');
-assert.deepEqual(Object.keys(packs),['日常生活','美食消费','社交关系','亲密关系','娱乐脑洞','旅行自然']);
+assert.deepEqual(Object.keys(packs),['日常生活','美食消费','社交关系','亲密关系','娱乐脑洞','旅行自然','情侣模式']);
 const seen=new Set();
 for(const [i,row] of questions.entries()){
  assert.equal(row.length,3,`第${i+1}题应为[分类,左端,右端]`);
@@ -15,6 +15,6 @@ for(const [i,row] of questions.entries()){
  assert.ok(!seen.has(key),`第${i+1}题重复或反向重复`);seen.add(key);
 }
 assert.equal(prompts.length,questions.length);assert.equal(new Set(prompts.map(p=>p.id)).size,questions.length);
-assert.equal(Object.values(packs).reduce((a,n)=>a+n,0),questions.length);assert.ok(packs['亲密关系']>=120,'亲密关系至少120题');
+assert.equal(Object.values(packs).reduce((a,n)=>a+n,0),questions.length);assert.ok(packs['亲密关系']>=120,'亲密关系至少120题');assert.ok(packs['情侣模式']>=50,'情侣模式至少50题');
 
 console.log(`PASS ${questions.length}题 / ${Object.keys(packs).length}类：格式、长度、去重、ID、洗牌`);

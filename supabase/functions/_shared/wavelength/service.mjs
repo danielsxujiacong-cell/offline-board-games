@@ -7,7 +7,7 @@ export const secureRandom=()=>crypto.getRandomValues(new Uint32Array(1))[0]/4294
 export function roomCode(){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:10},()=>alphabet[Math.floor(secureRandom()*32)]).join('');}
 export function createRoom(actor,command){
  const name=text(command.name,12,'invalid_name');
- requireRule(Array.isArray(command.packs)&&command.packs.length>0&&command.packs.length<=6&&command.packs.every(c=>categories.includes(c))&&new Set(command.packs).size===command.packs.length,'invalid_packs');
+ requireRule(Array.isArray(command.packs)&&command.packs.length>0&&command.packs.length<=categories.length&&command.packs.every(c=>categories.includes(c))&&new Set(command.packs).size===command.packs.length,'invalid_packs');
  return {id:crypto.randomUUID(),code:roomCode(),version:0,users:[actor,null],names:[name,null],packs:[...command.packs],returned:[false,false],status:'waiting',game:1,state:null,expiresAt:new Date(Date.now()+24*60*60*1000).toISOString()};
 }
 export function seat(room,actor){const p=room.users.indexOf(actor);requireRule(p>=0,'not_member',403);return p}

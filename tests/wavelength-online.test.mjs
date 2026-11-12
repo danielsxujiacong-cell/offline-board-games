@@ -6,11 +6,11 @@ const cmd=(type,r,extra={})=>({type,requestId:crypto.randomUUID(),...(r?{roomId:
 async function call(actor,body){const response=await handler(new Request('http://test',{method:'POST',headers:{Authorization:'Bearer '+actor,Origin:'http://127.0.0.1:8091','Content-Type':'application/json'},body:JSON.stringify(body)}));return {status:response.status,body:await response.json()}}
 async function act(actor,type,extra={}){const r=await call(users[actor],cmd(type,room,extra));assert.equal(r.status,200,JSON.stringify(r.body));room=r.body;return r.body}
 async function sync(actor){return (await call(users[actor],{type:'sync',roomId:room.id})).body}
-test('canonical 385-question library exactly matches frontend library',()=>{const source=fs.readFileSync('wavelength/questions.json','utf8');assert.equal(JSON.parse(source).length,385);assert.equal(source,fs.readFileSync('supabase/functions/_shared/wavelength/questions.json','utf8'))});
+test('canonical 435-question library exactly matches frontend library',()=>{const source=fs.readFileSync('wavelength/questions.json','utf8');assert.equal(JSON.parse(source).length,435);assert.equal(source,fs.readFileSync('supabase/functions/_shared/wavelength/questions.json','utf8'))});
 test('create, retry, names/categories, outsider and capacity',async()=>{
  const c=cmd('create',null,{name:'A <&>',packs:categories});let res=await call(users[0],c);assert.equal(res.status,200);room=res.body;const repeat=await call(users[0],c);assert.equal(repeat.body.id,room.id);assert.equal(repeat.body.version,0);
  assert.equal(room.status,'waiting');assert.equal(room.board,null);assert.deepEqual(room.returned,[false,false]);
- const join=cmd('join',null,{code:room.code,name:'B'});const joined=await call(users[1],join);assert.equal(joined.status,200);room=joined.body;assert.equal(room.seat,1);assert.equal(room.status,'playing');assert.equal(room.board.phase,'sender');assert.equal(room.game,1);const state=await store.getRoom(room.id);assert.equal(state.state.deck.length,384);await call(users[1],join);await call(users[1],cmd('join',null,{code:room.code,name:'ignored'}));assert.deepEqual((await store.getRoom(room.id)).state,state.state);assert.deepEqual((await sync(0)).names,['A <&>','B']);room=await sync(0);
+ const join=cmd('join',null,{code:room.code,name:'B'});const joined=await call(users[1],join);assert.equal(joined.status,200);room=joined.body;assert.equal(room.seat,1);assert.equal(room.status,'playing');assert.equal(room.board.phase,'sender');assert.equal(room.game,1);const state=await store.getRoom(room.id);assert.equal(state.state.deck.length,434);await call(users[1],join);await call(users[1],cmd('join',null,{code:room.code,name:'ignored'}));assert.deepEqual((await store.getRoom(room.id)).state,state.state);assert.deepEqual((await sync(0)).names,['A <&>','B']);room=await sync(0);
  assert.equal((await call(users[2],cmd('join',null,{code:room.code,name:'C'}))).status,409);
  assert.equal((await call(users[2],{type:'sync',roomId:room.id})).status,403);
  assert.equal((await call(users[0],cmd('create',null,{name:'bad',packs:['unknown']}))).status,400);
@@ -41,7 +41,7 @@ test('return barrier, duplicate/retried requests and stale versions start exactl
  assert.equal((await call(users[1],stale)).body.error,'version_conflict');
  const finish=cmd('return',await sync(1),{game:1});result=await call(users[1],finish);assert.equal(result.status,200);room=result.body;
  assert.equal(room.game,2);assert.equal(room.board.phase,'sender');assert.equal(room.board.round,0);assert.deepEqual(room.board.history,[]);assert.deepEqual(room.returned,[false,false]);
- assert.equal(room.id,first.id);assert.equal(room.code,first.code);assert.deepEqual(room.names,first.names);assert.deepEqual(room.packs,first.packs);assert.equal((await store.getRoom(room.id)).state.deck.length,384);
+ assert.equal(room.id,first.id);assert.equal(room.code,first.code);assert.deepEqual(room.names,first.names);assert.deepEqual(room.packs,first.packs);assert.equal((await store.getRoom(room.id)).state.deck.length,434);
  const state=await store.getRoom(room.id);for(const [actor,command] of [[users[1],finish],[users[0],back]]){const retry=await call(actor,command);assert.equal(retry.status,200);assert.equal(retry.body.game,2)}
  assert.equal((await call(users[0],cmd('return',room,{game:1}))).body.error,'game_not_finished');assert.deepEqual(await store.getRoom(room.id),state);
  await act(0,'leave');assert.equal(room.status,'closed');assert.equal((await sync(1)).board,null);
