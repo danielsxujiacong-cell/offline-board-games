@@ -30,11 +30,11 @@ python -m http.server 8080
 
 ## 验证
 
-Service Worker 使用 `daniel-board-games-v54-zhangnan` 版本缓存大厅、全部游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
+Service Worker 使用 `daniel-board-games-v55-zhangnan-short-replies` 版本缓存大厅、全部游戏及题库。更新发行内容时递增 `CACHE_NAME` 并重新运行离线验证。
 
 ## 张楠问答
 
-新增互动页 **张楠问答** 位于 `/zhangnan/`：紫发 Q 版人物、分层眨眼／歪头／嘴型、经典和自由问答、浏览器本地历史与重开。使用纯前端废话句式规则引擎，没有接入大模型，离线可玩。维护和验证见 [zhangnan/README.md](zhangnan/README.md)；继续沿用现有 `main` → EdgeOne 静态发布。
+互动页 **张楠问答** 位于 `/zhangnan/`：紫发 Q 版人物、分层眨眼／歪头／嘴型、最多 20 字的短废话、114514＋单位及固定身份梗，支持最近三轮的简单追问、浏览器本地历史与重开。使用纯前端规则引擎，离线可玩。维护和验证见 [zhangnan/README.md](zhangnan/README.md)；继续沿用现有 `main` → EdgeOne 静态发布。
 
 ## 花见小路维护
 

@@ -1,5 +1,22 @@
 # Handoff
 
+## 2026-11-12 · 张楠短句、固定梗与简单追问
+
+在笔记本 `G:\_Codex project\02_Game\offline-board-games` 的 `main` 开发，起点 `bdad145`，工作区干净且与 origin/main 一致。沿用原生静态页和 GitHub → EdgeOne 链路；复用 G 盘既有 Playwright 1.64.1 与系统 Edge，无依赖安装或构建。已核对同步脚本及五个源路径，旧 werewords-companion 来源不存在；本页直接维护，未运行同步脚本。
+
+`data.js` 收敛为用户确认的固定短句和同义问法，经典句不再强制去重；数字统一为 114514，单位随数值问题变化。“我是你爹。”仅用于直接询问身份，名字问题仍答“张楠。”，其他日常是平淡短废话。回复最多 20 个 Unicode 字符、一个完整句子；动作或主题过长时使用完整短兜底，不裁切回答。思考、点击、初始和重开台词同步缩短，五批快捷问题覆盖新梗。
+
+`engine.js` 先判断原因／判断／方法，再处理数值和单位，修正“绳子多长”被当作时间。明确单位从“多少／几”后的单位取值，避免从问题陈述的 3 瓶／3 公里误触发或取错单位；默认单位和维护说明见 `zhangnan/README.md`。`createReplyEngine({ history, recent, random })` 新增可选 history，`.answer(question)` 仍返回 `{ answer, category }`，`.reset()` 清空话题、最近三轮和近期回答。初始化重放最近三轮有效问题，支持价格／味道／方法的“那…呢”追问、价格原因接话与复述；明确新话题覆盖旧话题。UI 从既有 turns 初始化，沿用 `zhangnan-chat-v1` / version 1 / 最近 100 组历史，无迁移。旧长回答仍可查看，要求复述时用短句说明。
+
+本轮验证通过：
+
+- `node --test tests/zhangnan.test.mjs`：13 组，覆盖稳定重复、礼貌前缀和同义问法、身份梗范围、默认及明确单位、原因／判断／陈述、长度与时长、简单追问、话题切换、三轮恢复、复述与重置、旧存档兼容和完整短句上限。
+- `node tests/zhangnan-browser.cjs`：HTTP 服务 + 系统 Edge，真实发送、快捷按钮、IME、连续排队、刷新、取消／确认重开、历史格式兼容、固定梗与单位、追问／切换／复述、动画与点击、纯文本显示、320/390/768/1440px 与横屏、模拟键盘、减少动态效果全部通过，零 pageerror。
+- CDP Network Offline：大厅 + 全部 18 个实际入口由 Service Worker 返回对应页面，张楠可断网提问、刷新后继承价格话题、触发身份梗并回到大厅。
+- 缓存递增为 `daniel-board-games-v55-zhangnan-short-replies`，资源清单及其他游戏业务保持原样；JS 语法与差异空白检查通过。
+
+浏览器证据位于忽略目录 `.openai/zhangnan-short-local/`，包括 short-replies-mobile、表情层、历史及多视口截图。发布后使用正式根地址重跑同一浏览器套件，并核对线上 engine/data/app 与本地文件及 v55 缓存一致；结果以实际自定义域名检查为准。实体手机输入法与触屏手感仍由用户真机体验。
+
 ## 2026-11-12 · 张楠问答第一版
 
 在实际云端 `/workspace/offline-board-games` 开发。开始前阅读根 AGENTS、README 和本文件，确认工作区干净；先快进同步 origin/main 的 `8d4d283`，保留电波同步 435 题及情侣分类的全部更新。未运行同步脚本、未改其他游戏业务、域名、DNS 或托管配置。继续沿用同一 GitHub `main` → 既有 EdgeOne 静态链路。

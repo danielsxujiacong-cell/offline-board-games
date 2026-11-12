@@ -16,7 +16,7 @@
       turns = saved.turns.filter(turn => turn && typeof turn.question === 'string' && typeof turn.answer === 'string' && turn.question.length <= 180 && turn.answer.length <= 500).slice(-maxHistory);
     }
   } catch { storageAvailable = false; }
-  const engine = ZhangnanEngine.createReplyEngine({ recent: turns.map(turn => turn.answer) });
+  const engine = ZhangnanEngine.createReplyEngine({ history: turns, recent: turns.map(turn => turn.answer) });
   let queue = [];
   let processing = false;
   let session = 0;
@@ -104,9 +104,8 @@
   function renderQuickQuestions() {
     const container = $('#quick-questions');
     container.replaceChildren();
-    // Put the four approved core examples in the first batch.
-    const batches = [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]];
-    for (const index of batches[batch]) {
+    const batches = [[0, 6, 12, 14], [1, 2, 3, 4], [5, 7, 8, 9], [10, 11, 13, 15], [16, 12, 6, 14]];
+    for (const index of batches[batch % batches.length]) {
       const item = ZhangnanData.classics[index];
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'quick-question';
@@ -152,12 +151,12 @@
   $('#reset-confirm').addEventListener('click', () => {
     session++; queue = []; processing = false; turns = []; engine.reset(); save(); updateCount();
     $('#question-bubble').hidden = true; questionText.textContent = '';
-    scene.classList.remove('has-question'); answerText.textContent = '新的一聊，开始了就算开始了。';
+    scene.classList.remove('has-question'); answerText.textContent = '开始了就是开始了。';
     $('#answer-announcement').textContent = ''; questionInput.value = ''; resizeInput();
     setState('idle', '在呢，重新问一个吧。'); updateQueueHint(); $('#reset-dialog').close();
-    toast('翻篇了。现在是一个全新的现在。');
+    toast('翻篇了。');
   });
-  $('#shuffle').addEventListener('click', () => { batch = (batch + 1) % 3; renderQuickQuestions(); });
+  $('#shuffle').addEventListener('click', () => { batch++; renderQuickQuestions(); });
   $('#character').addEventListener('click', () => {
     clearTimeout(pokeTimer);
     $('#character').classList.remove('is-poked'); void $('#character').offsetWidth;

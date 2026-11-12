@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daniel-board-games-v54-zhangnan';
+const CACHE_NAME = 'daniel-board-games-v55-zhangnan-short-replies';
 const PRECACHE = [
   './zhangnan/',
   './zhangnan/index.html',

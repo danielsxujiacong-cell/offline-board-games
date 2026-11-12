@@ -1,107 +1,167 @@
 (function (root) {
   'use strict';
   const data = root.ZhangnanData || (typeof require === 'function' ? require('./data.js') : null);
-  const clean = text => String(text || '').normalize('NFKC').replace(/\s+/g, ' ').trim().replace(/[？?！!。～~]+$/g, '');
+  const size = text => Array.from(text).length;
+  const clean = text => String(text || '').normalize('NFKC').replace(/\s+/g, '').replace(/[？?！!。．…～~]+$/g, '');
+  const keyOf = text => clean(text).replace(/^(?:(?:张楠|请问一下|请问|想问一下|我想问一下)[，,:：]*)+/, '').replace(/[呀啊呢嘛吧]+$/g, '');
   const mirror = text => text.replace(/你|我|您/g, char => ({ 你: '我', 我: '你', 您: '我' })[char]);
-  const short = (text, length = 22) => Array.from(text).slice(0, length).join('');
-  const trimSubject = text => text.replace(/^(?:请问|请告诉我|想问一下|那个|这个|这根|这只|这杯|这碗|这块|这瓶|这种|这|那)/, '').replace(/(?:到底|究竟)/g, '').trim();
-  const actionOf = text => short(mirror(text.replace(/^.*?(?:怎么样才能|怎样才能|怎么才能|如何才能|怎么能|怎样能|怎样|如何|怎么)/, '').replace(/^(?:才|能|可以|去|做才能)+/, '').replace(/(?:呢|呀|啊|吗|么|嘛|吧|才能好|才好|比较好)$/g, '')));
+  const phrase = (text, limit = 6) => {
+    const value = mirror(text).replace(/^[，,:：]+|[，,:：]+$/g, '');
+    return value && size(value) <= limit && !/[，,。；;？！?!<>「」“”]/.test(value) ? value : '';
+  };
+  const subjectOf = text => phrase(text.replace(/^(?:这个|那个|这根|那根|这只|那只|这杯|这碗|这块|这瓶|这种|这|那)/, '').replace(/是$/, ''));
+  const fallback = () => ({ category: 'general', candidates: ['问了就算问了。', '说了就是说了。', '这样就是这样。'] });
+  const reply = (category, candidates, extra = {}) => ({ category, candidates, ...extra });
+  const units = '平方厘米|平方公里|平方米|立方米|摄氏度|华氏度|人民币|秒钟|毫秒|分钟|小时|钟头|星期|个月|千克|公斤|毫克|公里|千米|厘米|毫米|毫升|美元|美金|欧元|英镑|日元|港元|港币|块钱|岁|斤|米|度|秒|分|天|周|月|年|人|只|条|根|瓶|杯|碗|本|辆|次|件|张|台|头|份|套|袋|箱|包|支|口|点|个|元|块|%|cm|mm|km|kg|ml|m|g|L';
+  const explicitUnit = new RegExp('(?:多少|几)(?:个(?=小时|人|月))?(' + units + ')', 'i');
+  const defaultUnits = { price: '元', age: '岁', height: '厘米', length: '米', weight: '斤', area: '平方米', temperature: '度', duration: '分钟', quantity: '个', clock: '点' };
 
-  function classify(input) {
-    const q = clean(input);
-    const classic = data.classics.find(item => item.answers && clean(item.question) === q);
-    if (classic) return { category: 'classic:' + clean(classic.question), candidates: classic.answers };
+  function numberReply(category, unit = defaultUnits[category] || '') {
+    const topic = { category, unit };
+    return reply(category, ['114514' + unit + '。'], { fixed: true, topic });
+  }
+
+  function numerical(q) {
+    if (!/多少|几(?!乎)|多(?:大|高|长|重|宽|厚|远|深|热|冷|久|快)|(?:价格|价钱|售价|费用|年龄|年纪|身高|长度|宽度|厚度|距离|深度|高度|体重|重量|面积|温度|气温|时长)(?:是啥|是什么|呢|$)/.test(q)) return null;
+    const explicit = (q.match(explicitUnit) || [])[1];
+    let category;
+    let defaultUnit;
+    if (/多少钱|(?:价格|价钱|售价|费用)|几块(?:钱)?|多少(?:元|块钱|块|美元|美金|人民币|欧元|英镑|日元|港元|港币)/.test(q)) category = 'price';
+    else if (/几岁|多少岁|年龄|年纪|^(?:你|您|他|她|我|宝宝|孩子|小孩|小朋友|猫|狗)(?:今年|现在|到底|究竟|已经|有)*多大(?:了)?$/.test(q)) category = 'age';
+    else if (/多久|多长时间|时长|(?:多少|几)(?:个)?(?:秒钟|毫秒|秒|分钟|分|小时|钟头|天|周|星期|个月|月|年)/.test(q)) category = 'duration';
+    else if (/体重|重量|多重|(?:多少|几)(?:斤|公斤|千克|毫克|kg|g)/i.test(q)) category = 'weight';
+    else if (/面积|(?:房间|房子|房|屋|教室|客厅|卧室|操场|土地|占地|院子).{0,5}多大|(?:多少|几)平方/.test(q)) category = 'area';
+    else if (/温度|气温|(?:多少|几)(?:摄氏度|华氏度|度)|多热|多冷/.test(q)) category = 'temperature';
+    else if (/身高|多高/.test(q)) { category = 'height'; defaultUnit = /身高|你|您|他|她|我|孩子|宝宝/.test(q) ? '厘米' : '米'; }
+    else if (/多长|长度|多宽|宽度|多厚|厚度|多远|距离|多深|深度|高度|(?:多少|几)(?:米|厘米|毫米|公里|千米|cm|mm|km|m)/i.test(q)) category = 'length';
+    else if (/几点|几时|多少点/.test(q)) category = 'clock';
+    else if (/星期几|周几/.test(q)) return reply('calendar', ['星期114514。'], { fixed: true });
+    else if (/几号|几日/.test(q)) return numberReply('calendar', '号');
+    else if (/多大|多快|等于几|等于多少|数字|号码|编号/.test(q)) return numberReply('quantity', explicit || '');
+    else category = 'quantity';
+    return numberReply(category, explicit || defaultUnit || defaultUnits[category]);
+  }
+
+  function tasteReply(subject) {
+    return reply('taste', [subject ? '就是' + subject + '味。' : '就是那个味。'], { fixed: true, topic: { category: 'taste' } });
+  }
+
+  function howReply(action) {
+    return reply('how', [action ? action + '就能' + action + '。' : '做到了就做到了。'], { fixed: true, topic: { category: 'how' } });
+  }
+
+  function classify(input, topic = null, previous = null) {
+    const raw = clean(input);
+    if (size(raw) > 180) return fallback();
+    const q = keyOf(raw);
+    const classic = data.classics.find(item => item.answers && [item.question, ...(item.aliases || [])].some(alias => keyOf(alias) === q));
+    if (classic) {
+      const category = classic.category || 'classic:' + keyOf(classic.question);
+      const currentTopic = defaultUnits[category] ? { category, unit: classic.unit || defaultUnits[category] } : ['taste', 'how'].includes(category) ? { category } : null;
+      return reply(category, [classic.answers[0]], { fixed: true, topic: currentTopic });
+    }
+    if (/^(?:你|您)(?:到底|究竟|又)*(?:是谁|是哪位|是什么人|哪位)(?:来着)?$/.test(q)) return reply('identity', ['我是你爹。'], { fixed: true });
+    if (/^(?:(?:你|您)叫(?:什么|啥)(?:名字)?|你的名字(?:是什么|是啥|叫什么)?|你是张楠吗)$/.test(q)) return reply('name', ['张楠。'], { fixed: true });
+    if (/^(?:你)?(?:刚才|刚刚|上次|上一句)(?:说的|说了|说|回答的|回答了|回答)(?:是)?(?:什么|啥)(?:来着)?$|^(?:再|重新)(?:说|回答)(?:一遍|一次)$/.test(q)) {
+      const answer = previous ? (size(previous.answer) <= 20 ? previous.answer : '刚才那句说过了。') : '刚才还没说。';
+      return reply('recall', [answer], { fixed: true, topic });
+    }
+    if (/敷衍/.test(q) && /你|您/.test(q) && /吗|么|是不是|有没有|别|不要/.test(q)) return reply('response', ['我在回答你。'], { fixed: true });
+
+    // Question intent comes before numeric keywords: asking why something is expensive is not asking its price.
+    if (/为什么|为啥|为何|怎么回事|咋回事/.test(q)) {
+      if (/贵|便宜/.test(q)) return reply('why', [/便宜/.test(q) ? '因为不贵。' : '因为不便宜。'], { fixed: true, topic: { category: 'price', unit: topic?.category === 'price' ? topic.unit : '元' } });
+      if (/时间|过得.*快/.test(q)) return reply('time-why', ['因为时间没停。']);
+      const feeling = (q.match(/不开心|不高兴|不舒服|开心|难过|紧张|焦虑|生气|累|困|饿|渴/) || [])[0];
+      if (feeling) return reply('feeling', ['因为' + feeling + '。']);
+      const statement = phrase(q.replace(/为什么|为啥|为何|怎么回事|咋回事/g, '').replace(/^(?:会|要)/, ''), 8);
+      return reply('why', [statement ? '因为' + statement + '。' : '原因就是原因。']);
+    }
+    const judgement = q.match(/贵不贵|便宜不便宜|长不长|高不高|大不大|重不重|多不多|冷不冷|热不热/);
+    if (judgement) {
+      const word = judgement[0].split('不')[0];
+      return reply('judgement', [word + '就是' + word + '。']);
+    }
+    if (/怎么|怎样|如何|咋/.test(q) && !/会怎么样|天气怎么样|(?:明天|后天|未来|下周|以后)怎么样|选|纠结|选择/.test(q)) {
+      const action = phrase(q.replace(/^.*?(?:怎么样才能|怎么才能|怎样才能|如何才能|怎么才可以|怎么样|怎样|如何|怎么|咋)/, '').replace(/^(?:才|能|可以|才能|才可以)+/, ''));
+      return howReply(action);
+    }
+    const numeric = numerical(q);
+    if (numeric) return numeric;
+
     let match;
-    if (/(?:你是谁|你叫什么|你的名字|你是张楠)/.test(q)) return { category: 'identity', candidates: ['我是张楠，也就是正在回答你的这个张楠。', '张楠。叫我张楠，就算叫对了。', '你在张楠问答里问到的，自然是张楠。'] };
-    if (/星期几|周几|几月几[号日]/.test(q)) return { category: 'calendar', candidates: ['今天是昨天的后一天。', '今天这个日子，明天就算昨天了。', '日历上写着今天的那格，就是今天。'] };
-    if (/下雨|下雪|晴天|阴天|天气|气温|会不会冷|会不会热/.test(q)) {
+    if ((match = q.match(/^(.+?)(?:什么|啥|哪种)味(?:道|儿)?$/))) return tasteReply(subjectOf(match[1]));
+    if (/下雨|下雪|晴天|阴天|天气|会不会冷|会不会热/.test(q)) {
       const day = (q.match(/大后天|后天|明天|今天|今晚|周末|下周/) || ['那天'])[0];
       const event = /下雪/.test(q) ? '雪' : /下雨/.test(q) ? '雨' : null;
-      return { category: 'weather', candidates: event ? [`${day}下不下${event}，得看${day}有没有${event}。`, `有${event}的时候，${day}就不算没${event}。`, `${day}的${event}，要下了才能算下了。`] : [`${day}的天气，就是${day}出门能感受到的天气。`, `等到了${day}，就知道${day}是什么天气了。`, `${day}冷不冷，主要看${day}有多冷。`] };
+      return reply('weather', [event ? day + '下' + event + '就有' + event + '。' : day + '到了就知道了。']);
     }
-    if ((match = q.match(/(.{1,25}?)(?:是)?什么味(?:道|儿)?/))) {
-      const subject = short(mirror(trimSubject(match[1]).replace(/是$/, '')), 16) || '它';
-      return { category: 'taste', candidates: [`就是${subject}该有的味道。`, `${subject}吃起来，还是有${subject}的特点。`, `${subject}的味道，尝到的那一口最清楚。`, `你尝到的，就是${subject}的味道。`] };
-    }
-    if (/(?:吃|喝)(?:点|些)?什么|(?:午饭|晚饭|早餐|夜宵).*(?:选|推荐)/.test(q)) {
-      const meal = (q.match(/早餐|早饭|午饭|午餐|晚餐|晚饭|夜宵/) || [q.includes('中午') ? '午饭' : q.includes('晚上') ? '晚饭' : '这顿饭'])[0];
-      return { category: 'meal', candidates: [`等吃上了，${meal}吃什么就确定了。`, `${meal}最后吃的，就是最后选中的那个。`, `先决定吃什么，就知道${meal}吃什么了。`, `${meal}可以吃点能算作${meal}的东西。`, `这次吃的，会成为你吃过的东西。`] };
-    }
-    if (/好吃|好喝|难吃|难喝/.test(q)) {
-      const quality = (q.match(/好吃|好喝|难吃|难喝/) || ['好吃'])[0];
-      return { category: 'food-quality', candidates: [`因为尝起来${quality}。`, `${quality}这件事，尝起来最有发言权。`, `要不是${quality}，就不算${quality}了。`, `你觉得${quality}的，正好就是它${quality}的地方。`] };
-    }
-    if (/好看|漂亮|帅不帅|可爱|美不美|酷不酷/.test(q)) return { category: 'appearance', candidates: ['好看的地方，确实是越看越好看。', '可爱这件事，可爱起来就很明显。', '你认真看过之后，就算认真看过了。', '这份好看，主要体现在看起来好看。'] };
-    if (/好玩|有趣|无聊/.test(q)) return { category: 'fun', candidates: ['好不好玩，玩的时候就会有感觉。', '有趣的地方，正好是它不无聊的地方。', '玩过以后，你就多了一次玩过的经历。', '这个游戏玩起来，就是这个游戏的玩法。'] };
-    if (/爱我|喜欢我|陪我|想我/.test(q)) return { category: 'affection', candidates: ['我在陪你聊天，这天就不算你一个人聊的。', '你来找我的时候，我就在你找到的地方。', '现在陪着你的，正好就是现在的我。', '能一直聊的时候，我们就一直聊。'] };
-    if ((match = q.match(/(?:什么时候|几点|何时)(?:才|能|可以|才能|才可以)?(.+)/))) {
-      const action = short(mirror(match[1].replace(/(?:呢|呀|啊|吗)$/g, '')), 18);
-      return { category: 'when', candidates: [`等到${action}的时候，就${action}了。`, `到了能${action}的那个时候，就能${action}了。`, `${action}之前，暂时还不算${action}。`, `等${action}这件事发生了，时间也就对上了。`] };
-    }
-    if (/多久|多长时间|多长|多少分钟|多少小时/.test(q)) {
-      const topic = short(mirror(q.split(/(?:要|得|需要|还要)?(?:多久|多长时间|多长|多少分钟|多少小时)/)[0]), 14);
-      return { category: 'duration', candidates: [`${topic ? topic + '的时间' : '这段时间'}，就是从开始到结束那么久。`, `等结束的时候，就知道一共花了多久。`, `在它结束之前，时间还得接着算。`, `要是快一点，花的时间就会少一点。`] };
+    if (/(?:吃|喝)(?:点|些)?什么|(?:午饭|晚饭|早餐|夜宵).*(?:选|推荐)/.test(q)) return reply('meal', ['吃了就知道了。', '选什么就吃什么。']);
+    if ((match = q.match(/好吃|好喝|难吃|难喝/))) return reply('food-quality', [match[0] + '就是' + match[0] + '。']);
+    if (/好看|漂亮|帅不帅|可爱|美不美|酷不酷/.test(q)) return reply('appearance', ['好看就是好看。']);
+    if (/好玩|有趣|无聊/.test(q)) return reply('fun', ['玩了就算玩了。']);
+    if (/爱我|喜欢我|陪我|想我/.test(q)) return reply('affection', ['聊着就是陪着。']);
+    if ((match = q.match(/(?:什么时候|何时)(?:才可以|才能|才|能|可以)?(.+)/))) {
+      const action = phrase(match[1]);
+      return reply('when', [action ? action + '了就' + action + '了。' : '到时候就是时候。']);
     }
     if (/哪里|哪儿|在哪|何处|去哪/.test(q)) {
-      const subject = short(mirror(q.split(/(?:在|到|去)?(?:哪里|哪儿|哪|何处)/)[0]).replace(/(?:究竟|到底|现在|应该|可以|要|是|在|去|到|了)+$/g, ''), 16);
-      if (/去|玩|旅行|旅游/.test(q)) return { category: 'where-go', candidates: ['选好要去的地方，就有地方去了。', '去了哪里，哪里就是这次去的地方。', '你想去的那个地方，应该就在你想去的名单里。', '到了目的地，就知道自己到哪儿了。'] };
-      return { category: 'where', candidates: [`${subject || '它'}就在${subject ? '它' : '自己'}现在待着的地方。`, `找到了，就知道${subject || '它'}在哪儿了。`, `在找到${subject || '它'}的那个地方，就能找到${subject || '它'}。`, `${subject || '它'}的位置，就是它所在的位置。`] };
+      if (/去|玩|旅行|旅游/.test(q)) return reply('where-go', ['去了就是去过了。']);
+      const subject = phrase(q.split(/(?:在|到|去)?(?:哪里|哪儿|哪|何处)/)[0].replace(/(?:究竟|到底|现在|应该|可以|要|是|在|去|到|了)+$/g, ''));
+      return reply('where', [subject ? subject + '在它在的地方。' : '就在它在的地方。']);
     }
-    if (/选哪个|怎么选|如何选|该选|还是|纠结|选择/.test(q)) return { category: 'choice', candidates: ['选了其中一个，就少了一个没选过的。', '你最后选的那个，就是你的最终选择。', '先选一个；选好了，就算作出选择了。', '两个都想选，说明你还没只选一个。', '等你决定了，答案就跟着确定了。'] };
-    if (/为什么|为啥|怎么回事|为何/.test(q)) {
-      if (/时间|过得.*快/.test(q)) return { category: 'time-why', candidates: ['因为你发现的时候，时间已经过去了。', '过去的时间，确实不会还停在刚才。', '你觉得快的这段时间，已经过得挺快了。'] };
-      const feeling = (q.match(/累|困|饿|渴|开心|难过|紧张|焦虑|生气/) || [])[0];
-      if (feeling) return { category: 'feeling', candidates: [`${feeling}的时候，确实就会觉得${feeling}。`, `因为你现在的感受，正好是${feeling}。`, `要是不${feeling}了，就不是现在这个感觉了。`, `这份${feeling}，主要体现在你感觉到了它。`] };
-      const before = q.split(/为什么|为啥|为何/)[0];
-      const after = q.replace(/^.*?(?:为什么|为啥|为何)/, '');
-      const statement = short(mirror((before + after).replace(/[呢呀啊吗]$/g, '')), 24);
-      return { category: 'why', candidates: [`${statement || '这件事'}，肯定有它之所以这样的原因。`, `因为事情发展到这里，就成了${statement ? '你说的这个样子' : '现在这样'}。`, `要不是这样，你就不会问为什么这样了。`, `关于${statement ? '「' + statement + '」' : '这件事'}，原因就在导致它发生的原因里。`] };
+    if (/选哪个|怎么选|如何选|该选|还是|纠结|选择/.test(q)) return reply('choice', ['选了就是选了。']);
+    if ((match = q.match(/^(?:什么是|何为|什么叫)(.+)$/)) || (match = q.match(/^(.+?)(?:的)?(?:意义|意思|定义)(?:是)?什么$/))) {
+      const subject = subjectOf(match[1]);
+      return reply('definition', [subject ? subject + '就是' + subject + '。' : '意思就是那个意思。']);
     }
-    if (/怎么|怎样|如何/.test(q) && !/(?:会怎么样|(?:明天|后天|以后|未来|下周)怎么样)/.test(q)) {
-      const action = actionOf(q) || '把这件事做好';
-      return { category: 'how', candidates: [`想${action}，得先做到${action}。`, `等你成功${action}，就算学会${action}了。`, `${action}的关键，就是做到前面说的这件事。`, `先开始${action}，就不算完全没开始。`, `用能${action}的方法，就能往${action}的方向走。`] };
-    }
-    if ((match = q.match(/(?:什么是|何为)(.+)/)) || (match = q.match(/(.+?)(?:的)?(?:意义|意思|定义)(?:是)?什么/))) {
-      const subject = short(mirror(match[1]), 16);
-      return { category: 'definition', candidates: [`${subject}，就是被叫作${subject}的那个东西。`, `说到${subject}，说的就是${subject}这件事。`, `${subject}的意思，主要就在${subject}的意思里。`, `弄明白${subject}之后，就知道${subject}是什么了。`] };
-    }
-    if (/多少钱|贵不贵|便宜|价格/.test(q)) return { category: 'price', candidates: ['价格是多少，就得按多少来算。', '贵不贵，主要得看它有多贵。', '买下来的时候，花掉的就是它的价钱。', '便宜一点，确实就能少花一点。'] };
-    if (/多少|几个|几次|几岁/.test(q)) return { category: 'quantity', candidates: ['有多少个，数完就是多少个。', '全部加起来，就是总共的数量。', '比现在多一个，就比现在多一个。', '你数出来的那个数，就是这次的结果。'] };
-    if (/明天|后天|以后|未来|下周|会怎么样/.test(q)) {
+    if (/明天|后天|以后|未来|下周|会怎么样/.test(q) && /怎么样|怎样|如何|会发生什么/.test(q)) {
       const time = (q.match(/大后天|后天|明天|以后|未来|下周/) || ['以后'])[0];
-      return { category: 'future', candidates: [`等${time}到了，就知道了。`, `${time}的事，等发生了就不算没发生。`, `${time}会怎么样，得让${time}先来。`, `到${time}再回头看，今天就成了以前。`] };
+      return reply('future', [time + '到了就知道了。']);
     }
-    if (/能不能|可不可以|会不会|是不是|有没有|行不行|对不对|可以吗|能.*吗|会.*吗|吗$|么$/.test(q)) {
-      const subject = short(mirror(q.replace(/[吗么嘛呢]$/g, '')), 22);
-      return { category: 'yes-no', candidates: [`${subject ? '关于「' + subject + '」' : '这个问题'}，确定了就有确定的答案了。`, '可以的时候，自然就不算不可以。', '有这回事，就说明不是没这回事。', '等结果出来，就能知道答案对不对了。', '是就是，不是就还不能算是。'] };
+    if (/^(?:你好|嗨|哈喽|hello|hi|在吗|早上好|晚上好)$/i.test(q)) return reply('greeting', [/在吗/.test(q) ? '在呢。' : '你好就是你好。']);
+    if (/能不能|可不可以|会不会|是不是|有没有|行不行|对不对|可以吗|能.*吗|会.*吗|吗$|么$/.test(q)) return reply('yes-no', ['是就是。', '行了就是行了。']);
+    const feeling = (q.split(/[，,。；;]/).at(-1).match(/不开心|不高兴|不舒服|不累|不困|不饿|不渴|开心|难过|紧张|焦虑|生气|累|困|饿|渴/) || [])[0];
+    if (feeling) return reply('feeling', [feeling.length === 1 ? feeling + '了就是' + feeling + '了。' : feeling + '就是' + feeling + '。'], { fixed: true });
+    if ((match = q.match(/(?:想要|想|准备)(.+)/))) {
+      const action = phrase(match[1]);
+      return reply('wish', [action ? action + '了就算' + action + '了。' : '想了就是想了。']);
     }
-    if (/^(?:你好|嗨|哈喽|hello|hi|在吗|早上好|晚上好)$/i.test(q)) return { category: 'greeting', candidates: ['你好。你这一句，确实让我收到问候了。', '在呢。能回答你，就算在。', '见到你了，这就不算没见到。', '你好呀，打完招呼就算认识了。'] };
-    if ((match = q.match(/(?:想|想要|准备)(.+)/))) {
-      const action = short(mirror(match[1]), 20);
-      return { category: 'wish', candidates: [`想${action}的时候，确实会有想${action}的感觉。`, `如果开始${action}，就不只是想${action}了。`, `${action}这件事，你已经认真想过了。`, `做完${action}，就会多一件做完的事。`] };
+
+    // Only an elliptical follow-up inherits a topic; an explicit new question above always wins.
+    const followup = /呢$/.test(raw) ? q.match(/^(?:那么|那|换成|还有|至于)?(.{1,12})$/) : null;
+    if (followup && topic) {
+      if (Object.hasOwn(defaultUnits, topic.category)) return numberReply(topic.category, topic.unit);
+      if (topic.category === 'taste') return tasteReply(subjectOf(followup[1]));
+      if (topic.category === 'how') return howReply(phrase(followup[1]));
     }
-    const topic = short(mirror(q.split(/[，,。；;！!？?]/)[0]), 22);
-    return { category: 'general', candidates: [`关于「${topic}」，你确实已经把问题问出来了。`, `「${topic}」这件事，得看它具体是怎么一回事。`, `说到「${topic}」，那我们说的就是同一件事了。`, `你想知道「${topic}」，说明这就是你现在想知道的。`, `等「${topic}」有了答案，就不会还没答案了。`, `「${topic}」这个问题，问出来以后就算问过了。`] };
+    return fallback();
   }
 
   function createReplyEngine(options = {}) {
-    let recent = (options.recent || []).slice(-40);
-    const random = options.random || Math.random;
+    const validTurn = turn => turn && typeof turn.question === 'string' && typeof turn.answer === 'string' && size(turn.question) <= 180 && size(turn.answer) <= 500;
+    let history = (Array.isArray(options.history) ? options.history : []).filter(validTurn).slice(-3);
+    let recent = (Array.isArray(options.recent) ? options.recent : history.map(turn => turn.answer)).slice(-40);
+    let topic = null;
+    for (let index = 0; index < history.length; index++) topic = classify(history[index].question, topic, history[index - 1]).topic || null;
+    const random = typeof options.random === 'function' ? options.random : Math.random;
     return {
       answer(question) {
         const q = clean(question);
         if (!q) throw new RangeError('请先写一个问题');
-        const result = classify(short(q, 180));
-        let available = result.candidates.filter(answer => !recent.includes(answer));
-        if (!available.length) available = result.candidates.filter(answer => answer !== recent.at(-1));
-        if (!available.length) available = result.candidates;
-        // The first encounter with a real classic retains its original punchline.
-        const firstClassic = result.category.startsWith('classic:') && result.candidates.every(answer => !recent.includes(answer));
-        const answer = firstClassic ? available[0] : available[Math.min(available.length - 1, Math.max(0, Math.floor(random() * available.length)))];
+        const result = classify(q, topic, history.at(-1));
+        const candidates = result.candidates.filter(answer => size(answer) <= 20 && answer.split(/[。！？!?]/).filter(Boolean).length <= 1);
+        let available = result.fixed ? candidates : candidates.filter(answer => !recent.includes(answer));
+        if (!available.length) available = candidates.length ? candidates : fallback().candidates;
+        const roll = Number(random());
+        const index = Number.isFinite(roll) ? Math.min(available.length - 1, Math.max(0, Math.floor(roll * available.length))) : 0;
+        const answer = available[result.fixed ? 0 : index];
+        history.push({ question: q, answer, category: result.category }); history = history.slice(-3);
         recent.push(answer); recent = recent.slice(-40);
+        topic = result.topic || null;
         return { answer, category: result.category };
       },
-      reset() { recent = []; }
+      reset() { history = []; recent = []; topic = null; }
     };
   }
   const api = { createReplyEngine, classify };

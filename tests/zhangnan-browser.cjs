@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const root = path.resolve(__dirname, '..');
-const out = path.join(root, '.openai/zhangnan');
+const out = path.resolve(process.env.TEST_OUTPUT_DIR || path.join(root, '.openai/zhangnan'));
 fs.mkdirSync(out, { recursive: true });
 const base = (process.env.TEST_URL || 'http://127.0.0.1:8080').replace(/\/$/, '');
 const expectedCache = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8').match(/CACHE_NAME = '([^']+)'/)[1];
@@ -20,6 +20,14 @@ const launchOptions = process.env.TEST_BROWSER_PATH ? { executablePath: process.
   };
   const input = page.locator('#question-input');
   async function send(question) { await input.fill(question); await page.locator('#send-button').click(); }
+  async function clickQuick(question) {
+    const button = page.getByRole('button', { name: question, exact: true });
+    for (let batch = 0; batch < 5; batch++) {
+      if (await button.count()) { await button.click(); return; }
+      await page.locator('#shuffle').click();
+    }
+    throw new Error('Quick question is missing: ' + question);
+  }
   const noOverflow = async () => assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'horizontal overflow');
   const reset = async () => { await page.locator('#reset-open').click(); await page.locator('#reset-confirm').click(); };
   try {
@@ -102,6 +110,46 @@ const launchOptions = process.env.TEST_BROWSER_PATH ? { executablePath: process.
     await reset(); await page.reload(); await waitIdle(0);
     console.log('PASS cancelled reset, in-flight reset cancellation and cleared persisted history');
 
+    for (const [index, question, expected] of [
+      [1, '牛奶多少钱？', '114514元。'],
+      [2, '那面包呢？', '114514元。'],
+      [3, '为什么这么贵？', '因为不便宜。']
+    ]) {
+      await send(question); await waitIdle(index);
+      assert.equal(await page.locator('#answer-text').textContent(), expected);
+    }
+    await page.reload(); await waitIdle(3);
+    for (const [index, question, expected] of [
+      [4, '那蛋糕呢？', '114514元。'],
+      [5, '你刚才说什么？', '114514元。'],
+      [6, '你几岁？', '114514岁。'],
+      [7, '那体重呢？', '114514斤。'],
+      [8, '我好累。', '累了就是累了。']
+    ]) {
+      await send(question); await waitIdle(index);
+      assert.equal(await page.locator('#answer-text').textContent(), expected);
+    }
+    await send('那面包呢？'); await waitIdle(9);
+    assert.doesNotMatch(await page.locator('#answer-text').textContent(), /114514/);
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('zhangnan-chat-v1')));
+    assert.equal(saved.version, 1);
+    assert.equal(saved.turns.length, 9);
+    assert.ok(saved.turns.every(turn => Array.from(turn.answer).length <= 20));
+    await reset();
+    await send('你刚才说什么？'); await waitIdle(1);
+    assert.equal(await page.locator('#answer-text').textContent(), '刚才还没说。');
+    await send('那面包呢？'); await waitIdle(2);
+    assert.doesNotMatch(await page.locator('#answer-text').textContent(), /114514/);
+    for (const [index, question] of [[3, '你到底是谁？'], [4, '你哪位？']]) {
+      await send(question); await waitIdle(index);
+      assert.equal(await page.locator('#answer-text').textContent(), '我是你爹。');
+    }
+    await send('牛奶贵不贵？'); await waitIdle(5);
+    assert.equal(await page.locator('#answer-text').textContent(), '贵就是贵。');
+    await page.screenshot({ path: path.join(out, 'short-replies-mobile.png') });
+    await reset();
+    console.log('PASS fixed jokes, units, intent, contextual follow-ups, refresh, topic switch and reset');
+
     const firstBatch = await page.locator('#quick-questions').textContent();
     await page.locator('#shuffle').click(); assert.notEqual(await page.locator('#quick-questions').textContent(), firstBatch);
     await send('<img src=x onerror=alert(1)>'); await waitIdle(1);
@@ -109,7 +157,7 @@ const launchOptions = process.env.TEST_BROWSER_PATH ? { executablePath: process.
     assert.equal(await page.locator('#question-text').textContent(), '<img src=x onerror=alert(1)>');
     await send('我想问一个很长的问题'.repeat(9)); await waitIdle(2); await noOverflow();
     await reset();
-    await page.getByRole('button', { name: '今天吃什么？', exact: true }).click(); await waitIdle(1);
+    await clickQuick('今天吃什么？'); await waitIdle(1);
     console.log('PASS functional shuffle, safe plain text and long questions');
 
     for (const [width, height] of [[320,568], [390,844], [768,1024], [1440,1000], [844,390]]) {
@@ -148,9 +196,16 @@ const launchOptions = process.env.TEST_BROWSER_PATH ? { executablePath: process.
     }
     await page.goto(base + '/zhangnan/');
     await reset();
-    await page.getByRole('button', { name: '这香蕉是什么味道？', exact: true }).click(); await waitIdle(1);
+    await clickQuick('这香蕉是什么味道？'); await waitIdle(1);
     assert.equal(await page.locator('#answer-text').textContent(), '就是香蕉味。');
     await page.reload(); await waitIdle(1);
+    await send('牛奶多少钱？'); await waitIdle(2);
+    assert.equal(await page.locator('#answer-text').textContent(), '114514元。');
+    await page.reload(); await waitIdle(2);
+    await send('那面包呢？'); await waitIdle(3);
+    assert.equal(await page.locator('#answer-text').textContent(), '114514元。');
+    await send('你是谁？'); await waitIdle(4);
+    assert.equal(await page.locator('#answer-text').textContent(), '我是你爹。');
     await page.locator('.home-link').click(); assert.match(await page.title(), /Daniel 的桌游/);
     assert.deepEqual(errors, []);
     console.log(`PASS all acceptance checks; lobby + ${entries.length} real offline entries; zero page errors`);
