@@ -3,77 +3,760 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#172033">
+  <meta name="theme-color" content="#101018">
+  <meta name="description" content="Daniel 的中文聚会桌游与在线联机游戏厅：包含狼人真言、芥末轮盘、双簧大忽悠、电波同步、花见小路、诺丁汉警长等 18 款精选桌游，支持手机安装与离线游玩。">
+  <link rel="canonical" href="https://games.danielxu.cn/">
+  <meta name="robots" content="index,follow">
+  <link rel="dns-prefetch" href="https://werewords.games.danielxu.cn">
+  <link rel="preconnect" href="https://werewords.games.danielxu.cn" crossorigin>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/favicon.svg?v=1" type="image/svg+xml">
-  <title>Daniel 的桌游｜中文离线聚会桌游合集</title>
+  <title>Daniel 的桌游｜霓虹聚会桌游厅</title>
   <style>
-    :root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#101522; color:#f7f3e9; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:radial-gradient(circle at top,#273958,#101522 55%); }
-    main { width:min(100% - 32px, 620px); margin:auto; padding:clamp(32px,8vh,72px) 0 40px; }
-    h1 { margin:0; font-size:clamp(2.2rem,10vw,4rem); letter-spacing:-.06em; }
-    .subtitle { margin:8px 0 22px; color:#b8c3d6; letter-spacing:.08em; text-transform:uppercase; }
-    #offline-status { min-height:24px; margin-bottom:18px; color:#86efac; }
-    .games { display:grid; gap:14px; }
-    .game { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px; border:1px solid #405274; border-radius:22px; background:#1b2940e8; box-shadow:0 12px 30px #0003; }
-    .game h2 { margin:0 0 5px; font-size:1.18rem; }
-    .game p { margin:0; color:#aebbd0; font-size:.9rem; }
-    a { color:inherit; text-decoration:none; }
-    .launch { flex:none; padding:12px 15px; border-radius:14px; background:#f3c969; color:#172033; font-weight:800; white-space:nowrap; }
-    @media (max-width:420px) { .game { align-items:flex-start; flex-direction:column; } .launch { width:100%; text-align:center; } }
-    .neon { border:3px solid var(--accent); box-shadow:5px 5px 0 var(--accent); background:#171723; margin-bottom:6px; }
-    .neon h2 { color:var(--accent); font-size:1.3rem; }
-    .neon .launch { background:var(--accent); font-weight:900; }
-    .neon-lime { --accent:#c5ff4a; } .neon-pink { --accent:#ff58b6; } .neon-cyan { --accent:#56e5ff; }
-    .zhangnan-game { background:#f0e8f4; border-color:#c4aace; color:#493951; }
-    .zhangnan-game p { color:#92799e; } .zhangnan-game .launch { background:#8d6b9f; color:#fff; }
-    .werewords-online { background:linear-gradient(135deg,#1d243b,#121726); border-color:#e5bc6e; box-shadow:0 12px 30px rgba(229,188,110,.16); }
-    .werewords-online h2 { color:#f3d28f; }
-    .werewords-online .launch { background:linear-gradient(135deg,#ebc77e,#c99945); color:#15120c; }
+    :root {
+      color-scheme: dark;
+      --bg: #101018;
+      --surface: #1b1b29;
+      --surface-hi: #232336;
+      --ink: #fff8e8;
+      --muted: #b5b5cc;
+      --line: #3a3a54;
+      --shadow-dark: #07070c;
+      --lime: #c5ff4a;
+      --pink: #ff58b6;
+      --cyan: #56e5ff;
+      --yellow: #ffe25a;
+      --violet: #b78cff;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100dvh;
+      color: var(--ink);
+      background:
+        radial-gradient(640px 260px at 14% -40px, rgba(255, 88, 182, 0.14), transparent 68%),
+        radial-gradient(640px 260px at 88% -40px, rgba(86, 229, 255, 0.12), transparent 68%),
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px) 0 0 / 18px 18px,
+        var(--bg);
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+
+    main {
+      width: min(100% - 28px, 920px);
+      margin: 0 auto;
+      padding: clamp(18px, 4vh, 36px) 0 max(44px, env(safe-area-inset-bottom));
+    }
+
+    /* Compact Arcade Header */
+    .topbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--yellow);
+      color: #101018;
+      border: 2px solid var(--shadow-dark);
+      box-shadow: 3px 3px 0 var(--pink);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transform: rotate(-1.5deg);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.85rem, 6.8vw, 2.85rem);
+      font-weight: 950;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      text-shadow: 3px 3px 0 #07070c;
+    }
+
+    #offline-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 2px solid var(--line);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--yellow);
+      white-space: nowrap;
+      box-shadow: 3px 3px 0 var(--shadow-dark);
+    }
+
+    /* Horizontal Category Filter Bar */
+    .filter-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 12;
+      margin: 0 -14px 18px;
+      padding: 10px 14px;
+      background: rgba(16, 16, 24, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px 0 4px;
+    }
+
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 2.5px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 900;
+      box-shadow: 3px 3px 0 var(--shadow-dark);
+      transition: transform 0.08s, box-shadow 0.08s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--ink);
+      border-color: #6a6a90;
+    }
+
+    .tab-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--shadow-dark);
+    }
+
+    .tab-btn .cnt {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.09);
+      color: inherit;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tab-btn[aria-pressed="true"],
+    .tab-btn[aria-pressed="true"]:hover {
+      background: var(--yellow);
+      color: #101018;
+      border-color: var(--shadow-dark);
+      box-shadow: 3px 3px 0 var(--pink);
+    }
+
+    .tab-btn[aria-pressed="true"] .cnt {
+      background: rgba(16, 16, 24, 0.16);
+    }
+
+    /* Featured Spotlight Card (Werewords Dual Entry) */
+    .spotlight {
+      position: relative;
+      margin-bottom: 18px;
+      padding: 18px 18px 16px;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255, 226, 90, 0.12), rgba(255, 88, 182, 0.08) 55%, rgba(27, 27, 41, 0.96)),
+        var(--surface);
+      border: 3px solid var(--yellow);
+      box-shadow: 6px 6px 0 var(--pink);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .spotlight[hidden] { display: none; }
+
+    .spotlight-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .spotlight-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .spot-icon {
+      flex: 0 0 auto;
+      width: 50px;
+      height: 50px;
+      border-radius: 13px;
+      background: #141420;
+      border: 2.5px solid var(--yellow);
+      box-shadow: 3px 3px 0 var(--shadow-dark);
+      display: grid;
+      place-items: center;
+      font-size: 25px;
+    }
+
+    .spot-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 5px;
+    }
+
+    .spot-kicker {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: var(--pink);
+      color: #101018;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .spotlight h2 {
+      margin: 0;
+      font-size: clamp(1.22rem, 4.4vw, 1.48rem);
+      font-weight: 950;
+      color: var(--yellow);
+      line-height: 1.2;
+    }
+
+    .spotlight p {
+      margin: 5px 0 0;
+      color: #ddd9e8;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    .pill-seat {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 7px;
+      border: 2px solid currentColor;
+      background: rgba(16, 16, 24, 0.55);
+      font-size: 11.5px;
+      font-weight: 900;
+      white-space: nowrap;
+      line-height: 1.1;
+    }
+
+    .spotlight .pill-seat {
+      color: var(--yellow);
+    }
+
+    .spot-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .arcade-btn {
+      flex: 1 1 140px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 46px;
+      padding: 10px 16px;
+      border-radius: 11px;
+      border: 2.5px solid var(--shadow-dark);
+      font-size: 14.5px;
+      font-weight: 950;
+      box-shadow: 4px 4px 0 var(--shadow-dark);
+      transition: transform 0.1s, box-shadow 0.1s, filter 0.14s;
+      white-space: nowrap;
+    }
+
+    .arcade-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--shadow-dark);
+    }
+
+    .arcade-btn-primary {
+      background: var(--yellow);
+      color: #101018;
+    }
+
+    .arcade-btn-secondary {
+      background: var(--surface-hi);
+      color: var(--ink);
+      border-color: var(--cyan);
+      box-shadow: 4px 4px 0 rgba(86, 229, 255, 0.35);
+    }
+
+    /* Minimal Horizontal Game Cards: Mobile 1-col / Desktop 2-col */
+    .games-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .games-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .spotlight {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 22px;
+      }
+      .spot-actions {
+        flex: 0 0 auto;
+        flex-direction: row;
+      }
+      .arcade-btn {
+        flex: 0 0 auto;
+        min-width: 132px;
+      }
+    }
+
+    .game-card {
+      --accent: var(--lime);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 15px;
+      border-radius: 15px;
+      background: var(--surface);
+      border: 2.5px solid var(--accent);
+      box-shadow: 4px 4px 0 var(--accent);
+      transition: transform 0.1s, box-shadow 0.1s, background 0.14s;
+      min-width: 0;
+    }
+
+    .game-card[hidden] { display: none; }
+
+    .game-card:hover {
+      background: var(--surface-hi);
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0 var(--accent);
+    }
+
+    .game-card:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--accent);
+    }
+
+    .game-card:focus-visible,
+    .arcade-btn:focus-visible,
+    .tab-btn:focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+    }
+
+    .accent-lime   { --accent: var(--lime); }
+    .accent-pink   { --accent: var(--pink); }
+    .accent-cyan   { --accent: var(--cyan); }
+    .accent-yellow { --accent: var(--yellow); }
+    .accent-violet { --accent: var(--violet); }
+
+    .card-emblem {
+      flex: 0 0 auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 11px;
+      background: #13131e;
+      border: 2px solid var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .card-body {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-body p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .game-card .pill-seat {
+      color: var(--accent);
+      border-color: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3px 7px;
+      font-size: 11px;
+    }
+
+    .foot-note {
+      margin-top: 26px;
+      text-align: center;
+      color: #82829c;
+      font-size: 12px;
+    }
+
+    @media (max-width: 390px) {
+      main { width: min(100% - 20px, 920px); }
+      .filter-wrap { margin: 0 -10px 16px; padding: 8px 10px; }
+      .spotlight { padding: 15px 14px; }
+      .spot-icon { width: 44px; height: 44px; font-size: 22px; }
+      .game-card { padding: 12px 12px; gap: 11px; }
+      .card-emblem { width: 40px; height: 40px; font-size: 20px; }
+      .card-title { font-size: 15px; }
+      .card-body p { font-size: 12.5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
   </style>
-  <meta name="description" content="手机优先的中文聚会桌游合集，包含伪艺术家、赝品画师、Spyfall、狼人真言等游戏，支持安装与离线游玩。" />
-  <link rel="canonical" href="https://games.danielxu.cn/" />
-  <meta name="robots" content="index,follow" />
 </head>
 <body>
   <main>
-    <h1>Daniel 的桌游</h1>
-    <p class="subtitle">Offline Party Games</p>
-    <div id="offline-status" role="status" aria-live="polite">正在准备离线资源…</div>
-    <section class="games" aria-label="桌游列表">
-      <a class="game werewords-online" href="https://werewords.games.danielxu.cn/"><div><h2>🌙 狼人真言 · 多人联机版</h2><p>扫码建房 · 手机私密发牌 · 月下秘仪版（含单机传玩）</p></div><span class="launch">开房联机</span></a>
-      <a class="game zhangnan-game" href="./zhangnan/"><div><h2>✦ 张楠问答</h2><p>你认真问，她认真答 · 每句话都好像没说</p></div><span class="launch">问问张楠</span></a>
-      <a class="game" href="./wavelength/"><div><h2>〰️ 电波同步 Wavelength</h2><p>双人默契挑战 · 435 组精选题 · 传手机猜脑回路</p></div><span class="launch">开始对频</span></a>
-      <a class="game" href="./sheriff/"><div><h2>⚜ 诺丁汉警长 · 双袋博弈</h2><p>双人传阅 · 嘴炮谈判 · 六回合走私心理战</p></div><span class="launch">开启城门</span></a>
-      <a class="game" href="./tragedy-looper/"><div><h2>⏳ 惨剧轮回 Tragedy Looper</h2><p>线下推理 · GM 暗箱 · 时间轮回与命运博弈</p></div><span class="launch">开启轮回</span></a>
-      <a class="game" href="./lost-cities/"><div><h2>✥ 失落的城市 Lost Cities</h2><p>双人传阅 · 五色远征 · 自动存档与累计计分</p></div><span class="launch">开始远征</span></a>
-      <a class="game" href="./jaipur/"><div><h2>◇ 斋浦尔 Jaipur</h2><p>两人同屏传阅 · 市集交易 · 三局两胜</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/hanamikoji/"><div><h2>🌸 花见小路 Hanamikoji</h2><p>两人传递 · 七位艺伎的倾心之争</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/friend-court/"><div><h2>⚖️ 损友审判庭</h2><p>100 道灵魂拷问 · 倒数指人 · 线下嘴炮</p></div><span class="launch">进入游戏</span></a>
+    <header class="topbar">
+      <div class="brand-block">
+        <span class="eyebrow">DANIEL'S PARTY ARCADE</span>
+        <h1>Daniel 的桌游</h1>
+      </div>
+      <div id="offline-status" role="status" aria-live="polite">正在准备离线资源…</div>
+    </header>
 
-      <a class="game neon neon-lime" href="./wasabi-roulette/"><div><h2>🥵 芥末俄罗斯轮盘</h2><p>3 分钟微表情演技局 · 找出藏在身边的影帝</p></div><span class="launch">开演</span></a>
-      <a class="game neon neon-pink" href="./two-faced/"><div><h2>🎭 双簧大忽悠</h2><p>一个真专家，一个全靠编 · 记者团请发难</p></div><span class="launch">开演</span></a>
-      <a class="game neon neon-cyan" href="./fun-employed/"><div><h2>💼 戏精求职部</h2><p>三个离谱特长 · 45 秒把老板忽悠瘸</p></div><span class="launch">开演</span></a>
-      <a class="game" href="./pass-the-bomb/"><div><h2>💣 嘴炮炸弹 Pass the Bomb</h2><p>中文接词 · 场景联想 · 脑洞炸弹</p></div><span class="launch">点燃引信</span></a>
-      <a class="game" href="./games/fake-artist-new-york/"><div><h2>🎨 伪艺术家纽约行</h2><p>单手机传阅版身份推理</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/fake-painter/"><div><h2>🖼️ 赝品画师</h2><p>看画、传阅、找出赝品画师</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/pick-one-for-me/"><div><h2>🎲 今天纠结什么</h2><p>把选择交给随机命运</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/spyfall/"><div><h2>🕵️ 间谍危机</h2><p>Spyfall 多人问答派对</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/werewords-companion/"><div><h2>🌙 Werewords</h2><p>狼人真言桌面伴侣</p></div><span class="launch">进入游戏</span></a>
-      <a class="game" href="./games/just-one/"><div><h2>💬 独家暗语 Just One</h2><p>13 张题卡 · 手机提示白板</p></div><span class="launch">进入游戏</span></a>
+    <nav class="filter-wrap" aria-label="游戏分类筛选">
+      <div class="filter-bar" id="filter-bar">
+        <button type="button" class="tab-btn" data-filter="all" aria-pressed="true">全部 <span class="cnt" data-cnt="all">18</span></button>
+        <button type="button" class="tab-btn" data-filter="party" aria-pressed="false">多人聚会 <span class="cnt" data-cnt="party">11</span></button>
+        <button type="button" class="tab-btn" data-filter="duo" aria-pressed="false">双人博弈 <span class="cnt" data-cnt="duo">6</span></button>
+        <button type="button" class="tab-btn" data-filter="online" aria-pressed="false">联机开房 <span class="cnt" data-cnt="online">3</span></button>
+        <button type="button" class="tab-btn" data-filter="fun" aria-pressed="false">整活工具 <span class="cnt" data-cnt="fun">2</span></button>
+      </div>
+    </nav>
+
+    <!-- Featured Dual-Entry Spotlight -->
+    <article class="spotlight" data-cats="party online" aria-label="主推游戏：狼人真言">
+      <div class="spotlight-top">
+        <div class="spotlight-head">
+          <div class="spot-icon" aria-hidden="true">🐺</div>
+          <div>
+            <div class="spot-meta-row">
+              <span class="spot-kicker">热门主推 · 联机 / 单机</span>
+              <span class="pill-seat">4–20人</span>
+            </div>
+            <h2>狼人真言 Werewords</h2>
+            <p>扫码建房私密发牌，限时猜词揪狼人，支持镇长自定义魔法词。</p>
+          </div>
+        </div>
+      </div>
+      <div class="spot-actions">
+        <a class="arcade-btn arcade-btn-primary" href="https://werewords.games.danielxu.cn/">联机开房 →</a>
+        <a class="arcade-btn arcade-btn-secondary" href="https://werewords.games.danielxu.cn/local">单机传玩</a>
+      </div>
+    </article>
+
+    <!-- Minimal Horizontal Arcade Cards -->
+    <section class="games-grid" id="games-grid" aria-label="桌游列表">
+      <a class="game-card accent-lime" data-cats="party" href="./wasabi-roulette/">
+        <span class="card-emblem" aria-hidden="true">🥵</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">芥末俄罗斯轮盘</h2>
+            <span class="pill-seat">4–10人</span>
+          </div>
+          <p>3 分钟微表情演技局，找出藏在身边的影帝</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-pink" data-cats="party" href="./two-faced/">
+        <span class="card-emblem" aria-hidden="true">🎭</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">双簧大忽悠</h2>
+            <span class="pill-seat">3–10人</span>
+          </div>
+          <p>一个真专家一个全靠编，记者团请发难</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-cyan" data-cats="party" href="./fun-employed/">
+        <span class="card-emblem" aria-hidden="true">💼</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">戏精求职部</h2>
+            <span class="pill-seat">3–10人</span>
+          </div>
+          <p>三个离谱特长，45 秒把老板忽悠瘸</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-cyan" data-cats="duo online" href="./wavelength/">
+        <span class="card-emblem" aria-hidden="true">〰️</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">电波同步 Wavelength</h2>
+            <span class="pill-seat">2人+ · 联机</span>
+          </div>
+          <p>435 组精选题，传手机或在线测脑回路默契</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-pink" data-cats="duo online" href="./games/hanamikoji/">
+        <span class="card-emblem" aria-hidden="true">🌸</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">花见小路 Hanamikoji</h2>
+            <span class="pill-seat">2人 · 联机</span>
+          </div>
+          <p>四人行动博弈，争夺七位艺伎的倾心</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-yellow" data-cats="duo" href="./sheriff/">
+        <span class="card-emblem" aria-hidden="true">⚜️</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">诺丁汉警长 · 双袋博弈</h2>
+            <span class="pill-seat">2人</span>
+          </div>
+          <p>双袋申报嘴炮谈判，六回合走私心理战</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-yellow" data-cats="party" href="./games/friend-court/">
+        <span class="card-emblem" aria-hidden="true">⚖️</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">损友审判庭</h2>
+            <span class="pill-seat">3–12人</span>
+          </div>
+          <p>100 道灵魂拷问，倒数指人线下嘴炮</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-lime" data-cats="party" href="./pass-the-bomb/">
+        <span class="card-emblem" aria-hidden="true">💣</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">嘴炮炸弹 Pass the Bomb</h2>
+            <span class="pill-seat">2–10人</span>
+          </div>
+          <p>中文接词与场景联想，引信随时炸裂</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-cyan" data-cats="duo" href="./lost-cities/">
+        <span class="card-emblem" aria-hidden="true">🧭</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">失落的城市 Lost Cities</h2>
+            <span class="pill-seat">2人</span>
+          </div>
+          <p>五色远征押注，自动存档与累计计分</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-lime" data-cats="duo" href="./jaipur/">
+        <span class="card-emblem" aria-hidden="true">🐪</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">斋浦尔 Jaipur</h2>
+            <span class="pill-seat">2人</span>
+          </div>
+          <p>两人同屏传阅市集交易，三局两胜</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-pink" data-cats="duo party" href="./tragedy-looper/">
+        <span class="card-emblem" aria-hidden="true">⏳</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">惨剧轮回 Tragedy Looper</h2>
+            <span class="pill-seat">2–4人</span>
+          </div>
+          <p>线下硬核推理，GM 暗箱与时间轮回博弈</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-cyan" data-cats="party" href="./games/just-one/">
+        <span class="card-emblem" aria-hidden="true">💬</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">独家暗语 Just One</h2>
+            <span class="pill-seat">3–7人</span>
+          </div>
+          <p>13 张题卡与提示白板，撞词作废的默契猜词</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-pink" data-cats="party" href="./games/spyfall/">
+        <span class="card-emblem" aria-hidden="true">🕵️</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">间谍危机 Spyfall</h2>
+            <span class="pill-seat">4–10人</span>
+          </div>
+          <p>多人轮流试探发问，揪出不知地点的卧底</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-yellow" data-cats="party" href="./games/fake-artist-new-york/">
+        <span class="card-emblem" aria-hidden="true">🎨</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">伪艺术家纽约行</h2>
+            <span class="pill-seat">4–10人</span>
+          </div>
+          <p>单手机传阅发词，轮流画一笔抓伪装者</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-lime" data-cats="party" href="./games/fake-painter/">
+        <span class="card-emblem" aria-hidden="true">🖼️</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">赝品画师</h2>
+            <span class="pill-seat">4–10人</span>
+          </div>
+          <p>看画传阅细品破绽，合力找出赝品画师</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-violet" data-cats="fun" href="./zhangnan/">
+        <span class="card-emblem" aria-hidden="true">✦</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">张楠问答</h2>
+            <span class="pill-seat">1人+</span>
+          </div>
+          <p>你认真问她认真答，每句话都好像没说</p>
+        </div>
+      </a>
+
+      <a class="game-card accent-violet" data-cats="fun" href="./games/pick-one-for-me/">
+        <span class="card-emblem" aria-hidden="true">🎲</span>
+        <div class="card-body">
+          <div class="card-head">
+            <h2 class="card-title">今天纠结什么</h2>
+            <span class="pill-seat">1人+</span>
+          </div>
+          <p>吃啥去哪选不定，把决定交给随机命运</p>
+        </div>
+      </a>
     </section>
+
+    <p class="foot-note">支持添加到手机主屏幕 · 本地桌游断网可玩 · 狼人真言支持联机与单机</p>
   </main>
+
   <script>
-    const status = document.querySelector('#offline-status');
-    const setStatus = (text, ok = false) => { status.textContent = text; status.style.color = ok ? '#86efac' : '#f3c969'; };
-    window.addEventListener('online', () => setStatus('✓ 在线，离线资源会自动更新', true));
-    window.addEventListener('offline', () => setStatus('离线模式'));
-    if (!navigator.onLine) setStatus('离线模式');
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').then(reg => {
-      if (navigator.serviceWorker.controller) setStatus(navigator.onLine ? '✓ 离线游戏已准备完成' : '离线模式', true);
-      reg.addEventListener('updatefound', () => setStatus('正在准备离线资源…'));
-    }).catch(() => setStatus('正在准备离线资源…'));
+    (() => {
+      const items = [...document.querySelectorAll('.spotlight, .game-card')];
+      const buttons = [...document.querySelectorAll('.tab-btn')];
+      const FILTER_KEY = 'daniel_games_hub_filter';
+
+      const counts = { all: items.length, party: 0, duo: 0, online: 0, fun: 0 };
+      for (const el of items) {
+        const cats = (el.dataset.cats || '').split(/\s+/).filter(Boolean);
+        for (const c of cats) if (c in counts) counts[c]++;
+      }
+      for (const [k, v] of Object.entries(counts)) {
+        const badge = document.querySelector(`[data-cnt="${k}"]`);
+        if (badge) badge.textContent = String(v);
+      }
+
+      const applyFilter = (cat) => {
+        const valid = cat in counts ? cat : 'all';
+        for (const btn of buttons) {
+          btn.setAttribute('aria-pressed', String(btn.dataset.filter === valid));
+        }
+        for (const el of items) {
+          const cats = (el.dataset.cats || '').split(/\s+/);
+          el.hidden = valid !== 'all' && !cats.includes(valid);
+        }
+        try { sessionStorage.setItem(FILTER_KEY, valid); } catch {}
+      };
+
+      buttons.forEach((btn) =>
+        btn.addEventListener('click', () => {
+          applyFilter(btn.dataset.filter);
+          btn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+        }),
+      );
+      try {
+        const saved = sessionStorage.getItem(FILTER_KEY);
+        if (saved && saved in counts) applyFilter(saved);
+      } catch {}
+
+      const status = document.querySelector('#offline-status');
+      const setStatus = (text, ok = false) => {
+        status.textContent = text;
+        status.style.color = ok ? '#c5ff4a' : '#ffe25a';
+        status.style.borderColor = ok ? '#c5ff4a' : '#3a3a54';
+      };
+      window.addEventListener('online', () => setStatus('✓ 在线，离线资源会自动更新', true));
+      window.addEventListener('offline', () => setStatus('离线模式'));
+      if (!navigator.onLine) setStatus('离线模式');
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./service-worker.js').then((reg) => {
+          if (navigator.serviceWorker.controller) {
+            setStatus(navigator.onLine ? '✓ 离线游戏已准备完成' : '离线模式', true);
+          }
+          reg.addEventListener('updatefound', () => setStatus('正在准备离线资源…'));
+        }).catch(() => setStatus('正在准备离线资源…'));
+      }
+    })();
   </script>
 </body>
 </html>
