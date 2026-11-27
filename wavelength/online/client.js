@@ -62,6 +62,60 @@ function showToast(text){
   setTimeout(()=>el.remove(),1750);
 }
 
+async function copyText(text){
+  if(navigator.clipboard?.writeText){
+    try{await navigator.clipboard.writeText(text);return true}catch{}
+  }
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.setAttribute('readonly','');
+  ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.append(ta);ta.focus();ta.select();
+  let ok=false;
+  try{ok=document.execCommand('copy')}catch{}
+  ta.remove();
+  return ok;
+}
+
+function showWeChatGuide(){
+  document.querySelector('#wx-share-guide')?.remove();
+  const guide=document.createElement('div');
+  guide.id='wx-share-guide';guide.className='wx-guide';guide.setAttribute('role','dialog');guide.setAttribute('aria-label','微信分享引导');
+  guide.innerHTML='<div class="wx-guide-arrow" aria-hidden="true">↗</div><div class="wx-guide-card"><h3>发给微信搭档，一起对频！</h3><p>1. 点击右上角 <strong>···</strong> 直接转发给微信好友。</p><p>2. 邀请文案与链接也已自动复制，返回聊天窗直接粘贴也可以。</p><p class="small" style="opacity:.8">点击任意处关闭提示</p></div>';
+  guide.onclick=()=>guide.remove();
+  document.body.append(guide);
+}
+
+function inviteText(){
+  return `〰️ 来和我玩「电波同步」测测脑回路！点链接直接进房（房间码 ${room.code}）：\n${invite()}`;
+}
+
+async function shareToWeChat(){
+  const url=invite();
+  const text=inviteText();
+  const isWeChat=/micromessenger/i.test(navigator.userAgent);
+  if(isWeChat){
+    const copied=await copyText(text);
+    status.textContent=copied?'请点右上角 ··· 转发（链接已复制）':'请点右上角 ··· 转发给微信好友';
+    showWeChatGuide();
+    return;
+  }
+  if(navigator.share){
+    try{
+      await navigator.share({title:'电波同步 · 邀请加入房间',text:`来和我玩「电波同步」测测脑回路！房间码：${room.code}`,url});
+      status.textContent='已调起系统分享';
+      return;
+    }catch(e){
+      if(e?.name==='AbortError')return;
+    }
+  }
+  if(await copyText(text)){
+    status.textContent='微信邀请文案已复制';
+    showToast('✅ 邀请文案已复制，去微信粘贴即可');
+  }else{
+    status.textContent='请长按上方邀请链接复制';
+  }
+}
+
 let sessionPromise=null;
 async function session(){
   if(sessionPromise)return sessionPromise;
@@ -102,6 +156,12 @@ function apply(snapshot){
   const prevPhase=room?.board?.phase,prevRound=room?.board?.round;
   room=snapshot;
   storage.set(roomKey,room.id);
+  if(room.status!=='closed'){
+    if(location.hash!=='#'+room.code)history.replaceState(null,'','#'+room.code);
+    document.title=`电波同步 · 房间 ${room.code}`;
+  }else{
+    document.title='电波同步 · 双人联机';
+  }
   if(room.board?.phase!==prevPhase||room.board?.round!==prevRound){
     ghostGuess=null;partnerTyping=false;showHint=false;maskPeek=false;
   }
@@ -254,10 +314,10 @@ async function send(type,extra={},retry=false){
 
 function invite(){const url=new URL(location.href);url.search='';url.hash=room.code;return url.href}
 
-function spectrum(b,secret=false,guess=false,reveal=false,watchGhost=false){
+function spectrum(b,isSecret=false,guess=false,reveal=false,watchGhost=false,masked=false){
   const target=typeof b.target==='number';
   const guessVal=guess?(readDraft().guess??b.guess??50):50;
-  return `<div class="track ${secret?'hidden-target':''} ${reveal?'reveal-track':''}" ${secret?'id="secret-track"':''}>${target?`<span class="zone" style="left:${b.target-14}%;width:28%"></span><span class="zone three" style="left:${b.target-8}%;width:16%"></span><span class="zone four" style="left:${b.target-3}%;width:6%"></span><span class="targetline" style="left:${b.target}%"></span>`:''}${reveal?'<span class="curtain curtain-left" aria-hidden="true"></span><span class="curtain curtain-right" aria-hidden="true"></span>':''}${watchGhost?`<span class="ghost-needle" id="ghost-needle" ${ghostGuess===null?'hidden':''} style="left:clamp(4px,${ghostGuess??50}%,calc(100% - 4px))"></span>`:''}${guess?`<span class="needle" style="left:clamp(4px,${guessVal}%,calc(100% - 4px))"></span>`:''}<i class="guide" style="left:25%"></i><i class="guide mid" style="left:50%"></i><i class="guide" style="left:75%"></i></div>`;
+  return `<div class="track ${masked?'hidden-target':''} ${reveal?'reveal-track':''}" ${isSecret?'id="secret-track"':''}>${target?`<span class="zone" style="left:${b.target-14}%;width:28%"></span><span class="zone three" style="left:${b.target-8}%;width:16%"></span><span class="zone four" style="left:${b.target-3}%;width:6%"></span><span class="targetline" style="left:${b.target}%"></span>`:''}${isSecret?'<span class="secret-veil" aria-hidden="true">🙈 靶心已隐藏</span>':''}${reveal?'<span class="curtain curtain-left" aria-hidden="true"></span><span class="curtain curtain-right" aria-hidden="true"></span>':''}${watchGhost?`<span class="ghost-needle" id="ghost-needle" ${ghostGuess===null?'hidden':''} style="left:clamp(4px,${ghostGuess??50}%,calc(100% - 4px))"></span>`:''}${guess?`<span class="needle" style="left:clamp(4px,${guessVal}%,calc(100% - 4px))"></span>`:''}<i class="guide" style="left:25%"></i><i class="guide mid" style="left:50%"></i><i class="guide" style="left:75%"></i></div>`;
 }
 
 const endpoints=b=>`<div class="endpoints"><span>${escape(b.prompt.left)}</span><span>${escape(b.prompt.right)}</span></div>`;
@@ -292,7 +352,10 @@ async function finishLeave(){
   storage.remove(roomKey);room=null;subscribedRoom=null;
   if(channel)await client.removeChannel(channel);
   if(liveChannel)await client.removeChannel(liveChannel);
-  channel=null;liveChannel=null;location.hash='';render();
+  channel=null;liveChannel=null;
+  history.replaceState(null,'',location.pathname);
+  document.title='电波同步 · 双人联机';
+  render();
 }
 
 function celebrate(){
@@ -341,13 +404,13 @@ function render(){
     if(room.status==='closed'){
       content='<div class="panel waiting"><h2>房间已关闭</h2><p>一位玩家已主动退出，可以返回创建新房间。</p></div>';
     }else if(!b){
-      content=`<div class="panel waiting"><div class="eyebrow">PAIRING / 等搭档落座</div><h2>等待搭档加入…</h2><p class="small">话题：${room.packs.map(escape).join('、')} · ${mode==='endless'?'无限畅玩':'经典靶心续命'}</p><div class="players">${room.names.map(name=>`<div class="player ${name?'joined':''}">${escape(name||'等待加入…')}</div>`).join('')}</div><button type="button" id="copy-big" class="primary wide">📋 复制邀请链接发给搭档</button></div>`;
+      content=`<div class="panel waiting"><div class="eyebrow">PAIRING / 等搭档落座</div><h2>等待搭档加入…</h2><p class="small">话题：${room.packs.map(escape).join('、')} · ${mode==='endless'?'无限畅玩':'经典靶心续命'}</p><div class="players">${room.names.map(name=>`<div class="player ${name?'joined':''}">${escape(name||'等待加入…')}</div>`).join('')}</div><div class="invite-actions"><button type="button" id="wx-share-big" class="primary wx-btn">💬 一键微信分享给搭档</button><button type="button" id="copy-big">📋 复制邀请链接</button></div></div>`;
     }else if(b.phase==='report'&&room.returned?.[room.seat]){
       content='<div class="panel waiting"><h2>已回到房间，等待搭档</h2><p>搭档还在看战报；双方都返回后自动开下一局。</p><button data-mutation data-send="return" class="wide" disabled>已回到房间</button></div>';
     }else if(b.phase==='sender'){
       if(room.seat===b.sender){
         const hints=b.prompt.hints||'';
-        content=`<div class="panel"><div class="topline"><span class="eyebrow">01 / ${escape(b.prompt.category)} · 你是发射员</span><button type="button" class="peek-toggle" id="toggle-mask">${maskPeek?'👁 显示靶心':'🙈 遮住靶心'}</button></div><h2>${sender}，给一个线索</h2>${endpoints(b)}${spectrum(b,maskPeek)}<div class="tools"><button type="button" data-mutation data-send="swap">换一题</button><button type="button" data-mutation id="custom">自定义</button>${hints?`<button type="button" id="hint-toggle">💡 灵感</button>`:''}</div><div class="hint-box" id="hint-box" ${showHint?'':'hidden'}><span>灵感参考：<strong>${escape(hints)}</strong></span></div><form id="clue-form"><label for="clue">留给 ${receiver} 的线索（不报数字，不用端点词）</label><input id="clue" type="text" maxlength="40" required autocomplete="off" value="${escape(readDraft().clue||'')}" placeholder="一个具体事物，比如：螺蛳粉、番茄"><button data-mutation class="primary wide">发送线索，看对方怎么猜 →</button></form></div>`;
+        content=`<div class="panel"><div class="topline"><span class="eyebrow">01 / ${escape(b.prompt.category)} · 你是发射员</span><button type="button" class="peek-toggle" id="toggle-mask" aria-pressed="${!maskPeek}">${maskPeek?'👁 显示靶心':'🙈 遮住靶心'}</button></div><h2>${sender}，给一个线索</h2>${endpoints(b)}${spectrum(b,true,false,false,false,maskPeek)}<div class="tools"><button type="button" data-mutation data-send="swap">换一题</button><button type="button" data-mutation id="custom">自定义</button>${hints?`<button type="button" id="hint-toggle">💡 灵感</button>`:''}</div><div class="hint-box" id="hint-box" ${showHint?'':'hidden'}><span>灵感参考：<strong>${escape(hints)}</strong></span></div><form id="clue-form"><label for="clue">留给 ${receiver} 的线索（不报数字，不用端点词）</label><input id="clue" type="text" maxlength="40" required autocomplete="off" value="${escape(readDraft().clue||'')}" placeholder="一个具体事物，比如：螺蛳粉、番茄"><button data-mutation class="primary wide">发送线索，看对方怎么猜 →</button></form></div>`;
       }else{
         content=`<div class="panel waiting"><div class="eyebrow">01 / 等待发射</div><h2>${sender} 正在想线索…</h2>${endpoints(b)}<div class="typing-pill" id="typing-pill" ${partnerTyping?'':'hidden'}>✨ 对方正在输入线索…</div><p class="small">靶心只显示在对方手机上，线索发出后你就可以拖动指针。</p></div>`;
       }
@@ -376,15 +439,23 @@ function render(){
 
     const totalNow=b?b.history.reduce((n,r)=>n+r.points,0):0;
     const roundBadge=b?(mode==='endless'?`ROUND ${b.round+1} · 无限`:`ROUND ${Math.min(targetRounds,b.round+1)} / ${String(targetRounds).padStart(2,'0')}`):'';
-    app.innerHTML=`<div class="room-toolbar"><strong class="room-code">${room.code}</strong><span class="small">${escape(room.names[room.seat])} · ${room.isHost?'房主':'搭档'}</span><button id="copy">复制邀请</button><button id="leave">${room.status==='closed'?'回大厅':'退出'}</button><div class="invite-row"><a class="invite" href="${invite()}">${invite()}</a></div></div>${b?`<div class="topline round-label"><span class="eyebrow">${roundBadge}</span><div class="hud-badges">${b.streak>0?`<span class="badge hot">🔥 ${b.streak} 连击</span>`:''}${b.bonusRounds>0?`<span class="badge bonus">+${b.bonusRounds} 续命</span>`:''}<span class="online-score">${totalNow} 分</span></div></div>`:''}${content}`;
+    app.innerHTML=`<div class="room-toolbar"><strong class="room-code">${room.code}</strong><span class="small">${escape(room.names[room.seat])} · ${room.isHost?'房主':'搭档'}</span><button type="button" id="wx-share" class="wx-btn">💬 微信分享</button><button type="button" id="copy">复制</button><button type="button" id="leave">${room.status==='closed'?'回大厅':'退出'}</button><div class="invite-row"><a class="invite" href="${invite()}">${invite()}</a></div></div>${b?`<div class="topline round-label"><span class="eyebrow">${roundBadge}</span><div class="hud-badges">${b.streak>0?`<span class="badge hot">🔥 ${b.streak} 连击</span>`:''}${b.bonusRounds>0?`<span class="badge bonus">+${b.bonusRounds} 续命</span>`:''}<span class="online-score">${totalNow} 分</span></div></div>`:''}${content}`;
 
-    const copyInvite=async()=>{try{await navigator.clipboard.writeText(invite());status.textContent='邀请链接已复制';showToast('已复制邀请链接')}catch{status.textContent='请长按上方邀请链接复制'}};
+    const copyInvite=async()=>{if(await copyText(invite())){status.textContent='邀请链接已复制';showToast('已复制邀请链接')}else status.textContent='请长按上方邀请链接复制'};
     $('#copy').onclick=copyInvite;
+    $('#wx-share').onclick=()=>void shareToWeChat();
     if($('#copy-big'))$('#copy-big').onclick=copyInvite;
+    if($('#wx-share-big'))$('#wx-share-big').onclick=()=>void shareToWeChat();
     $('#leave').onclick=confirmLeave;
     app.querySelectorAll('[data-send]').forEach(button=>button.onclick=()=>send(button.dataset.send,button.dataset.send==='return'?{game:room.game}:{}));
 
-    if($('#toggle-mask'))$('#toggle-mask').onclick=()=>{maskPeek=!maskPeek;$('#secret-track')?.classList.toggle('hidden-target',maskPeek);$('#toggle-mask').textContent=maskPeek?'👁 显示靶心':'🙈 遮住靶心'};
+    if($('#toggle-mask'))$('#toggle-mask').onclick=()=>{
+      maskPeek=!maskPeek;
+      const t=$('#secret-track');
+      if(t)t.classList.toggle('hidden-target',maskPeek);
+      $('#toggle-mask').textContent=maskPeek?'👁 显示靶心':'🙈 遮住靶心';
+      $('#toggle-mask').setAttribute('aria-pressed',String(!maskPeek));
+    };
     if($('#hint-toggle'))$('#hint-toggle').onclick=()=>{showHint=!showHint;$('#hint-box').hidden=!showHint};
     if($('#clue'))$('#clue').oninput=e=>{draft({clue:e.target.value});broadcastTyping()};
     if($('#clue-form'))$('#clue-form').onsubmit=e=>{e.preventDefault();void send('clue',{clue:$('#clue').value.trim()})};

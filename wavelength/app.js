@@ -3,7 +3,7 @@ import {showReportImage} from './report.js';
 import {packs,prompts,PACK_META,DEFAULT_OFF_PACKS,shuffle,score,roundComment,rating,readBest,recordBest} from './prompts.js';
 
 const app=document.querySelector('#app');
-let s=null,peeked=false,showHint=false;
+let s=null,peeked=false,targetVisible=false,showHint=false;
 const $=q=>document.querySelector(q);
 const escape=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PREF_KEY='wavelength-prefs-v2';
@@ -15,10 +15,15 @@ function savePrefs(patch){
   try{localStorage.setItem(PREF_KEY,JSON.stringify({...readPrefs(),...patch}))}catch{}
 }
 const save=()=>{try{sessionStorage.setItem('wavelength-v1',JSON.stringify(s))}catch{}};
-function hide(){const t=$('#secret-track');if(t)t.classList.add('hidden-target')}
+function hide(){
+  targetVisible=false;
+  const t=$('#secret-track');
+  if(t)t.classList.add('hidden-target');
+  const btn=$('#peek');
+  if(btn){btn.textContent='👁 点击查看靶心';btn.setAttribute('aria-pressed','false')}
+}
 
-document.addEventListener('visibilitychange',hide);
-window.addEventListener('blur',hide);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hide()});
 window.addEventListener('pagehide',hide);
 $('#rules').onclick=()=>{hide();$('#help').showModal()};
 $('#close-help').onclick=()=>$('#help').close();
@@ -61,14 +66,15 @@ function next(){
   s.guess=50;
   s.phase='sender';
   peeked=false;
+  targetVisible=false;
   showHint=false;
   save();
   render();
 }
 
-function track(secret=false,guess=false,reveal=false){
+function track(secret=false,guess=false,reveal=false,hidden=secret){
   const showTarget=secret||s.phase!=='guess';
-  return `<div class="track ${secret?'hidden-target':''} ${reveal?'reveal-track':''}" ${secret?'id="secret-track"':''}>${showTarget?`<span class="zone" style="left:${s.target-14}%;width:28%"></span><span class="zone three" style="left:${s.target-8}%;width:16%"></span><span class="zone four" style="left:${s.target-3}%;width:6%"></span><span class="targetline" style="left:${s.target}%"></span>`:''}${reveal?'<span class="curtain curtain-left" aria-hidden="true"></span><span class="curtain curtain-right" aria-hidden="true"></span>':''}${guess?`<span class="needle" style="left:clamp(4px,${s.guess}%,calc(100% - 4px))"></span>`:''}<i class="guide" style="left:25%"></i><i class="guide mid" style="left:50%"></i><i class="guide" style="left:75%"></i></div>`;
+  return `<div class="track ${hidden?'hidden-target':''} ${reveal?'reveal-track':''}" ${secret?'id="secret-track"':''}>${showTarget?`<span class="zone" style="left:${s.target-14}%;width:28%"></span><span class="zone three" style="left:${s.target-8}%;width:16%"></span><span class="zone four" style="left:${s.target-3}%;width:6%"></span><span class="targetline" style="left:${s.target}%"></span>`:''}${secret?'<span class="secret-veil" aria-hidden="true">🙈 靶心已隐藏</span>':''}${reveal?'<span class="curtain curtain-left" aria-hidden="true"></span><span class="curtain curtain-right" aria-hidden="true"></span>':''}${guess?`<span class="needle" style="left:clamp(4px,${s.guess}%,calc(100% - 4px))"></span>`:''}<i class="guide" style="left:25%"></i><i class="guide mid" style="left:50%"></i><i class="guide" style="left:75%"></i></div>`;
 }
 
 const endpoints=()=>`<div class="endpoints"><span>${escape(s.prompt.left)}</span><span>${escape(s.prompt.right)}</span></div>`;
@@ -91,12 +97,15 @@ function render(){
 
   if(s.phase==='sender'){
     const hints=s.prompt.hints||'';
-    stage.innerHTML=`<div class="eyebrow">01 / ${escape(s.prompt.category)} · 只给发射员看</div><h2>${sender}，发出你的信号</h2><p class="small">请 ${receiver} 暂时移开视线</p>${endpoints()}${track(true)}<button type="button" class="peek" id="peek">按住查看靶心 · 松手隐藏</button><div class="tools"><button type="button" id="swap">换一题</button><button type="button" id="custom">自定义</button>${hints?`<button type="button" id="hint-toggle">💡 灵感</button>`:''}</div><div class="hint-box" id="hint-box" ${showHint?'':'hidden'}><span>灵感参考：<strong>${escape(hints)}</strong></span></div><form id="clue-form"><label for="clue">留一个具体事物（不报数字，不用端点词）</label><input id="clue" type="text" maxlength="40" placeholder="比如：螺蛳粉、番茄、周一早八" autocomplete="off" value="${escape(s.clue)}"><div class="error" id="error" role="alert"></div><button class="primary wide">隐藏靶心，交给 ${receiver} →</button><button type="button" class="oral-btn" id="oral">🗣️ 已口头说线索，直接交给 ${receiver} →</button></form>`;
+    stage.innerHTML=`<div class="eyebrow">01 / ${escape(s.prompt.category)} · 只给发射员看</div><h2>${sender}，发出你的信号</h2><p class="small">请 ${receiver} 暂时移开视线</p>${endpoints()}${track(true,false,false,!targetVisible)}<button type="button" class="peek" id="peek" aria-pressed="${targetVisible}">${targetVisible?'🙈 点击隐藏靶心':'👁 点击查看靶心'}</button><div class="tools"><button type="button" id="swap">换一题</button><button type="button" id="custom">自定义</button>${hints?`<button type="button" id="hint-toggle">💡 灵感</button>`:''}</div><div class="hint-box" id="hint-box" ${showHint?'':'hidden'}><span>灵感参考：<strong>${escape(hints)}</strong></span></div><form id="clue-form"><label for="clue">留一个具体事物（不报数字，不用端点词）</label><input id="clue" type="text" maxlength="40" placeholder="比如：螺蛳粉、番茄、周一早八" autocomplete="off" value="${escape(s.clue)}"><div class="error" id="error" role="alert"></div><button class="primary wide">隐藏靶心，交给 ${receiver} →</button><button type="button" class="oral-btn" id="oral">🗣️ 已口头说线索，直接交给 ${receiver} →</button></form>`;
 
-    const show=e=>{if(e.type==='keydown'&&![' ','Enter'].includes(e.key))return;e.preventDefault();peeked=true;$('#secret-track').classList.remove('hidden-target')};
-    $('#peek').onpointerdown=show;$('#peek').onkeydown=show;
-    for(const event of ['pointerup','pointercancel','pointerleave','keyup','blur'])$('#peek').addEventListener(event,hide);
-    $('#peek').oncontextmenu=e=>e.preventDefault();
+    $('#peek').onclick=()=>{
+      targetVisible=!targetVisible;
+      if(targetVisible)peeked=true;
+      $('#secret-track')?.classList.toggle('hidden-target',!targetVisible);
+      $('#peek').textContent=targetVisible?'🙈 点击隐藏靶心':'👁 点击查看靶心';
+      $('#peek').setAttribute('aria-pressed',String(targetVisible));
+    };
     $('#clue').oninput=e=>{s.clue=e.target.value;save()};
     if($('#hint-toggle'))$('#hint-toggle').onclick=()=>{showHint=!showHint;$('#hint-box').hidden=!showHint};
     $('#swap').onclick=()=>{if(!s.deck.length){$('#error').textContent='题库已抽完，可使用自定义光谱。';return}s.prompt=s.deck.pop();s.clue='';showHint=false;render()};

@@ -11,11 +11,18 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH || 'playwright');const asse
     await a.locator('[name=pack][value="微醺暧昧"]').check();
     await a.locator('#create').click();
     await a.locator('.room-code').waitFor();
+    await a.locator('#wx-share-big').waitFor();
+    await a.locator('#wx-share').waitFor();
     const roomCode=await a.locator('.room-code').innerText();
     await b.locator('#tab-join').click();
     await b.locator('#code').fill(roomCode);
     await b.locator('#join').click();
     await b.getByText(/正在想线索/).waitFor();
+    assert.equal(await a.locator('#secret-track .zone.four').isVisible(),true);
+    await a.locator('#toggle-mask').click();
+    assert.equal(await a.locator('#secret-track .zone.four').isVisible(),false);
+    await a.locator('#toggle-mask').click();
+    assert.equal(await a.locator('#secret-track .zone.four').isVisible(),true);
     await a.locator('#clue').fill('火锅');
     await a.locator('#clue-form .primary').click();
     await b.locator('#lock').waitFor();

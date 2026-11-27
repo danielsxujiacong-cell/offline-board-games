@@ -76,6 +76,8 @@ input[type=text],select{width:100%;min-height:42px;border:1px solid var(--line);
 .zone.four{background:#e86b5b}
 .targetline{position:absolute;top:0;bottom:0;width:2px;background:#fff;z-index:2;box-shadow:0 0 8px #ffffffaa}
 .hidden-target .zone,.hidden-target .targetline{display:none}
+.secret-veil{display:none}
+.track.hidden-target .secret-veil{display:flex;align-items:center;justify-content:center;position:absolute;inset:0;z-index:4;background:#183632eb;color:var(--muted);font-size:13px;font-weight:700;letter-spacing:.04em}
 
 /* Curtain reveal animation */
 .curtain{position:absolute;top:0;bottom:0;width:50.5%;background:linear-gradient(135deg,#21433d,#19332f);z-index:3;pointer-events:none}

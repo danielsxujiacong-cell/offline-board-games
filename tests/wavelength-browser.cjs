@@ -25,12 +25,14 @@ const assert=require('node:assert/strict');
       assert.equal(await page.locator('.scale').count(),0);
       assert.equal(await page.locator('#secret-track .zone').count(),3);
       assert.equal(await page.locator('#secret-track .zone.four').isVisible(),false);
-      await page.locator('#peek').dispatchEvent('pointerdown',{pointerType:'touch'});
+      await page.locator('#peek').click();
       assert.equal(await page.locator('#secret-track').evaluate(e=>e.classList.contains('hidden-target')),false);
       assert.equal(await page.locator('#secret-track .zone.four').isVisible(),true);
-      await page.locator('#peek').dispatchEvent('pointerup');
+      await page.locator('#peek').click();
       assert.equal(await page.locator('#secret-track').evaluate(e=>e.classList.contains('hidden-target')),true);
       assert.equal(await page.locator('#secret-track .zone.four').isVisible(),false);
+      await page.locator('#peek').click();
+      assert.equal(await page.locator('#secret-track .zone.four').isVisible(),true);
     };
 
     let expected=0;
