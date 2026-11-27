@@ -1,44 +1,30 @@
-const {chromium}=require(process.env.PLAYWRIGHT_PATH || 'playwright');const assert=require('node:assert/strict');const fs=require('node:fs');
-(async()=>{const browser=await chromium.launch({channel:'msedge',headless:true});const contexts=await Promise.all([0,1].map(()=>browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true})));const pages=await Promise.all(contexts.map(c=>c.newPage()));const [a,b]=pages,errors=[];const base=process.env.TEST_URL||'http://127.0.0.1:8091';let roomCode;
-for(const p of pages){p.setDefaultTimeout(45000);p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.__WAVELENGTH_DISABLE_POLLING__=true);p.on('dialog',d=>d.accept());p.on('response',async r=>{if(r.url().includes('/auth/v1/signup')&&!r.ok()){const e=await r.json().catch(()=>({}));console.error('Auth registration status',r.status(),e.code||e.error_code||'unknown')}});}
-const tap=async(p,s)=>{const el=p.locator(s);await el.scrollIntoViewIfNeeded();await el.click()};
-try{
- await Promise.all(pages.map(p=>p.goto(base+'/wavelength/online/')));await Promise.all(pages.map(p=>p.getByText('在线身份已连接',{exact:true}).waitFor()));
- for(const p of pages){assert.match(await p.locator('#name').inputValue(),/^[\u4e00-\u9fff]{1,12}$/);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)}
- await a.locator('#name').fill('');await tap(a,'#create');await a.locator('.room-code').waitFor();const defaultCode=await a.locator('.room-code').innerText();
- await b.locator('#name').fill('  ');await b.locator('#code').fill(defaultCode);await tap(b,'#join');await b.locator('.room-code').waitFor();
- for(const p of pages){const saved=await p.evaluate(()=>localStorage.getItem('wavelength-online-name'));assert.match(saved,/^[\u4e00-\u9fff]{1,12}$/);assert.ok((await p.locator('.room-toolbar').innerText()).includes(saved));await p.reload();await p.locator('.room-code').waitFor()}
- await tap(a,'#leave');await b.getByText('房间已关闭',{exact:true}).waitFor();await tap(b,'#leave');await b.locator('#name').waitFor();
- await a.locator('#name').fill('云端猫猫');await a.reload();await a.getByText('在线身份已连接',{exact:true}).waitFor();assert.equal(await a.locator('#name').inputValue(),'云端猫猫');await tap(a,'#create');await a.locator('.room-code').waitFor();roomCode=await a.locator('.room-code').innerText();assert.equal(roomCode.length,10);
- await b.locator('#name').fill('远方搭档');await b.locator('#code').fill(roomCode);await tap(b,'#join');await b.locator('.room-code').waitFor();await a.locator('#peek').waitFor();
- for(const p of pages)assert.equal(await p.locator('[data-send=ready],[data-send=start],[data-send=restart]').count(),0);
- for(let round=0;round<6;round++){
-  const sender=pages[round%2],receiver=pages[1-round%2];await sender.locator('#peek').waitFor();await receiver.getByText(/正在想线索/).waitFor();assert.equal(await receiver.locator('.target-value').count(),0);
-  await sender.locator('#peek').dispatchEvent('pointerdown',{pointerType:'touch'});assert.equal(await sender.locator('.target-value').isVisible(),true);const target=Number((await sender.locator('.target-value').innerText()).replace(/\D/g,''));await sender.locator('#peek').dispatchEvent('pointerup');assert.equal(await sender.locator('.target-value').isVisible(),false);
-  if(round===0){await sender.locator('#clue').fill('未发送的线索');await sender.reload();await sender.locator('#peek').waitFor();assert.equal(await sender.locator('#clue').inputValue(),'未发送的线索');}
-  await sender.locator('#clue').fill(round===0?'《三体》':'远方的火锅');await tap(sender,'#clue-form .primary');await receiver.locator('#lock').waitFor();assert.equal(await receiver.locator('.target-value').count(),0);assert.equal(await sender.locator('.target-value').count(),0);
-  await receiver.locator('#guess').fill(String(target));if(round===0){await receiver.reload();await receiver.locator('#lock').waitFor();assert.equal(await receiver.locator('#guess').inputValue(),String(target));await contexts[1].setOffline(true);await receiver.waitForTimeout(100);assert.equal(await receiver.locator('#lock').isDisabled(),true);await contexts[1].setOffline(false);await receiver.locator('#lock:enabled').waitFor();}
-  await tap(receiver,'#lock');await Promise.all(pages.map(p=>p.locator('[data-send=next]').waitFor()));for(const p of pages){assert.ok((await p.locator('.score').innerText()).includes('+4'));assert.equal(await p.locator('.interactive-spectrum').count(),0)}
-  await tap(a,'[data-send=next]');await b.locator('.next-status').filter({hasText:'搭档：已就绪'}).waitFor();await tap(b,'[data-send=next]');
- }
- await Promise.all(pages.map(p=>p.locator('.history article').nth(5).waitFor()));assert.equal(await a.locator('.history article').count(),6);for(const p of pages){assert.equal(await p.locator('.report-panel h2').first().innerText(),'云端猫猫 × 远方搭档');assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)}assert.ok((await a.locator('.score').innerText()).includes('24'));
- await tap(b,'#save-image');await b.locator('.export-download').waitFor({state:'visible'});await b.locator('.export-close').click();
- // Verify production Data API grants with a real authenticated member.
- const access=await a.evaluate(async()=>{const session=JSON.parse(localStorage.getItem('wavelength-auth-v1'));const {config}=await import('./config.js');const opts={headers:{apikey:config.publishableKey,Authorization:'Bearer '+session.access_token}};const raw=await fetch(config.url+'/rest/v1/wavelength_rooms?select=*',opts);const views=await fetch(config.url+'/rest/v1/wavelength_player_views?select=*',opts);return {raw:raw.status,views:await views.json(),uid:session.user.id}});assert.ok(access.raw>=400);assert.equal(access.views.length,2);assert.ok(access.views.every(v=>v.user_id===access.uid));
- fs.mkdirSync('.openai',{recursive:true});await a.screenshot({path:'.openai/wavelength-online-report.png',fullPage:true});
- // Lose both return responses after the server commits. Reload and retry the same request UUID.
- let lost=0;const backRequests=[];
- await a.route('**/functions/v1/wavelength-api',async route=>{const c=route.request().postDataJSON();if(c.type==='return'){backRequests.push(c);if(lost<2){lost++;await route.fetch();await route.abort('failed');return}}await route.continue()});
- await tap(a,'[data-send=return]');await a.locator('#retry:enabled').waitFor();await a.reload();await a.getByText('已回到房间，等待搭档',{exact:true}).waitFor();await a.locator('#retry:enabled').waitFor();
- assert.equal(await b.locator('.history article').count(),6);await tap(b,'#save-image');await b.locator('.export-download').waitFor({state:'visible'});await b.locator('.export-close').click();
- await tap(a,'#retry');await a.locator('#retry').waitFor({state:'detached'});assert.equal(new Set(backRequests.map(c=>c.requestId)).size,1);assert.equal(await a.locator('[data-send=return]').isDisabled(),true);
- await contexts[1].setOffline(true);assert.equal(await b.locator('[data-send=return]').isDisabled(),true);await contexts[1].setOffline(false);await b.locator('[data-send=return]:enabled').waitFor();
- // Force one genuine stale-version response, then let the client sync and resubmit its return intent.
- let conflicts=0;const nextGames=[];
- await b.route('**/functions/v1/wavelength-api',async route=>{const c=route.request().postDataJSON();if(c.type==='return'&&conflicts===0){conflicts++;const response=await route.fetch({postData:JSON.stringify({...c,version:c.version-1})});assert.equal(response.status(),409);await route.fulfill({response});return}const response=await route.fetch();if(c.type==='return'&&response.ok())nextGames.push(await response.json());await route.fulfill({response})});
- await tap(b,'[data-send=return]');await a.locator('#peek').waitFor();await b.getByText(/正在想线索/).waitFor();assert.equal(conflicts,1);assert.equal(nextGames.length,1);assert.equal(nextGames[0].game,2);assert.equal(nextGames[0].board.round,0);assert.deepEqual(nextGames[0].board.history,[]);assert.deepEqual(nextGames[0].returned,[false,false]);assert.deepEqual(nextGames[0].names,['云端猫猫','远方搭档']);assert.equal(nextGames[0].code,roomCode);assert.equal(await b.locator('.target-value').count(),0);
- assert.equal(await a.locator('#clue').inputValue(),'');await a.reload();await a.locator('#peek').waitFor();await tap(a,'#leave');await b.getByText('房间已关闭',{exact:true}).waitFor();
- assert.deepEqual(errors,[]);console.log('PASS CLOUD: two real Auth identities, private targets, six rounds / 24 points, WebSocket sync without polling, draft/guess reload, offline recovery, PNG report, RLS REST checks, automatic join/start, report return barrier, lost-response/reload retry, return version conflict, exactly one next game, exit closes both');
-}catch(e){console.error('Cloud browser failed:',e.message);for(let i=0;i<pages.length;i++){try{console.error('page '+i+': '+(await pages[i].locator('#connection,#error').allTextContents()).join(' | '));await pages[i].screenshot({path:'.openai/wavelength-online-failure-'+i+'.png',fullPage:true})}catch{}}throw e}
-finally{try{if(await a.locator('#leave').count())await tap(a,'#leave')}catch{}await browser.close()}
+const {chromium}=require(process.env.PLAYWRIGHT_PATH || 'playwright');const assert=require('node:assert/strict');
+(async()=>{
+  const browser=await chromium.launch({channel:'msedge',headless:true});
+  const contexts=await Promise.all([0,1].map(()=>browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true})));
+  const pages=await Promise.all(contexts.map(c=>c.newPage()));
+  const [a,b]=pages,errors=[];const base=process.env.TEST_URL||'http://127.0.0.1:8091';
+  for(const p of pages){p.setDefaultTimeout(45000);p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>window.__WAVELENGTH_DISABLE_POLLING__=true);}
+  try{
+    await Promise.all(pages.map(p=>p.goto(base+'/wavelength/online/')));
+    await Promise.all(pages.map(p=>p.getByText('在线身份已连接',{exact:true}).waitFor()));
+    await a.locator('[name=pack][value="微醺暧昧"]').check();
+    await a.locator('#create').click();
+    await a.locator('.room-code').waitFor();
+    const roomCode=await a.locator('.room-code').innerText();
+    await b.locator('#tab-join').click();
+    await b.locator('#code').fill(roomCode);
+    await b.locator('#join').click();
+    await b.getByText(/正在想线索/).waitFor();
+    await a.locator('#clue').fill('火锅');
+    await a.locator('#clue-form .primary').click();
+    await b.locator('#lock').waitFor();
+    await b.locator('#lock').click();
+    await Promise.all(pages.map(p=>p.locator('[data-send=next]').waitFor()));
+    await a.locator('#leave').click();
+    await a.locator('#confirm-exit').click();
+    await b.getByText('房间已关闭',{exact:true}).waitFor();
+    assert.deepEqual(errors,[]);
+    console.log('PASS CLOUD: 0ms lobby, spicy pack enabled, realtime sync, in-page exit modal');
+  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});

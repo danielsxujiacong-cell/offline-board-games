@@ -62,26 +62,6 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   const scopeUrl = new URL('./', self.registration.scope);
-  const wavelengthQ = new URL('./wavelength/questions.json', scopeUrl).pathname;
-
-  // Keep Wavelength questions fresh when online, offline fallback to GAMES_CACHE
-  if (url.pathname === wavelengthQ) {
-    event.respondWith(
-      (async () => {
-        try {
-          const response = await fetch(req, { cache: 'no-store' });
-          if (!response.ok) throw new Error('Question library unavailable');
-          const cache = await caches.open(GAMES_CACHE);
-          await cache.put(req, response.clone());
-          return response;
-        } catch {
-          const cached = await caches.match(req);
-          return cached || new Response('Question library unavailable', { status: 503 });
-        }
-      })(),
-    );
-    return;
-  }
 
   const isHubRoot = url.pathname === scopeUrl.pathname || url.pathname === new URL('./index.html', scopeUrl).pathname;
   const isNav = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('.html');
