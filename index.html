@@ -52,7 +52,7 @@
     main {
       width: min(100% - 28px, 920px);
       margin: 0 auto;
-      padding: clamp(18px, 4vh, 36px) 0 max(44px, env(safe-area-inset-bottom));
+      padding: clamp(18px, 4vh, 36px) 0 max(48px, env(safe-area-inset-bottom));
     }
 
     /* Compact Arcade Header */
@@ -98,20 +98,29 @@
       text-shadow: 3px 3px 0 #07070c;
     }
 
+    /* Clickable Offline Pack Status Pill */
     #offline-status {
       display: inline-flex;
       align-items: center;
-      min-height: 30px;
-      padding: 4px 11px;
+      gap: 6px;
+      min-height: 36px;
+      padding: 5px 13px;
       border-radius: 999px;
       background: var(--surface);
       border: 2px solid var(--line);
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--yellow);
+      font-size: 12.5px;
+      font-weight: 900;
+      color: var(--ink);
       white-space: nowrap;
       box-shadow: 3px 3px 0 var(--shadow-dark);
+      transition: transform 0.08s, box-shadow 0.08s;
     }
+
+    #offline-status:hover { border-color: var(--cyan); }
+    #offline-status:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow-dark); }
+    #offline-status[data-state="ready"] { color: var(--lime); border-color: var(--lime); }
+    #offline-status[data-state="busy"] { color: var(--yellow); border-color: var(--yellow); }
+    #offline-status[data-state="offline"] { color: var(--cyan); border-color: var(--cyan); }
 
     /* Horizontal Category Filter Bar */
     .filter-wrap {
@@ -153,15 +162,8 @@
       white-space: nowrap;
     }
 
-    .tab-btn:hover {
-      color: var(--ink);
-      border-color: #6a6a90;
-    }
-
-    .tab-btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0 var(--shadow-dark);
-    }
+    .tab-btn:hover { color: var(--ink); border-color: #6a6a90; }
+    .tab-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow-dark); }
 
     .tab-btn .cnt {
       font-size: 11px;
@@ -277,9 +279,7 @@
       line-height: 1.1;
     }
 
-    .spotlight .pill-seat {
-      color: var(--yellow);
-    }
+    .spotlight .pill-seat { color: var(--yellow); }
 
     .spot-actions {
       display: flex;
@@ -300,26 +300,31 @@
       font-size: 14.5px;
       font-weight: 950;
       box-shadow: 4px 4px 0 var(--shadow-dark);
-      transition: transform 0.1s, box-shadow 0.1s, filter 0.14s;
+      transition: transform 0.08s, box-shadow 0.08s;
       white-space: nowrap;
     }
 
-    .arcade-btn:active {
+    .arcade-btn:active:not(:disabled) {
       transform: translate(2px, 2px);
       box-shadow: 2px 2px 0 var(--shadow-dark);
     }
 
-    .arcade-btn-primary {
-      background: var(--yellow);
-      color: #101018;
-    }
-
+    .arcade-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .arcade-btn-primary { background: var(--yellow); color: #101018; }
+    .arcade-btn-lime { background: var(--lime); color: #101018; }
     .arcade-btn-secondary {
       background: var(--surface-hi);
       color: var(--ink);
       border-color: var(--cyan);
       box-shadow: 4px 4px 0 rgba(86, 229, 255, 0.35);
     }
+    .arcade-btn-danger {
+      background: rgba(255, 88, 182, 0.16);
+      color: #ff9dd6;
+      border-color: var(--pink);
+      box-shadow: 3px 3px 0 var(--shadow-dark);
+    }
+    .arcade-btn-sm { min-height: 40px; padding: 7px 13px; font-size: 13px; }
 
     /* Minimal Horizontal Game Cards: Mobile 1-col / Desktop 2-col */
     .games-grid {
@@ -339,14 +344,8 @@
         justify-content: space-between;
         padding: 20px 22px;
       }
-      .spot-actions {
-        flex: 0 0 auto;
-        flex-direction: row;
-      }
-      .arcade-btn {
-        flex: 0 0 auto;
-        min-width: 132px;
-      }
+      .spot-actions { flex: 0 0 auto; flex-direction: row; }
+      .arcade-btn { flex: 0 0 auto; min-width: 132px; }
     }
 
     .game-card {
@@ -359,7 +358,7 @@
       background: var(--surface);
       border: 2.5px solid var(--accent);
       box-shadow: 4px 4px 0 var(--accent);
-      transition: transform 0.1s, box-shadow 0.1s, background 0.14s;
+      transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
       min-width: 0;
     }
 
@@ -378,7 +377,8 @@
 
     .game-card:focus-visible,
     .arcade-btn:focus-visible,
-    .tab-btn:focus-visible {
+    .tab-btn:focus-visible,
+    #offline-status:focus-visible {
       outline: 3px solid var(--cyan);
       outline-offset: 3px;
     }
@@ -402,10 +402,7 @@
       line-height: 1;
     }
 
-    .card-body {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
+    .card-body { flex: 1 1 auto; min-width: 0; }
 
     .card-head {
       display: flex;
@@ -450,6 +447,168 @@
       font-size: 12px;
     }
 
+    /* Offline Manager Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(8, 8, 14, 0.78);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop[hidden] { display: none; }
+
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 3px solid var(--cyan);
+      box-shadow: 6px 6px 0 var(--pink);
+      padding: 18px 18px 20px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 950;
+      color: var(--ink);
+    }
+
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 2px solid var(--line);
+      background: #141420;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+    }
+
+    .close-btn:hover { color: var(--ink); border-color: var(--pink); }
+
+    .offline-stat-box {
+      padding: 13px 14px;
+      border-radius: 12px;
+      background: #141420;
+      border: 2px solid var(--line);
+      margin-bottom: 14px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .stat-num {
+      font-size: 20px;
+      font-weight: 950;
+      color: var(--lime);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #26263a;
+      overflow: hidden;
+      border: 1.5px solid #3c3c56;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--lime));
+      transition: width 0.16s ease;
+    }
+
+    .modal-desc {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .modal-msg {
+      margin: 0 0 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--yellow);
+      min-height: 18px;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-actions > .arcade-btn {
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    .modal-actions-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .modal-actions-row > .arcade-btn { flex: 1 1 0; min-width: 0; }
+
+    /* Bottom Update Toast Bar */
+    .update-toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 50;
+      width: min(calc(100% - 24px), 420px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px 10px 15px;
+      border-radius: 14px;
+      background: #171725;
+      border: 2.5px solid var(--yellow);
+      box-shadow: 5px 5px 0 var(--pink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .update-toast[hidden] { display: none; }
+
+    .update-toast-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
     @media (max-width: 390px) {
       main { width: min(100% - 20px, 920px); }
       .filter-wrap { margin: 0 -10px 16px; padding: 8px 10px; }
@@ -473,7 +632,9 @@
         <span class="eyebrow">DANIEL'S PARTY ARCADE</span>
         <h1>Daniel 的桌游</h1>
       </div>
-      <div id="offline-status" role="status" aria-live="polite">正在准备离线资源…</div>
+      <button type="button" id="offline-status" data-state="idle" aria-haspopup="dialog" aria-controls="offline-modal" title="管理离线游戏包">
+        离线包 · 检查中
+      </button>
     </header>
 
     <nav class="filter-wrap" aria-label="游戏分类筛选">
@@ -697,11 +858,56 @@
       </a>
     </section>
 
-    <p class="foot-note">支持添加到手机主屏幕 · 本地桌游断网可玩 · 狼人真言支持联机与单机</p>
+    <p class="foot-note">玩过的本地桌游自动缓存可断网玩 · 点击右上角可一键下载全部离线包</p>
   </main>
 
+  <!-- Offline Manager Modal -->
+  <div class="modal-backdrop" id="offline-modal" role="dialog" aria-modal="true" aria-labelledby="offline-modal-title" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 class="modal-title" id="offline-modal-title">离线游戏包管理</h2>
+        <button type="button" class="close-btn" id="btn-close-offline" aria-label="关闭">×</button>
+      </div>
+
+      <div class="offline-stat-box">
+        <div class="stat-row">
+          <span class="stat-num" id="offline-games-count">0 / 17 款</span>
+          <span class="stat-sub" id="offline-files-count">0 / 0 个资源</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="offline-progress-fill"></div>
+        </div>
+      </div>
+
+      <p class="modal-desc">
+        进大厅不占流量，点玩过的本地游戏会自动保存。坐飞机或露营没网前，点下方按钮即可一键打包下载全部 17 款离线桌游（约 4.1 MB，已下载的文件会自动跳过，支持断点续下）。
+      </p>
+
+      <div class="modal-msg" id="offline-modal-msg" aria-live="polite"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="arcade-btn arcade-btn-primary" id="btn-download-all">一键下载全部离线包</button>
+        <div class="modal-actions-row">
+          <button type="button" class="arcade-btn arcade-btn-secondary arcade-btn-sm" id="btn-check-update">检查页面更新</button>
+          <button type="button" class="arcade-btn arcade-btn-danger arcade-btn-sm" id="btn-clear-cache">清理离线缓存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Silent Background Update Toast -->
+  <div class="update-toast" id="update-toast" role="status" aria-live="polite" hidden>
+    <span>发现桌游厅新版本</span>
+    <div class="update-toast-actions">
+      <button type="button" class="arcade-btn arcade-btn-primary arcade-btn-sm" id="btn-reload-now" style="min-width:auto;min-height:34px;padding:4px 12px">立即刷新</button>
+      <button type="button" class="close-btn" id="btn-dismiss-update" aria-label="稍后" style="width:30px;height:30px">×</button>
+    </div>
+  </div>
+
+  <script src="./assets/offline-manifest.js"></script>
   <script>
     (() => {
+      // --- 1. Category Filter ---
       const items = [...document.querySelectorAll('.spotlight, .game-card')];
       const buttons = [...document.querySelectorAll('.tab-btn')];
       const FILTER_KEY = 'daniel_games_hub_filter';
@@ -739,22 +945,296 @@
         if (saved && saved in counts) applyFilter(saved);
       } catch {}
 
-      const status = document.querySelector('#offline-status');
-      const setStatus = (text, ok = false) => {
-        status.textContent = text;
-        status.style.color = ok ? '#c5ff4a' : '#ffe25a';
-        status.style.borderColor = ok ? '#c5ff4a' : '#3a3a54';
+      // --- 2. Two-Tier Offline Pack Manager + Live Update Toast ---
+      const manifest = window.OFFLINE_MANIFEST;
+      const GAMES_CACHE = manifest?.GAMES_CACHE || 'daniel-games-assets-v1';
+      const OFFLINE_GAMES = manifest?.OFFLINE_GAMES || [];
+      const ALL_UNIQUE_FILES = [...new Set(OFFLINE_GAMES.flatMap((g) => g.files))];
+
+      const statusBtn = document.getElementById('offline-status');
+      const modalEl = document.getElementById('offline-modal');
+      const closeModalBtn = document.getElementById('btn-close-offline');
+      const gamesCountEl = document.getElementById('offline-games-count');
+      const filesCountEl = document.getElementById('offline-files-count');
+      const progressFillEl = document.getElementById('offline-progress-fill');
+      const modalMsgEl = document.getElementById('offline-modal-msg');
+      const dlBtn = document.getElementById('btn-download-all');
+      const checkUpdateBtn = document.getElementById('btn-check-update');
+      const clearBtn = document.getElementById('btn-clear-cache');
+      const updateToast = document.getElementById('update-toast');
+
+      const state = {
+        cachedGames: 0,
+        totalGames: OFFLINE_GAMES.length,
+        cachedFiles: 0,
+        totalFiles: ALL_UNIQUE_FILES.length,
+        downloading: false,
+        cancelled: false,
+        failedCount: 0,
+        confirmClear: false,
+        swReg: null,
       };
-      window.addEventListener('online', () => setStatus('✓ 在线，离线资源会自动更新', true));
-      window.addEventListener('offline', () => setStatus('离线模式'));
-      if (!navigator.onLine) setStatus('离线模式');
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./service-worker.js').then((reg) => {
-          if (navigator.serviceWorker.controller) {
-            setStatus(navigator.onLine ? '✓ 离线游戏已准备完成' : '离线模式', true);
+
+      const toAbs = (rel) => new URL(rel, window.location.href).href;
+
+      function updateUI() {
+        const pct = state.totalFiles ? Math.round((state.cachedFiles / state.totalFiles) * 100) : 0;
+        const allReady = state.totalGames > 0 && state.cachedGames >= state.totalGames;
+
+        if (!navigator.onLine) {
+          statusBtn.dataset.state = 'offline';
+          statusBtn.textContent = `✈ 离线模式 · ${state.cachedGames}/${state.totalGames}`;
+        } else if (state.downloading) {
+          statusBtn.dataset.state = 'busy';
+          statusBtn.textContent = `离线下载 ${pct}%`;
+        } else if (allReady) {
+          statusBtn.dataset.state = 'ready';
+          statusBtn.textContent = `✓ 全离线就绪 ${state.cachedGames}/${state.totalGames}`;
+        } else {
+          statusBtn.dataset.state = 'idle';
+          statusBtn.textContent = `⬇ 离线包 ${state.cachedGames}/${state.totalGames}`;
+        }
+
+        gamesCountEl.textContent = `${state.cachedGames} / ${state.totalGames} 款已离线`;
+        filesCountEl.textContent = `${state.cachedFiles} / ${state.totalFiles} 资源 (${pct}%)`;
+        progressFillEl.style.width = `${pct}%`;
+
+        if (state.downloading) {
+          dlBtn.textContent = `暂停下载 (${pct}%)`;
+          dlBtn.className = 'arcade-btn arcade-btn-secondary';
+          dlBtn.disabled = false;
+        } else if (!navigator.onLine) {
+          dlBtn.textContent = '当前离线，联网后可继续下载';
+          dlBtn.className = 'arcade-btn arcade-btn-secondary';
+          dlBtn.disabled = true;
+        } else if (allReady) {
+          dlBtn.textContent = '✓ 全部 17 款已可断网畅玩（点此校验补全）';
+          dlBtn.className = 'arcade-btn arcade-btn-lime';
+          dlBtn.disabled = false;
+        } else if (state.failedCount > 0) {
+          dlBtn.textContent = `重试剩余 ${state.totalFiles - state.cachedFiles} 个资源`;
+          dlBtn.className = 'arcade-btn arcade-btn-primary';
+          dlBtn.disabled = false;
+        } else {
+          dlBtn.textContent = state.cachedFiles > 0 ? '继续下载剩余离线包' : '一键下载全部离线包（约 4.1 MB）';
+          dlBtn.className = 'arcade-btn arcade-btn-primary';
+          dlBtn.disabled = false;
+        }
+
+        clearBtn.textContent = state.confirmClear ? '再点一次确认清空' : '清理离线缓存';
+        clearBtn.disabled = state.downloading;
+      }
+
+      async function inspectOfflineStatus() {
+        if (!('caches' in window)) {
+          statusBtn.textContent = '浏览器不支持离线包';
+          return;
+        }
+        try {
+          const cache = await caches.open(GAMES_CACHE);
+          const keys = await cache.keys();
+          const keySet = new Set(keys.map((r) => r.url));
+
+          let cachedFiles = 0;
+          for (const rel of ALL_UNIQUE_FILES) {
+            if (keySet.has(toAbs(rel))) cachedFiles++;
           }
-          reg.addEventListener('updatefound', () => setStatus('正在准备离线资源…'));
-        }).catch(() => setStatus('正在准备离线资源…'));
+          let cachedGames = 0;
+          for (const game of OFFLINE_GAMES) {
+            if (game.files.every((rel) => keySet.has(toAbs(rel)))) cachedGames++;
+          }
+          state.cachedFiles = cachedFiles;
+          state.cachedGames = cachedGames;
+        } catch {
+          // Ignore storage inspection error
+        }
+        updateUI();
+      }
+
+      async function fetchWithRetry(absUrl) {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 12000);
+          try {
+            const res = await fetch(absUrl, { cache: 'no-cache', signal: ctrl.signal });
+            clearTimeout(timer);
+            if (res.ok) return res;
+          } catch {
+            clearTimeout(timer);
+          }
+          if (attempt === 0) await new Promise((r) => setTimeout(r, 700));
+        }
+        return null;
+      }
+
+      async function startOrPauseDownload() {
+        if (state.downloading) {
+          state.cancelled = true;
+          modalMsgEl.textContent = '正在暂停…已下载的资源已安全保存。';
+          return;
+        }
+        if (!navigator.onLine) {
+          modalMsgEl.textContent = '当前未联网，请联网后再下载。';
+          return;
+        }
+        if (!('caches' in window)) {
+          modalMsgEl.textContent = '当前浏览器不支持离线缓存。';
+          return;
+        }
+
+        state.downloading = true;
+        state.cancelled = false;
+        state.failedCount = 0;
+        state.confirmClear = false;
+        modalMsgEl.textContent = '正在增量下载未缓存资源（4 并发防卡顿）…';
+        updateUI();
+
+        try {
+          const cache = await caches.open(GAMES_CACHE);
+          const existingKeys = new Set((await cache.keys()).map((r) => r.url));
+          const pending = ALL_UNIQUE_FILES.filter((rel) => !existingKeys.has(toAbs(rel)));
+          state.cachedFiles = ALL_UNIQUE_FILES.length - pending.length;
+          updateUI();
+
+          let cursor = 0;
+          const CONCURRENCY = 4;
+          const worker = async () => {
+            while (!state.cancelled && cursor < pending.length) {
+              const rel = pending[cursor++];
+              const absUrl = toAbs(rel);
+              const res = await fetchWithRetry(absUrl);
+              if (res) {
+                await cache.put(absUrl, res);
+                state.cachedFiles++;
+              } else {
+                state.failedCount++;
+              }
+              updateUI();
+            }
+          };
+
+          await Promise.all(Array.from({ length: Math.min(CONCURRENCY, pending.length || 1) }, worker));
+        } finally {
+          state.downloading = false;
+          await inspectOfflineStatus();
+          if (state.cancelled) {
+            modalMsgEl.textContent = `已暂停，当前已有 ${state.cachedGames}/${state.totalGames} 款可离线，随时可继续。`;
+          } else if (state.failedCount > 0) {
+            modalMsgEl.textContent = `有 ${state.failedCount} 个资源下载超时，点上方按钮可仅重试剩余项。`;
+          } else {
+            modalMsgEl.textContent = '✓ 全部 17 款本地桌游已保存，开飞行模式也能流畅畅玩！';
+          }
+          updateUI();
+        }
+      }
+
+      const openModal = async () => {
+        state.confirmClear = false;
+        modalEl.hidden = false;
+        await inspectOfflineStatus();
+      };
+      const closeModal = () => {
+        state.confirmClear = false;
+        modalEl.hidden = true;
+      };
+
+      statusBtn.addEventListener('click', openModal);
+      closeModalBtn.addEventListener('click', closeModal);
+      modalEl.addEventListener('click', (e) => {
+        if (e.target === modalEl) closeModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modalEl.hidden) closeModal();
+      });
+
+      dlBtn.addEventListener('click', startOrPauseDownload);
+
+      checkUpdateBtn.addEventListener('click', async () => {
+        if (!navigator.onLine) {
+          modalMsgEl.textContent = '当前离线，无法检查更新。';
+          return;
+        }
+        modalMsgEl.textContent = '正在检查大厅与桌游更新…';
+        try {
+          if (state.swReg) await state.swReg.update();
+          const res = await fetch('./index.html', { cache: 'no-cache' });
+          if (res.ok && 'caches' in window && manifest?.SHELL_CACHE) {
+            const shell = await caches.open(manifest.SHELL_CACHE);
+            await shell.put(toAbs('./'), res.clone());
+            await shell.put(toAbs('./index.html'), res);
+          }
+          modalMsgEl.textContent = '✓ 已拉取最新版本，如有界面改动可刷新生效。';
+        } catch {
+          modalMsgEl.textContent = '检查更新超时，请稍后再试。';
+        }
+      });
+
+      clearBtn.addEventListener('click', async () => {
+        if (!state.confirmClear) {
+          state.confirmClear = true;
+          modalMsgEl.textContent = '清理后需要联网或重新下载才能离线游玩，再次点击确认。';
+          updateUI();
+          return;
+        }
+        state.confirmClear = false;
+        if ('caches' in window) {
+          await caches.delete(GAMES_CACHE);
+        }
+        state.failedCount = 0;
+        await inspectOfflineStatus();
+        modalMsgEl.textContent = '已清理所有游戏离线包，大厅仍保持秒开。';
+      });
+
+      // Update toast handlers
+      const showUpdateToast = () => { updateToast.hidden = false; };
+      document.getElementById('btn-reload-now').addEventListener('click', () => window.location.reload());
+      document.getElementById('btn-dismiss-update').addEventListener('click', () => { updateToast.hidden = true; });
+
+      window.addEventListener('online', () => {
+        inspectOfflineStatus();
+      });
+      window.addEventListener('offline', () => {
+        updateUI();
+      });
+
+      // --- 3. Service Worker Lifecycle (Zero Stuck Status + Auto Update Detection!) ---
+      if ('serviceWorker' in navigator) {
+        const hadController = Boolean(navigator.serviceWorker.controller);
+
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data?.type === 'HUB_UPDATE_READY') {
+            showUpdateToast();
+          }
+        });
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          inspectOfflineStatus();
+          if (hadController) {
+            showUpdateToast();
+          }
+        });
+
+        navigator.serviceWorker
+          .register('./service-worker.js')
+          .then((reg) => {
+            state.swReg = reg;
+            reg.addEventListener('updatefound', () => {
+              const installing = reg.installing;
+              if (!installing) return;
+              installing.addEventListener('statechange', () => {
+                if (installing.state === 'activated') {
+                  inspectOfflineStatus();
+                  if (hadController) showUpdateToast();
+                }
+              });
+            });
+            inspectOfflineStatus();
+          })
+          .catch(() => {
+            inspectOfflineStatus();
+          });
+      } else {
+        inspectOfflineStatus();
       }
     })();
   </script>

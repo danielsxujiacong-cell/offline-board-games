@@ -1,194 +1,151 @@
-const CACHE_NAME = 'daniel-board-games-v57-arcade-hub';
-const PRECACHE = [
-  './zhangnan/',
-  './zhangnan/index.html',
-  './zhangnan/style.css',
-  './zhangnan/data.js',
-  './zhangnan/engine.js',
-  './zhangnan/app.js',
-  './zhangnan/assets/character.webp',
-  './zhangnan/assets/blink.webp',
-  './zhangnan/assets/talk.webp',
-  './zhangnan/assets/spark.svg',
-  './games/hanamikoji/art.js',
-  './games/hanamikoji/online/',
-  './games/hanamikoji/online/index.html',
-  './games/hanamikoji/online/client.js',
-  './games/hanamikoji/online/config.js',
-  './games/hanamikoji/online/online.css',
-  './games/hanamikoji/online/vendor/supabase.js',
-  './wavelength/',
-  './wavelength/index.html',
-  './wavelength/style.css',
-  './wavelength/prompts.js',
-  './wavelength/questions.json',
-  './wavelength/app.js',
-  './wavelength/report.js',
-  './wavelength/spectrum.js',
-  './wavelength/online/',
-  './wavelength/online/index.html',
-  './wavelength/online/client.js',
-  './wavelength/online/config.js',
-  './wavelength/online/online.css',
-  './sheriff/',
-  './sheriff/index.html',
-  './sheriff/style.css',
-  './sheriff/style.css?v=compact-1',
-  './sheriff/app.js',
-  './sheriff/app.js?v=compact-1',
-  './sheriff/art.js',
-  './sheriff/art.js?v=compact-1',
-  './sheriff/assets/gate.webp',
-  './sheriff/engine.js',
-  './sheriff/RULES.md',
-  './sheriff/DEVELOPMENT.md',
-  './tragedy-looper/',
-  './tragedy-looper/index.html',
-  './tragedy-looper/src/app.js',
-  './tragedy-looper/src/components/CardSelection.js',
-  './tragedy-looper/src/components/CharacterCard.js',
-  './tragedy-looper/src/components/DeductionMatrix.js',
-  './tragedy-looper/src/components/GMMasterPanel.js',
-  './tragedy-looper/src/components/IncidentChecklist.js',
-  './tragedy-looper/src/components/LocationBoard.js',
-  './tragedy-looper/src/components/ResolutionPanel.js',
-  './tragedy-looper/src/components/shared.js',
-  './tragedy-looper/src/data/action-cards.json',
-  './tragedy-looper/src/data/characters.json',
-  './tragedy-looper/src/data/incidents.json',
-  './tragedy-looper/src/data/locations.json',
-  './tragedy-looper/src/data/plots.json',
-  './tragedy-looper/src/data/roles.json',
-  './tragedy-looper/src/data/schema.json',
-  './tragedy-looper/src/data/scripts/prevailing-secrecy.json',
-  './tragedy-looper/src/data/scripts/the-first-script.json',
-  './tragedy-looper/src/state/abilities.js',
-  './tragedy-looper/src/state/conditions.js',
-  './tragedy-looper/src/state/game-state.js',
-  './tragedy-looper/src/state/incidents.js',
-  './tragedy-looper/src/state/persistence.js',
-  './tragedy-looper/src/state/phase-machine.js',
-  './tragedy-looper/src/state/resolution.js',
-  './tragedy-looper/style.css',
-  './lost-cities/',
-  './lost-cities/index.html',
-  './lost-cities/style.css',
-  './lost-cities/app.js',
-  './lost-cities/engine.js',
-  './lost-cities/storage.js',
-  './jaipur/',
-  './jaipur/index.html',
-  './jaipur/style.css',
-  './jaipur/app.js',
-  './jaipur/engine.js',
-  './games/hanamikoji/',
-  './games/hanamikoji/index.html',
-  './games/hanamikoji/style.css',
-  './games/hanamikoji/app.js',
-  './games/hanamikoji/engine.js',
-  './games/friend-court/',
-  './games/friend-court/index.html',
-  './games/friend-court/styles.css',
-  './games/friend-court/questions.js',
-  './games/friend-court/app.js',
-  './wasabi-roulette/',
-  './wasabi-roulette/index.html',
-  './two-faced/',
-  './two-faced/index.html',
-  './fun-employed/',
-  './fun-employed/index.html',
-  './assets/party.css',
-  './assets/party-data.js',
-  './assets/party.js',
-  './pass-the-bomb/',
-  './pass-the-bomb/index.html',
-  './pass-the-bomb/styles.css',
-  './pass-the-bomb/app.js',
-  ...['word', 'scene', 'brainstorm'].flatMap(mode => ['normal', 'hard', 'extreme'].map(level => `./pass-the-bomb/data/${mode}-${level}.tsv`)),
-  './',
-  './games/fake-artist-new-york/',
-  './games/fake-painter/',
-  './games/pick-one-for-me/',
-  './games/spyfall/',
-  './games/werewords-companion/',
-  './games/just-one/',
-  './games/just-one/index.html',
-  './games/just-one/styles.css',
-  './games/just-one/app.js',
-  './games/just-one/data/normal.csv',
-  './games/just-one/data/hard.csv',
-  './games/just-one/data/insane.csv',
-  './assets/home-link.js',
-  './assets/icon.svg',
-  './assets/favicon.svg?v=1',
-  './games/fake-artist-new-york/data/words.js',
-  './games/fake-artist-new-york/index.html',
-  './games/fake-painter/app.js',
-  './games/fake-painter/assets/cards/card_001.svg',
-  './games/fake-painter/assets/cards/card_001.webp',
-  './games/fake-painter/assets/cards/card_002.svg',
-  './games/fake-painter/assets/cards/card_002.webp',
-  './games/fake-painter/assets/cards/card_003.svg',
-  './games/fake-painter/assets/cards/card_003.webp',
-  './games/fake-painter/assets/cards/card_004.svg',
-  './games/fake-painter/assets/cards/card_004.webp',
-  './games/fake-painter/assets/cards/card_005.svg',
-  './games/fake-painter/assets/cards/card_005.webp',
-  './games/fake-painter/assets/cards/card_006.webp',
-  './games/fake-painter/assets/cards/card_007.webp',
-  './games/fake-painter/assets/cards/card_008.webp',
-  './games/fake-painter/assets/cards/card_009.webp',
-  './games/fake-painter/assets/cards/card_010.webp',
-  './games/fake-painter/assets/cards/card_011.webp',
-  './games/fake-painter/assets/cards/card_012.webp',
-  './games/fake-painter/data/cards_batch_template.json',
-  './games/fake-painter/data/cards.js',
-  './games/fake-painter/data/cards.json',
-  './games/fake-painter/discard.css',
-  './games/fake-painter/fullscreen.css',
-  './games/fake-painter/index.html',
-  './games/fake-painter/responsive.css',
-  './games/fake-painter/scripts/import-cards.js',
-  './games/fake-painter/scripts/validate-cards.js',
-  './games/fake-painter/styles.css',
-  './games/pick-one-for-me/app.js',
-  './games/pick-one-for-me/feedback.css',
-  './games/pick-one-for-me/index.html',
-  './games/pick-one-for-me/styles.css',
-  './games/spyfall/app.js',
-  './games/spyfall/index.html',
-  './games/spyfall/styles.css',
-  './games/werewords-companion/group.png',
-  './games/werewords-companion/index.html',
-  './games/werewords-companion/reward.png',
-  './games/werewords-companion/werewords.css',
-  './index.html',
-  './manifest.webmanifest',
-  './service-worker.js'
-];
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
+// Two-tier Service Worker for Daniel's Board Games:
+// 1) SHELL_CACHE (< 45 KB): instant install on first visit, never blocks on 4.7 MB of games.
+// 2) GAMES_CACHE (persistent): auto-caches any game as you play, plus supports on-demand batch download
+//    without ever wiping already-downloaded game artwork when hub UI updates.
+importScripts('./assets/offline-manifest.js');
+
+const { SHELL_CACHE, GAMES_CACHE, SHELL_FILES } = self.OFFLINE_MANIFEST;
+const KEEP_CACHES = new Set([SHELL_CACHE, GAMES_CACHE]);
+const IMMUTABLE_MEDIA_RE = /\.(webp|png|jpg|jpeg|gif|svg|ico|woff2?)$/i;
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches
+      .open(SHELL_CACHE)
+      .then((cache) =>
+        Promise.all(
+          SHELL_FILES.map((url) =>
+            fetch(url, { cache: 'no-cache' })
+              .then((res) => (res.ok ? cache.put(url, res) : null))
+              .catch(() => null),
+          ),
+        ),
+      )
+      .then(() => self.skipWaiting()),
+  );
 });
-self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => !KEEP_CACHES.has(k)).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
+  );
 });
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
-  if (new URL(event.request.url).pathname === new URL('./wavelength/questions.json', self.registration.scope).pathname) {
-    event.respondWith((async () => {
-      try {
-        const response = await fetch(event.request, {cache: 'no-store'});
-        if (!response.ok) throw new Error('Question library unavailable');
-        const cache = await caches.open(CACHE_NAME);
-        await cache.put(event.request, response.clone());
-        return response;
-      } catch (error) {
-        const cached = await caches.match(event.request);
-        if (cached) return cached;
-        return new Response('Question library unavailable', {status: 503});
-      }
-    })());
+
+async function notifyClients(message) {
+  const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  for (const client of list) {
+    client.postMessage(message);
+  }
+}
+
+function responseChanged(prev, next) {
+  if (!prev || !next) return false;
+  const e1 = prev.headers.get('etag');
+  const e2 = next.headers.get('etag');
+  if (e1 && e2) return e1 !== e2;
+  const lm1 = prev.headers.get('last-modified');
+  const lm2 = next.headers.get('last-modified');
+  if (lm1 && lm2) return lm1 !== lm2;
+  const cl1 = prev.headers.get('content-length');
+  const cl2 = next.headers.get('content-length');
+  if (cl1 && cl2) return cl1 !== cl2;
+  return false;
+}
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  const scopeUrl = new URL('./', self.registration.scope);
+  const wavelengthQ = new URL('./wavelength/questions.json', scopeUrl).pathname;
+
+  // Keep Wavelength questions fresh when online, offline fallback to GAMES_CACHE
+  if (url.pathname === wavelengthQ) {
+    event.respondWith(
+      (async () => {
+        try {
+          const response = await fetch(req, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Question library unavailable');
+          const cache = await caches.open(GAMES_CACHE);
+          await cache.put(req, response.clone());
+          return response;
+        } catch {
+          const cached = await caches.match(req);
+          return cached || new Response('Question library unavailable', { status: 503 });
+        }
+      })(),
+    );
     return;
   }
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)); return response; }).catch(() => caches.match('./index.html'))));
+
+  const isHubRoot = url.pathname === scopeUrl.pathname || url.pathname === new URL('./index.html', scopeUrl).pathname;
+  const isNav = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('.html');
+
+  // Immutable media assets: Cache-First in GAMES_CACHE / SHELL_CACHE
+  if (IMMUTABLE_MEDIA_RE.test(url.pathname)) {
+    event.respondWith(
+      caches.match(req).then((cached) => {
+        if (cached) return cached;
+        return fetch(req).then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(GAMES_CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        });
+      }),
+    );
+    return;
+  }
+
+  // HTML navigations & JS/CSS/data: Stale-While-Revalidate (instant paint + silent background update!)
+  const targetCacheName = isHubRoot || url.pathname.includes('/assets/offline-manifest.js') ? SHELL_CACHE : GAMES_CACHE;
+
+  event.respondWith(
+    (async () => {
+      const cached =
+        (await caches.match(req)) ||
+        (url.pathname.endsWith('/index.html')
+          ? await caches.match(new URL('./', req.url).href)
+          : url.pathname.endsWith('/')
+            ? await caches.match(new URL('./index.html', req.url).href)
+            : null);
+      const networkPromise = fetch(req, { cache: 'no-cache' })
+        .then(async (res) => {
+          if (res.ok) {
+            const changed = isHubRoot && cached && responseChanged(cached, res);
+            const cache = await caches.open(targetCacheName);
+            await cache.put(req, res.clone());
+            if (isHubRoot) {
+              await cache.put(scopeUrl.href, res.clone());
+              await cache.put(new URL('./index.html', scopeUrl).href, res.clone());
+            } else if (url.pathname.endsWith('/index.html')) {
+              await cache.put(new URL('./', req.url).href, res.clone());
+            }
+            if (changed) {
+              notifyClients({ type: 'HUB_UPDATE_READY' });
+            }
+          }
+          return res;
+        })
+        .catch(() => null);
+
+      if (cached) {
+        event.waitUntil(networkPromise);
+        return cached;
+      }
+
+      const fresh = await networkPromise;
+      if (fresh) return fresh;
+      if (isNav) {
+        return (await caches.match(new URL('./index.html', scopeUrl).href)) || new Response('离线不可用', { status: 503 });
+      }
+      return new Response('Offline', { status: 503 });
+    })(),
+  );
 });
