@@ -10,7 +10,7 @@ const client=createClient(config.url,config.publishableKey,{auth:{storageKey:'wa
 
 let user=null,room=null,channel=null,liveChannel=null,liveReady=false,busy=false,syncing=false,pending=null,connected=navigator.onLine,subscribedRoom=null;
 let maskPeek=false,showHint=false,ghostGuess=null,partnerTyping=false,typingTimer=null,lastRevealKey='',recordedGame=null,danmakuSlot=0;
-const roomKey='wavelength-online-room-v1',pendingKey='wavelength-online-pending-v1',prefsKey='wavelength-online-prefs-v2';
+const roomKey='wavelength-online-room-v1',pendingKey='wavelength-online-pending-v1',prefsKey='wavelength-online-prefs-v3',legacyPrefsKey='wavelength-online-prefs-v2';
 
 const messages={
   unauthorized:'身份已失效，请点击重新同步。',
@@ -42,7 +42,19 @@ const REACTIONS=[
 ];
 
 const storage={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}},remove:k=>{try{localStorage.removeItem(k)}catch{}}};
-const readPrefs=()=>{try{return JSON.parse(storage.get(prefsKey)||'null')||{}}catch{return {}}};
+const readPrefs=()=>{
+  try{
+    const cur=storage.get(prefsKey);
+    if(cur)return JSON.parse(cur)||{};
+    const old=JSON.parse(storage.get(legacyPrefsKey)||'null');
+    if(old&&typeof old==='object'){
+      const migrated={...(old.mode?{mode:old.mode}:{})};
+      storage.set(prefsKey,JSON.stringify(migrated));
+      return migrated;
+    }
+    return {};
+  }catch{return {}}
+};
 const savePrefs=p=>storage.set(prefsKey,JSON.stringify({...readPrefs(),...p}));
 const randomNickname=()=>['糯米团子','芝麻汤圆','小熊软糖','橘子汽水','奶油泡芙','焦糖布丁','摸鱼小猫','打盹小熊'][Math.floor(Math.random()*8)];
 let nickname=storage.get('wavelength-online-name')?.trim()||randomNickname();

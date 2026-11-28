@@ -8,7 +8,7 @@
   ];
 
   root.OFFLINE_MANIFEST = {
-    SHELL_CACHE: 'daniel-hub-shell-v62',
+    SHELL_CACHE: 'daniel-hub-shell-v63',
     GAMES_CACHE: 'daniel-games-assets-v1',
     SHELL_FILES: [
       './',

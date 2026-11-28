@@ -8,12 +8,12 @@ JS_OUT = ROOT / "wavelength" / "questions-data.js"
 EDGE_OUT = ROOT / "supabase" / "functions" / "_shared" / "wavelength" / "questions.json"
 
 EXPECTED_PACKS = {
-    "边界与直觉": 35,
-    "吃喝与消费": 35,
-    "生活与脑洞": 35,
-    "观点与社交": 35,
-    "情侣日常": 40,
-    "微醺暧昧": 30,
+    "边界与直觉": 65,
+    "吃喝与消费": 55,
+    "生活与脑洞": 60,
+    "观点与社交": 55,
+    "情侣日常": 70,
+    "微醺暧昧": 55,
 }
 
 def main():
@@ -30,8 +30,8 @@ def main():
         for field_name, val in [("category", cat), ("left", left), ("right", right), ("hints", hints)]:
             assert isinstance(val, str) and val.strip() == val and len(val) > 0, f"Row {idx} {field_name} invalid: {val!r}"
             assert "\n" not in val and "\r" not in val and "<" not in val and ">" not in val, f"Row {idx} illegal chars: {val!r}"
-        assert 1 <= len(left) <= 6, f"Row {idx} left too long ({len(left)}): {left!r}"
-        assert 1 <= len(right) <= 6, f"Row {idx} right too long ({len(right)}): {right!r}"
+        assert 1 <= len(left) <= 5, f"Row {idx} left too long ({len(left)}): {left!r}"
+        assert 1 <= len(right) <= 5, f"Row {idx} right too long ({len(right)}): {right!r}"
         assert left != right, f"Row {idx} identical endpoints: {left!r}"
         assert 2 <= len(hints) <= 40, f"Row {idx} hints invalid length: {hints!r}"
 

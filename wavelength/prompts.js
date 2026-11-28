@@ -6,10 +6,10 @@ export const PACK_META={
   '生活与脑洞':{icon:'🧠',desc:'脑回路 · 离谱对比'},
   '观点与社交':{icon:'🗣️',desc:'价值观 · 社交拉扯'},
   '情侣日常':{icon:'💕',desc:'恋爱细节 · 求生欲'},
-  '微醺暧昧':{icon:'🍷',desc:'默认关闭 · 夜晚微醺'},
+  '微醺暧昧':{icon:'🍷',desc:'深夜私密 · 成人幽默'},
 };
 
-export const DEFAULT_OFF_PACKS=new Set(['微醺暧昧']);
+export const DEFAULT_OFF_PACKS=new Set();
 export const prompts=QUESTIONS.map(([category,left,right,hints=''],i)=>({id:`q-${i}`,category,left,right,hints}));
 export const packs=Object.fromEntries(
   [...new Set(prompts.map(p=>p.category))].map(category=>[category,prompts.filter(p=>p.category===category).length])

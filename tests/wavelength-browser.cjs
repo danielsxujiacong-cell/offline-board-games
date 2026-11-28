@@ -9,8 +9,8 @@ const assert=require('node:assert/strict');
   try{
     await page.goto(base+'/wavelength/');
     assert.equal(await page.locator('[name=pack][value="情侣日常"]').isChecked(),true);
-    assert.equal(await page.locator('[name=pack][value="微醺暧昧"]').isChecked(),false);
-    assert.equal(await page.locator('[name=pack]:checked').count(),5);
+    assert.equal(await page.locator('[name=pack][value="微醺暧昧"]').isChecked(),true);
+    assert.equal(await page.locator('[name=pack]:checked').count(),6);
     assert.equal(await page.locator('.scale').count(),0);
     for(const width of [320,390,768,1280]){
       await page.setViewportSize({width,height:844});
@@ -62,6 +62,6 @@ const assert=require('node:assert/strict');
     assert.equal(await page.locator('.history article').count(),7);
     assert.ok((await page.locator('.score').innerText()).includes(String(expected)));
     assert.deepEqual(errors,[]);
-    console.log('PASS: 210 short cards, default 5 packs + spicy off, pure intuition bar, oral clue, bonus +1 round, report');
+    console.log('PASS: 360 short cards, default all 6 packs on, pure intuition bar, oral clue, bonus +1 round, report');
   }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});

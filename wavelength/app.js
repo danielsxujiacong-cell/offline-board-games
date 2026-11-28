@@ -6,10 +6,20 @@ const app=document.querySelector('#app');
 let s=null,peeked=false,targetVisible=false,showHint=false;
 const $=q=>document.querySelector(q);
 const escape=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const PREF_KEY='wavelength-prefs-v2';
+const PREF_KEY='wavelength-prefs-v3',LEGACY_PREF_KEY='wavelength-prefs-v2';
 
 function readPrefs(){
-  try{return JSON.parse(localStorage.getItem(PREF_KEY)||'null')||{}}catch{return {}}
+  try{
+    const cur=localStorage.getItem(PREF_KEY);
+    if(cur)return JSON.parse(cur)||{};
+    const old=JSON.parse(localStorage.getItem(LEGACY_PREF_KEY)||'null');
+    if(old&&typeof old==='object'){
+      const migrated={...(old.names?{names:old.names}:{}),...(old.mode?{mode:old.mode}:{})};
+      localStorage.setItem(PREF_KEY,JSON.stringify(migrated));
+      return migrated;
+    }
+    return {};
+  }catch{return {}}
 }
 function savePrefs(patch){
   try{localStorage.setItem(PREF_KEY,JSON.stringify({...readPrefs(),...patch}))}catch{}
