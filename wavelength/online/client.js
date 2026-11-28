@@ -8,8 +8,8 @@ const app=document.querySelector('#online-app'),status=document.querySelector('#
 const $=s=>app.querySelector(s),escape=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const client=createClient(config.url,config.publishableKey,{auth:{storageKey:'wavelength-auth-v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 
-let user=null,room=null,channel=null,liveChannel=null,busy=false,syncing=false,pending=null,connected=navigator.onLine,subscribedRoom=null;
-let maskPeek=false,showHint=false,ghostGuess=null,partnerTyping=false,typingTimer=null,lastRevealKey='',recordedGame=null;
+let user=null,room=null,channel=null,liveChannel=null,liveReady=false,busy=false,syncing=false,pending=null,connected=navigator.onLine,subscribedRoom=null;
+let maskPeek=false,showHint=false,ghostGuess=null,partnerTyping=false,typingTimer=null,lastRevealKey='',recordedGame=null,danmakuSlot=0;
 const roomKey='wavelength-online-room-v1',pendingKey='wavelength-online-pending-v1',prefsKey='wavelength-online-prefs-v2';
 
 const messages={
@@ -54,12 +54,15 @@ function readDraft(){try{return JSON.parse(sessionStorage.getItem(draftKey()))||
 function draft(value){try{sessionStorage.setItem(draftKey(),JSON.stringify({...readDraft(),...value}))}catch{}}
 function hide(){document.querySelector('#secret-track')?.classList.add('hidden-target')}
 
-function showToast(text){
+function showToast(text,fromPartner=false){
   const el=document.createElement('div');
-  el.className='reaction-toast';
+  el.className=`reaction-toast${fromPartner?' partner':''}`;
+  const slots=['22%','30%','38%'];
+  el.style.bottom=slots[danmakuSlot%slots.length];
+  danmakuSlot++;
   el.textContent=text;
   document.body.append(el);
-  setTimeout(()=>el.remove(),1750);
+  setTimeout(()=>el.remove(),2100);
 }
 
 async function copyText(text){
@@ -170,7 +173,7 @@ function apply(snapshot){
 }
 
 function broadcast(event,payload){
-  if(!liveChannel)return;
+  if(!liveChannel){if(room)void subscribe();return}
   void liveChannel.send({type:'broadcast',event,payload});
 }
 
@@ -221,9 +224,9 @@ async function subscribe(){
     });
 
   liveChannel=client.channel('wavelength-live-'+id,{config:{broadcast:{self:false}}})
-    .on('broadcast',({event,payload})=>{
+    .on('broadcast',{event:'dial'},({payload})=>{
       if(room?.id!==id)return;
-      if(event==='dial'&&room.board?.phase==='guess'&&room.seat===room.board.sender&&typeof payload?.value==='number'){
+      if(room.board?.phase==='guess'&&room.seat===room.board.sender&&typeof payload?.value==='number'){
         ghostGuess=Math.max(0,Math.min(100,Math.round(payload.value)));
         const ghost=document.querySelector('#ghost-needle');
         if(ghost){
@@ -232,7 +235,11 @@ async function subscribe(){
         }
         const tip=document.querySelector('#watch-tip');
         if(tip)tip.textContent='搭档正在调频犹豫中…（实时指针围观）';
-      }else if(event==='typing'&&room.board?.phase==='sender'&&room.seat!==room.board.sender){
+      }
+    })
+    .on('broadcast',{event:'typing'},()=>{
+      if(room?.id!==id)return;
+      if(room.board?.phase==='sender'&&room.seat!==room.board.sender){
         partnerTyping=true;
         const pill=document.querySelector('#typing-pill');
         if(pill)pill.hidden=false;
@@ -242,11 +249,15 @@ async function subscribe(){
           const p=document.querySelector('#typing-pill');
           if(p)p.hidden=true;
         },2600);
-      }else if(event==='react'&&payload?.label){
-        showToast(`${room.names[1-room.seat]||'搭档'}：${payload.label}`);
       }
     })
-    .subscribe();
+    .on('broadcast',{event:'react'},({payload})=>{
+      if(room?.id!==id||!payload?.label)return;
+      const who=payload.from||room.names[1-room.seat]||'搭档';
+      showToast(`${who}：${payload.label}`,true);
+      navigator.vibrate?.(15);
+    })
+    .subscribe(state=>{liveReady=state==='SUBSCRIBED'});
 }
 
 async function sync(){
@@ -349,7 +360,7 @@ function confirmLeave(){
 }
 
 async function finishLeave(){
-  storage.remove(roomKey);room=null;subscribedRoom=null;
+  storage.remove(roomKey);room=null;subscribedRoom=null;liveReady=false;
   if(channel)await client.removeChannel(channel);
   if(liveChannel)await client.removeChannel(liveChannel);
   channel=null;liveChannel=null;
@@ -434,7 +445,7 @@ function render(){
         recordedGame=`${room.id}:${room.game}`;
         bestNote=isNewScore?`<div class="badge bonus">🎉 刷新最高分纪录：${best.bestScore} 分！</div>`:'';
       }
-      content=`<div class="panel report-panel"><div class="eyebrow">SESSION COMPLETE / 联机默契战报</div><h2>${room.names.map(escape).join(' × ')}</h2>${bestNote}<div class="score">${total}<span style="font-size:20px"> / ${maxScore}</span></div><h2>${rating(total,b.history.length)}</h2><p class="small">共 ${b.history.length} 回合 · 同步率 ${Math.round(total/maxScore*100)}%${b.bonusRounds?` · 续命 +${b.bonusRounds}`:''}${b.maxStreak>1?` · 最高 ${b.maxStreak} 连击`:''}</p><div class="history">${b.history.map((r,i)=>`<article><span class="eyebrow">${String(i+1).padStart(2,'0')} / ${escape(r.sender)} 发射${r.bonus?' · +1续命':''}</span><p>${escape(r.left)} ↔ ${escape(r.right)}</p><p><strong>「${escape(r.clue)}」</strong> · +${r.points} 分</p></article>`).join('')}</div><div class="tools"><button id="save-image">保存战报图片</button><button id="print">打印 / PDF</button></div><p id="share-status" class="small" role="status"></p><button data-mutation data-send="return" class="primary wide">同房间再来一局 ↗</button></div>`;
+      content=`<div class="panel report-panel"><div class="eyebrow">SESSION COMPLETE / 联机默契战报</div><h2>${room.names.map(escape).join(' × ')}</h2>${bestNote}<div class="score">${total}<span style="font-size:20px"> / ${maxScore}</span></div><h2>${rating(total,b.history.length)}</h2><p class="small">共 ${b.history.length} 回合 · 同步率 ${Math.round(total/maxScore*100)}%${b.bonusRounds?` · 续命 +${b.bonusRounds}`:''}${b.maxStreak>1?` · 最高 ${b.maxStreak} 连击`:''}</p><div class="history">${b.history.map((r,i)=>`<article><span class="eyebrow">${String(i+1).padStart(2,'0')} / ${escape(r.sender)} 发射${r.bonus?' · +1续命':''}</span><p>${escape(r.left)} ↔ ${escape(r.right)}</p><p><strong>「${escape(r.clue)}」</strong> · +${r.points} 分</p></article>`).join('')}</div><div class="tools"><button id="save-image" class="wx-btn">🖼️ 战报海报 · 发微信</button><button id="print">打印 / PDF</button></div><p id="share-status" class="small" role="status"></p><button data-mutation data-send="return" class="primary wide">同房间再来一局 ↗</button></div>`;
     }
 
     const totalNow=b?b.history.reduce((n,r)=>n+r.points,0):0;
@@ -490,7 +501,7 @@ function render(){
         btn.onclick=()=>{
           const label=btn.dataset.react;
           showToast(`我：${label}`);
-          broadcast('react',{label});
+          broadcast('react',{label,from:room.names[room.seat]});
         };
       });
     }

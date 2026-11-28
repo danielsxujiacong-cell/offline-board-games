@@ -122,7 +122,12 @@ input[type=text],select{width:100%;min-height:42px;border:1px solid var(--line);
 /* Reactions bar & floating toast */
 .reactions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 4px}
 .react-btn{min-height:36px;padding:6px 4px;font-size:12px;background:#15312e;border-radius:10px;white-space:nowrap}
-.reaction-toast{position:fixed;left:50%;bottom:24%;transform:translateX(-50%);background:#132c2bf0;border:1.5px solid var(--lime);color:#fff;padding:10px 18px;border-radius:99px;font-size:15px;font-weight:750;z-index:30;pointer-events:none;box-shadow:0 12px 32px #00000066;animation:toast-up 1.7s cubic-bezier(.22,1,.36,1) forwards}
+.reaction-toast{position:fixed;left:50%;bottom:24%;transform:translateX(-50%);background:#132c2bf0;border:1.5px solid var(--lime);color:#fff;padding:10px 18px;border-radius:99px;font-size:15px;font-weight:750;z-index:30;pointer-events:none;white-space:nowrap;box-shadow:0 12px 32px #00000066;animation:toast-up 2s cubic-bezier(.22,1,.36,1) forwards}
+.reaction-toast.partner{border-color:var(--amber);background:#25201bf2;color:#ffe6d2}
+.wx-btn{background:#07c160;color:#fff;border:0;font-weight:800}
+.wx-btn:hover{background:#06ae56}
+.wx-poster-tip{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#07c1601f;border:1px solid #07c16066;color:#d6ffe7;font-size:12.5px;line-height:1.5}
+.wx-poster-tip[hidden]{display:none}
 
 .history{display:grid;gap:10px;margin-top:12px}
 .history article{border-top:1px solid var(--line);padding:12px 0}
@@ -144,9 +149,10 @@ footer{text-align:center;margin-top:16px;font-size:11px;color:var(--muted)}
 .report-export{max-width:680px;padding:20px}
 .report-export h2{font-size:22px;margin:0}
 .report-export .topline{align-items:flex-start}
-.export-actions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.export-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .export-actions[hidden]{display:none}
-.export-download{display:flex;align-items:center;justify-content:center;border-radius:12px;padding:12px 16px;min-height:44px}
+.export-actions button,.export-actions a{flex:1 1 135px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;padding:10px 14px;font-size:13.5px}
+.export-download{text-align:center}
 .export-image{display:block;width:100%;height:auto;border-radius:10px;user-select:auto;-webkit-user-select:auto}
 .export-image[hidden]{display:none}
 
