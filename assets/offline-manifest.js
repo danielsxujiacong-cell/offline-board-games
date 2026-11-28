@@ -8,7 +8,7 @@
   ];
 
   root.OFFLINE_MANIFEST = {
-    SHELL_CACHE: 'daniel-hub-shell-v61',
+    SHELL_CACHE: 'daniel-hub-shell-v62',
     GAMES_CACHE: 'daniel-games-assets-v1',
     SHELL_FILES: [
       './',
@@ -45,6 +45,7 @@
           './wavelength/questions-data.js',
           './wavelength/questions.json',
           './wavelength/share-icon.png',
+          './wavelength/wx-icon.png',
           './wavelength/app.js',
           './wavelength/report.js',
           './wavelength/spectrum.js',
